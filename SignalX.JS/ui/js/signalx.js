@@ -12,9 +12,11 @@
         signalx.debug.f && signalx.debug.f(o);
     };
     signalx.waitingList = function (n, f) {
-        signalx.waitingList.w = signalx.waitingList.w || {};
+        if (n && f) {
         signalx.waitingList.w[n] = f;
+        }
     };
+    signalx.waitingList.w = signalx.waitingList.w || {};
     //debug
     debuging("starting lib");
     if (window.signalx && window.signalx.server && window.signalx.error) {

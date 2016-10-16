@@ -38,7 +38,10 @@ namespace SignalXLib.Lib
         }
 
         public  HubConfiguration HubConfiguration { get; set; }
-
+        internal static bool AllowDynamicServerInternal { set; get; }
+        public  bool AllowDynamicServer {
+            set { AllowDynamicServer = value; }
+        }
         public IDisposable MyApp { get; set; }
        
         public void Dispose()
@@ -50,23 +53,16 @@ namespace SignalXLib.Lib
 
         public static void Server(string name, Action<object, object,string, string> server)
         {
-            if (_signalXServers.ContainsKey(name))
+            
+            if (_signalXServers.ContainsKey(name) && !AllowDynamicServerInternal)
             {
                 throw new Exception("Server with name '" + name + "' already created");
             }
-            var added = _signalXServers.TryAdd(name, server);
+             _signalXServers[name]= server;
             var camelCased = Char.ToLowerInvariant(name[0]) + name.Substring(1);
-            if (!_signalXServers.ContainsKey(camelCased))
-            {
-                added = _signalXServers.TryAdd(camelCased, server);//&&added;
-            }
-
+               _signalXServers[camelCased]= server; //&&added;
             var unCamelCased = Char.ToUpperInvariant(name[0]) + name.Substring(1);
-            if (!_signalXServers.ContainsKey(unCamelCased))
-            {
-                added = _signalXServers.TryAdd(unCamelCased, server);//&&added;
-            }
-            
+              _signalXServers[unCamelCased]= server;//&&added;
         }
 
         public static void Server(string name, Action<object, object,string> server)
