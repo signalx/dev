@@ -1,0 +1,30 @@
+{
+  "name": "signalx",
+  "version": "0.1.1",
+  "description": "Real time client server communication made easy",
+  "main": "SignalX/SignalX.JS/index.js",
+  "authors": [
+    "sam bamgboye"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "signalx",
+    "signalr",
+    "realtime",
+    "client",
+    "server"
+  ],
+  "homepage": "https://github.com/signalx/signalx",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~3.1.1",
+    "signalr": "~2.2.1"
+  }
+}

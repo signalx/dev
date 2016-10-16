@@ -1,0 +1,75 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.Tests", "SignalX.Tests\SignalXLib.Tests.csproj", "{895C5069-69E4-48C2-BEDD-7C9F7B1BF93D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.Lib", "SignalX.SignalXLib\SignalXLib.Lib.csproj", "{689AA72B-541C-48F8-BAB9-DF439B1C7108}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.SignalXUI", "SignalX.SignalXUI\SignalXLib.SignalXUI.csproj", "{056CC502-E875-40E7-A591-881D55D88971}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.TestsNuget", "SignalX.Tests2\SignalXLib.TestsNuget.csproj", "{FA3967AE-BFDA-4798-A130-1079660EB311}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.fsproj", "{104285B8-6851-4963-9E72-950BCC96D185}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.JS", "SignalX.JS\SignalXLib.JS.csproj", "{91D39FD0-DA2C-4A85-9E44-944BF943A6C2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QA", "QA", "{2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{D43AD249-FAA7-43A0-9D82-388E2830B8D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplicationCSharp", "ConsoleApplicationCSharp\ConsoleApplicationCSharp.csproj", "{2A43A64E-78A0-430E-8E10-93AAA25BF60E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LinqPad", "LinqPad", "{772E9DB3-3BF7-49A9-9717-AE7AEC8500EC}"
+	ProjectSection(SolutionItems) = preProject
+		LinqPadSamples\signalx_callback.linq = LinqPadSamples\signalx_callback.linq
+		LinqPadSamples\signalx_handler.linq = LinqPadSamples\signalx_handler.linq
+		LinqPadSamples\signalx_promise.linq = LinqPadSamples\signalx_promise.linq
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{895C5069-69E4-48C2-BEDD-7C9F7B1BF93D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{895C5069-69E4-48C2-BEDD-7C9F7B1BF93D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{895C5069-69E4-48C2-BEDD-7C9F7B1BF93D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{895C5069-69E4-48C2-BEDD-7C9F7B1BF93D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{689AA72B-541C-48F8-BAB9-DF439B1C7108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{689AA72B-541C-48F8-BAB9-DF439B1C7108}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{689AA72B-541C-48F8-BAB9-DF439B1C7108}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{689AA72B-541C-48F8-BAB9-DF439B1C7108}.Release|Any CPU.Build.0 = Release|Any CPU
+		{056CC502-E875-40E7-A591-881D55D88971}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{056CC502-E875-40E7-A591-881D55D88971}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{056CC502-E875-40E7-A591-881D55D88971}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{056CC502-E875-40E7-A591-881D55D88971}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA3967AE-BFDA-4798-A130-1079660EB311}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA3967AE-BFDA-4798-A130-1079660EB311}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA3967AE-BFDA-4798-A130-1079660EB311}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA3967AE-BFDA-4798-A130-1079660EB311}.Release|Any CPU.Build.0 = Release|Any CPU
+		{104285B8-6851-4963-9E72-950BCC96D185}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{104285B8-6851-4963-9E72-950BCC96D185}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{104285B8-6851-4963-9E72-950BCC96D185}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{104285B8-6851-4963-9E72-950BCC96D185}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91D39FD0-DA2C-4A85-9E44-944BF943A6C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91D39FD0-DA2C-4A85-9E44-944BF943A6C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91D39FD0-DA2C-4A85-9E44-944BF943A6C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91D39FD0-DA2C-4A85-9E44-944BF943A6C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A43A64E-78A0-430E-8E10-93AAA25BF60E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A43A64E-78A0-430E-8E10-93AAA25BF60E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A43A64E-78A0-430E-8E10-93AAA25BF60E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A43A64E-78A0-430E-8E10-93AAA25BF60E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{895C5069-69E4-48C2-BEDD-7C9F7B1BF93D} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
+		{FA3967AE-BFDA-4798-A130-1079660EB311} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
+		{104285B8-6851-4963-9E72-950BCC96D185} = {D43AD249-FAA7-43A0-9D82-388E2830B8D7}
+		{2A43A64E-78A0-430E-8E10-93AAA25BF60E} = {D43AD249-FAA7-43A0-9D82-388E2830B8D7}
+	EndGlobalSection
+EndGlobal

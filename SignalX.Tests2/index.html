@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html>
+<body>
+<input id="message" type="text"/>
+<button id="send">Send Message To Server</button>
+    <button id="clear">Clear Console</button>
+<div id="myconsole">
+
+</div>
+
+
+<script src="jquery.min.js"></script>
+<script src="jquery.signalr-2.2.0.min.js"></script>
+<script src="ui/js/signalx.js"></script>
+<script>
+    var writeToMyConsole = function(m) {
+        $("#myconsole").append(m + "<BR /><BR />");
+    };
+
+    $("#clear").on("click", function () {
+        $("#myconsole").html("--cleared--");
+    });
+    $("#send").on("click", function () {
+        var message = $("#message").val();
+        writeToMyConsole("Sending '" + message + "' message to server on click ... ");
+        signalx.server.sample(message);
+    });
+
+
+
+    signalx.client.myclient = function(message) {
+        writeToMyConsole("Got Message From Server : " + message);
+    };
+
+    signalx.ready(function(server) {
+        writeToMyConsole("Sending message to server on ready ... ");
+        server.sample("MESSAGE 1");
+    });
+    signalx.ready(function(server) {
+        writeToMyConsole("Sending another message to server on ready ... ");
+        server.sample("MESSAGE 2");
+    });
+
+    try {
+        writeToMyConsole("Sending message to server instantly ... ");
+        signalx.server.sample("MESSAGE 3");
+    } catch (e) {
+        writeToMyConsole("Error while sending message to server on instantly : " + e);
+    }
+
+    setTimeout(function() {
+            writeToMyConsole("Sending message to server after some time out of 5000ms ... ");
+            signalx.server.sample("MESSAGE 4");
+        },
+        5000);
+
+</script>
+</body>
+</html>

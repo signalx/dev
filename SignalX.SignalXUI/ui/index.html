@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Bootstrap 3 Control Panel</title>
+    <meta name="generator" content="Bootply"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+        <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="css/styles.css" rel="stylesheet">
+</head>
+<body>
+<!-- Header -->
+<div id="top-nav" class="navbar navbar-inverse navbar-static-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-toggle"></span>
+            </button>
+            <a class="navbar-brand" href="#">Control Panel</a>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+
+                <li class="dropdown">
+                    <a class="dropdown-toggle" role="button" data-toggle="dropdown" href="#">
+                        <i class="glyphicon glyphicon-user"></i> Admin <span class="caret"></span></a>
+                    <ul id="g-account-menu" class="dropdown-menu" role="menu">
+                        <li>
+                            <a href="#">My Profile</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="glyphicon glyphicon-lock"></i> Logout</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div><!-- /container -->
+</div>
+<!-- /Header -->
+
+<!-- Main -->
+<div class="container">
+
+    <!-- upper section -->
+    <div class="row">
+        <div class="col-sm-3">
+            <!-- left -->
+            <h3><i class="glyphicon glyphicon-briefcase"></i> Toolbox
+            </h3>
+            <hr>
+
+            <ul class="nav nav-stacked">
+                <li>
+                    <a href="http://www.bootply.com/85861" target="ext"><i class="glyphicon glyphicon-flash"></i> Alerts</a>
+                </li>
+                <li>
+                    <a href="http://www.bootply.com/85861" target="ext"><i class="glyphicon glyphicon-link"></i> Links</a>
+                </li>
+                <li>
+                    <a href="http://www.bootply.com/85861" target="ext"><i class="glyphicon glyphicon-list-alt"></i> Reports</a>
+                </li>
+                <li>
+                    <a href="http://www.bootply.com/85861" target="ext"><i class="glyphicon glyphicon-book"></i> Books</a>
+                </li>
+                <li>
+                    <a href="http://www.bootply.com/85861" target="ext"><i class="glyphicon glyphicon-briefcase"></i> Tools</a>
+                </li>
+                <li>
+                    <a href="http://www.bootply.com/85861" target="ext"><i class="glyphicon glyphicon-time"></i> Real-time</a>
+                </li>
+                <li>
+                    <a href="http://www.bootply.com/85861" target="ext"><i class="glyphicon glyphicon-plus"></i> Advanced..</a>
+                </li>
+            </ul>
+
+            <hr>
+
+        </div><!-- /span-3 -->
+        <div class="col-sm-9">
+
+            <!-- column 2 -->
+            <h3><i class="glyphicon glyphicon-dashboard"></i> Bootply Dashboard
+            </h3>
+
+            <hr>
+
+            <div class="row">
+                <!-- center left-->
+                <div class="col-md-7">
+                    <div class="well">Inbox Messages <span class="badge pull-right">3</span></div>
+
+
+                </div><!--/col-->
+
+                <!--center-right-->
+                <div class="col-md-5">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="panel-title">
+                                <i class="glyphicon glyphicon-wrench pull-right"></i>
+                                <h4>Submit Request</h4>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+
+                            <form class="form form-vertical">
+                                <div class="control-group">
+                                    <label>Name</label>
+                                    <div class="controls">
+                                        <input type="text" class="form-control" placeholder="Enter Name">
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Title</label>
+                                    <div class="controls">
+                                        <input type="password" class="form-control" placeholder="Password">
+
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Details</label>
+                                    <div class="controls">
+                                        <textarea class="form-control"></textarea>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label>Select</label>
+                                    <div class="controls">
+                                        <select class="form-control">
+                                            <option>General Question</option><option>Server Issues</option><option>Billing Question</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <label></label>
+                                    <div class="controls">
+                                        <button type="submit" class="btn btn-primary">
+                                            Post
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </form>
+
+
+                        </div><!--/panel content-->
+                    </div><!--/panel-->
+
+
+                    <hr>
+
+                    <div class="btn-group btn-group-justified">
+                        <a href="#" class="btn btn-info col-sm-3">
+                            <i class="glyphicon glyphicon-plus"></i><br>
+                            Service
+                        </a>
+                        <a href="#" class="btn btn-info col-sm-3">
+                            <i class="glyphicon glyphicon-cloud"></i><br>
+                            Cloud
+                        </a>
+                        <a href="#" class="btn btn-info col-sm-3">
+                            <i class="glyphicon glyphicon-cog"></i><br>
+                            Tools
+                        </a>
+                        <a href="#" class="btn btn-info col-sm-3">
+                            <i class="glyphicon glyphicon-question-sign"></i><br>
+                            Help
+                        </a>
+                    </div>
+
+                </div><!--/col-span-6-->
+
+            </div><!--/row-->
+        </div><!--/col-span-9-->
+
+    </div><!--/row-->
+    <!-- /upper section -->
+
+    <!-- lower section -->
+
+</div><!--/container-->
+<!-- /Main -->
+
+
+<!-- script references -->
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+
+<script src="js/jquery.signalr-2.2.0.min.js"></script>
+
+<script src="js/signalx.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

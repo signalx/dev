@@ -1,0 +1,19 @@
+{
+  "name": "signalx",
+  "version": "0.1.1-pre",
+  "description": "Real time client server communication made easy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/signalx/signalx/signalx.git"
+  },
+  "author": "sam bamgboye",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/signalx/signalx/issues"
+  },
+  "homepage": "https://github.com/signalx/signalx#readme"
+}

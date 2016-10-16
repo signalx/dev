@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html>
+<body>
+<input id="message" type="text"/>
+<button id="send1">Send Message To Server 1</button>
+<button id="send2">Send Message To Server 2</button>
+    <button id="send3">Send Message To Server 3</button>
+    <button id="clear">Clear Console</button>
+<div id="myconsole">
+
+</div>
+<script src="jquery.min.js"></script>
+<script src="jquery.signalr-2.2.0.min.js"></script>
+<script src="ui/js/signalx.js"></script>
+<script>
+    var writeToMyConsole = function(m) {
+        $("#myconsole").append(m + "<BR /><BR />");
+    };
+    signalx.debug(function (o) { writeToMyConsole(o); });
+    signalx.error(function (o) { writeToMyConsole(o); });
+    $("#clear").on("click", function () {
+        $("#myconsole").html("--cleared--");
+    });
+    $("#send1").on("click", function () {
+        var message = $("#message").val();
+        writeToMyConsole("Sending 1 '" + message + "' message to server on click ... ");
+        writeToMyConsole(signalx.server.sample2(message));
+        signalx.server.sample3("MESSAGE 1",  function (m) {
+            writeToMyConsole("WOOOOOOOOOOOOOOOOOOOOOO-    :  " + m);
+        });
+    });
+
+    $("#send2").on("click", function () {
+        var message = $("#message").val();
+        writeToMyConsole("Sending 2 '" + message + "' message to server on click ... ");
+        signalx.server.sample2(message, null, "delibarate name");
+        var promise = signalx.server.sample2(message);
+        promise.always(function(m) {
+            writeToMyConsole("nwwwwwwwwwwwwwwwwwww-    :  " + m);
+        });
+    });
+
+    $("#send3").on("click", function () {
+        var message = $("#message").val();
+        writeToMyConsole("Sending 3 '" + message + "' message to server on click ... ");
+        signalx.server.sample2(message, "replyto", "my name");
+        writeToMyConsole(signalx.server.sample2(message, "replyto", "my name"));
+    });
+
+    signalx.client.replyto = function (message) {
+        writeToMyConsole("Got Message From Server on the REPLY-TO handler : " + message);
+    };
+    signalx.client.myclient = function(message) {
+        writeToMyConsole("Got Message From Server : " + message);
+    };
+    signalx.ready(function (server) {
+        writeToMyConsole("Sending message to server on ready WITH CALLBACK!!!!! ... ");
+        server.sample2("MESSAGE 1", function(m) {
+            writeToMyConsole("WOOOOOOOOOOOOOOOOOOOOOO-    :  "+m);
+        });
+    });
+    signalx.ready(function(server) {
+        writeToMyConsole("Sending message to server on ready ... ");
+        server.sample("MESSAGE 1");
+    });
+    signalx.ready(function(server) {
+        writeToMyConsole("Sending another message to server on ready ... ");
+        server.sample("MESSAGE 2");
+    });
+
+    try {
+        writeToMyConsole("Sending message to server instantly ... ");
+        signalx.server.sample("MESSAGE 3");
+    } catch (e) {
+        writeToMyConsole("Error while sending message to server on instantly : " + e);
+    }
+
+    setTimeout(function() {
+            writeToMyConsole("Sending message to server after some time out of 5000ms ... ");
+            signalx.server.sample("MESSAGE 4");
+        },
+        5000);
+</script>
+</body>
+</html>
