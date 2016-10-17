@@ -18,16 +18,22 @@
     };
     signalx.debug(function (o) { writeToMyConsole(o); });
     signalx.error(function (o) { writeToMyConsole(o); });
+    signalx.ready( function(server) {
+        signalx.server("Sample3", function (request) {
+            request.respond("whaaaaaaaaa!!!!!!!");
+        });
+    });
     $("#clear").on("click", function () {
         $("#myconsole").html("--cleared--");
     });
     $("#send1").on("click", function () {
         var message = $("#message").val();
         writeToMyConsole("Sending 1 '" + message + "' message to server on click ... ");
-        writeToMyConsole(signalx.server.sample2(message));
-        signalx.server.sample3("MESSAGE 1",  function (m) {
+        signalx.server.sample3("MESSAGE 1", function (m) {
             writeToMyConsole("WOOOOOOOOOOOOOOOOOOOOOO-    :  " + m);
         });
+        writeToMyConsole(signalx.server.sample2(message));
+       
     });
 
     $("#send2").on("click", function () {

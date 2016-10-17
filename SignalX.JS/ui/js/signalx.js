@@ -30,7 +30,134 @@
         });
     }
     var handlers = {};
-    signalx.server = false;
+    var haservers = false;
+   var clientReceiver=function (owner, message) {
+        //debug
+        debuging("successfully received server message meant for  " + owner + " handler . Message is : " + message);
+
+        var own = signalx.waitingList.w[owner];
+
+        if (!own) {
+            debuging("Could not find any defined callback for " + owner);
+            own = handlers[owner];
+            if (!own) {
+                var errMsg = "Could not find specified client handler '" + owner + "' to handle the server response '" + message;
+                signalx.error.f({
+                    error: errMsg,
+                    description: "No client handler registered by the name " + owner
+                });
+            }
+        } else {
+            delete signalx.waitingList.w[owner];
+        }
+
+        try {
+            if (typeof own === "object" && typeof own.resolve === "function") {
+                own.resolve(message);
+            } else {
+                own && own(message);
+            }
+        } catch (e) {
+            signalx.error.f({
+                error: e,
+                description: "Error while running client handler " + owner + " with the server message " + message
+            });
+        }
+    };
+    var chatserversend = function (name, message, retTo, sender, mId,f) {
+        
+        var deferred = $.Deferred();
+        window.signalxidgen = window.signalxidgen || function () {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        };
+        window.signalxid = window.signalxid || window.signalxidgen();
+        sender = sender || window.signalxid;
+        retTo = retTo || '';
+        var messageId = window.signalxidgen();
+        var rt = retTo;
+        if (typeof retTo === 'function') {
+            signalx.waitingList(messageId, retTo);
+            rt = messageId;
+        }
+        if (!retTo) {
+            signalx.waitingList(messageId, deferred);
+            rt = messageId;
+        }
+
+
+        debuging("Server on client called  by " + name + " from sender " + sender + " with message id " + mId + " and return to " + rt + " message : " + message);
+
+
+        var respondTo = function (na, mes) {
+            clientReceiver(na, mes);
+        };
+        var respond = function (mes) {
+            respondTo(rt, mes);
+        };
+
+        var request = {
+            respondTo: respondTo,
+            RespondTo: respondTo,
+            Respond: respond,
+            respond: respond,
+            message: message,
+            replyTo: rt,
+            sender: sender,
+            messageId: mId,
+            Message: message,
+            ReplyTo: rt,
+            Sender: sender,
+            MessageId: mId
+        };
+
+        try {
+           f(request);
+        } catch (e) {
+            signalx.error.f({
+                error: e,
+                description: "Error executing server cliend"
+            });
+        }
+
+       
+        if (retTo) {
+            return messageId;
+        } else {
+             return deferred.promise();
+        }
+    };
+    var toCamelCase = function (str) {
+        return str.charAt(0).toLowerCase() + str.slice(1);
+    };
+    var toUnCamelCase = function (str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    };
+    signalx.server = function (n, f) {
+        
+        if (n && f) {
+            haservers = true;
+            var nname = toCamelCase(n);
+            signalx.server[nname] = (function (f, n) {
+                return function (message, retTo, sender, messageId) {
+                  return  chatserversend(n, message, retTo, sender, messageId,f);
+                };
+            })(f, nname);
+            nname = toUnCamelCase(n);
+            signalx.server[nname] = (function (f, n) {
+                return function (message, retTo, sender, messageId) {
+                    return chatserversend(n, message, retTo, sender, messageId, f);
+                };
+            })(f, nname);
+        } else {
+            signalx.error.f({
+                description: "error registering server handler"
+            });
+        }
+    };
+ 
     var hasRun = false;
     var mailBox = [];
 
@@ -49,12 +176,7 @@
             }
         }
     };
-    var toCamelCase = function (str) {
-        return str.charAt(0).toLowerCase() + str.slice(1);
-    };
-    var toUnCamelCase = function (str) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
-    };
+    
     signalx.client = function (name, f) {
         //todo check if is function
         if (name && f) {
@@ -79,10 +201,10 @@
             throw errMsg;
         }
     };
-
+    var isReady = false;
     signalx.ready = function (f) {
         f && mailBox.push(f);
-        mailBox.run();
+        isReady && mailBox.run();
         if (!hasRun) {
             hasRun = true;
 
@@ -114,7 +236,14 @@
                             try {
                                 //debug
                                 debuging("successfully loaded signalx script from server : " + message);
-                                signalx.server = eval(message);
+                                var server = eval(message);
+                                for (var nnn in server) {
+                                    if (server.hasOwnProperty(nnn)) {
+                                        signalx.server[nnn] = server[nnn];
+                                    }
+                                }
+                               // signalx.server = eval(message);
+                                isReady = true;
                                 mailBox.run();
                             } catch (e) {
                                 signalx.error.f({
@@ -125,39 +254,7 @@
                             }
                         };
 
-                        chat.client.broadcastMessage = function (owner, message) {
-                            //debug
-                            debuging("successfully received server message meant for  " + owner + " handler . Message is : " + message);
-
-                            var own = signalx.waitingList.w[owner];
-
-                            if (!own) {
-                                debuging("Could not find any defined callback for " + owner);
-                                own = handlers[owner];
-                                if (!own) {
-                                    var errMsg = "Could not find specified client handler '" + owner + "' to handle the server response '" + message;
-                                    signalx.error.f({
-                                        error: errMsg,
-                                        description: "No client handler registered by the name " + owner
-                                    });
-                                }
-                            } else {
-                                delete signalx.waitingList.w[owner];
-                            }
-
-                            try {
-                                if (typeof own === "object" && typeof own.resolve === "function") {
-                                    own.resolve(message);
-                                } else {
-                                    own && own(message);
-                                }
-                            } catch (e) {
-                                signalx.error.f({
-                                    error: e,
-                                    description: "Error while running client handler " + owner + " with the server message " + message
-                                });
-                            }
-                        };
+                        chat.client.broadcastMessage = clientReceiver;
                         var promise = $.connection.hub.start();
                         promise.done(function () {
                             //debug
@@ -175,19 +272,16 @@
         }
     };
     window.signalx = signalx;
-    setTimeout(function () {
-        signalx.ready(function () {
-            for (var key in handlers) {
-                if (handlers.hasOwnProperty(key)) {
-                    //debug
-                    debuging("Client handlers registered : " + key);
-                }
+    signalx.ready(function () {
+        for (var key in handlers) {
+            if (handlers.hasOwnProperty(key)) {
+                //debug
+                debuging("Client handlers registered : " + key);
             }
-
-            //debug
-            debuging("signalx is all set to start reactive server - client server communications");
-        });
-    }, 0);
+        }
+        //debug
+        debuging("signalx is all set to start reactive server - client server communications");
+    });
     signalx.client.signalx_error = function (message) {
         debuging(message);
         signalx.error.f({
