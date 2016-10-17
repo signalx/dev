@@ -36,6 +36,8 @@ https://signalx.github.io/LinqPadSamples/signalx_callback.linq
 https://signalx.github.io/LinqPadSamples/signalx_handler.linq
 
 https://signalx.github.io/LinqPadSamples/signalx_promise.linq
+
+https://signalx.github.io/LinqPadSamples/signalx_registering_server_on_client.linq
 	
 
 you can download linqpad here https://www.linqpad.net/
