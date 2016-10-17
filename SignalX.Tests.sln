@@ -28,6 +28,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LinqPad", "LinqPad", "{772E
 		LinqPadSamples\signalx_promise.linq = LinqPadSamples\signalx_promise.linq
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepRunner", "StepRunner\StepRunner.csproj", "{70247A36-2C1A-41D4-A660-023C137B41AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{2A43A64E-78A0-430E-8E10-93AAA25BF60E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A43A64E-78A0-430E-8E10-93AAA25BF60E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A43A64E-78A0-430E-8E10-93AAA25BF60E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70247A36-2C1A-41D4-A660-023C137B41AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70247A36-2C1A-41D4-A660-023C137B41AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70247A36-2C1A-41D4-A660-023C137B41AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70247A36-2C1A-41D4-A660-023C137B41AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,5 +77,6 @@ Global
 		{FA3967AE-BFDA-4798-A130-1079660EB311} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
 		{104285B8-6851-4963-9E72-950BCC96D185} = {D43AD249-FAA7-43A0-9D82-388E2830B8D7}
 		{2A43A64E-78A0-430E-8E10-93AAA25BF60E} = {D43AD249-FAA7-43A0-9D82-388E2830B8D7}
+		{70247A36-2C1A-41D4-A660-023C137B41AE} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
 	EndGlobalSection
 EndGlobal
