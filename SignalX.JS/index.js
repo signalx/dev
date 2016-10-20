@@ -1,5 +1,6 @@
 ﻿(function ($, window, undefined) {
     var signalx = {};
+	var context={};
     signalx.error = function (f) {
         signalx.error.f = f || signalx.error.f;
     };
@@ -34,7 +35,7 @@
    var clientReceiver=function (owner, message) {
         //debug
         debuging("successfully received server message meant for  " + owner + " handler . Message is : " + message);
-
+        context.loadClients();
         var own = signalx.waitingList.w[owner];
 
         if (!own) {
@@ -88,7 +89,7 @@
         }
 
 
-        debuging("Server on client called  by " + name + " from sender " + sender + " with message id " + mId + " and return to " + rt + " message : " + message);
+        debuging("Server on client called  by " + name + " from sender " + sender );
 
 
         var respondTo = function (na, mes) {
@@ -112,7 +113,7 @@
             Sender: sender,
             MessageId: mId
         };
-
+    debuging("Sending Message : " + JSON.stringify(request));
         try {
            f(request);
         } catch (e) {
@@ -162,6 +163,7 @@
     var mailBox = [];
 
     mailBox.run = function () {
+	     context.loadClients();
         if (signalx.server) {
             while (mailBox.length) {
                 var func = mailBox.pop();
@@ -201,13 +203,37 @@
             throw errMsg;
         }
     };
-    var isReady = false;
+   
+   context.loadClients=function(){
+	    for (var key in signalx.client) {
+                            if (signalx.client.hasOwnProperty(key)) {
+							if(!handlers[key]){
+								 handlers[key] = signalx.client[key];
+								}
+                               
+                                var camelCase = toCamelCase(key);
+                                if (camelCase !== key) {
+								if(!handlers[camelCase]){
+									handlers[camelCase] = signalx.client[key];}
+                                    
+                                }
+
+                                var unCamelCase = toUnCamelCase(key);
+                                if (unCamelCase !== key) {
+								if(!handlers[unCamelCase]){
+									 handlers[unCamelCase] = signalx.client[key];
+									}
+                                   
+                                }
+                            }
+                        }};
+   
+   var isReady = false;
     signalx.ready = function (f) {
         f && mailBox.push(f);
         isReady && mailBox.run();
         if (!hasRun) {
             hasRun = true;
-
             //debug
             debuging("loading signalr script at /signalr/hubs ");
             $.ajax({
@@ -218,20 +244,7 @@
                         var chat = $.connection.signalXHub;
                         //debug
                         debuging("successfully loaded signalr script from /signalr/hubs ");
-                        for (var key in signalx.client) {
-                            if (signalx.client.hasOwnProperty(key)) {
-                                handlers[key] = signalx.client[key];
-                                var camelCase = toCamelCase(key);
-                                if (camelCase !== key) {
-                                    handlers[camelCase] = signalx.client[key];
-                                }
-
-                                var unCamelCase = toUnCamelCase(key);
-                                if (unCamelCase !== key) {
-                                    handlers[unCamelCase] = signalx.client[key];
-                                }
-                            }
-                        }
+                        
                         chat.client.addMessage = function (message) {
                             try {
                                 //debug
@@ -267,12 +280,18 @@
                             });
                         });
                     });
-                }
-            });
+                },
+				
+            }).always(function(){
+			        context.loadClients();
+			   mailBox.run();
+			   isReady = true;
+			});					
+			
         }
     };
     window.signalx = signalx;
-    signalx.ready(function () {
+    signalx.ready(function () {	
         for (var key in handlers) {
             if (handlers.hasOwnProperty(key)) {
                 //debug
