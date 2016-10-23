@@ -32,7 +32,7 @@ namespace SignalXLib.Tests
                {
                     System.IO.File.WriteAllText(TestHelper.FilePath, index);
 
-                    SignalX.Server(serverHandler, request => SignalX.RespondTo(clientHandler, message));
+                    SignalX.Server(serverHandler, request => SignalX.RespondToAll(clientHandler, message));
                     SignalX.Server(testServerFeedbackHandler, request =>
                     {
                         finalMessage = request.Message as string;

@@ -17,22 +17,22 @@ namespace ConsoleApplicationCSharp
                  SignalX.Server("Sample", request =>
                 {
                     var messageId = Guid.NewGuid().ToString();
-                    SignalX.RespondTo("Myclient", messageId +" - "+ request.Message + ": Thank you for sending me the message " );
-                    SignalX.RespondTo("Myclient", messageId + " - " + request.Message + ": Hang on i'm not done yet");
+                    SignalX.RespondToAll("Myclient", messageId +" - "+ request.Message + ": Thank you for sending me the message " );
+                    SignalX.RespondToAll("Myclient", messageId + " - " + request.Message + ": Hang on i'm not done yet");
                     Task.Delay(TimeSpan.FromMilliseconds(1000)).ContinueWith(x =>
                     {
-                        SignalX.RespondTo("Myclient", messageId + " - " + request.Message + ": So im almost done");
+                        SignalX.RespondToAll("Myclient", messageId + " - " + request.Message + ": So im almost done");
                     });
                     Task.Delay(TimeSpan.FromMilliseconds(1000)).ContinueWith(x =>
                     {
-                        SignalX.RespondTo("Myclient", messageId + " - " + request.Message + ": Im' done!");
+                        SignalX.RespondToAll("Myclient", messageId + " - " + request.Message + ": Im' done!");
                     });
                 });
                 
-                SignalX.Server("Sample2", (message,sender, replyTo,messageId) => SignalX.RespondTo(string.IsNullOrEmpty(replyTo) ? "Myclient" : replyTo, messageId+":"+ sender + " sent me this message : " + message + " and asked me to reply to " + replyTo));
+                SignalX.Server("Sample2", (message,sender, replyTo,messageId) => SignalX.RespondToAll(string.IsNullOrEmpty(replyTo) ? "Myclient" : replyTo, messageId+":"+ sender + " sent me this message : " + message + " and asked me to reply to " + replyTo));
 
 
-                SignalX.Server("Sample3", (request) => request.Respond(request.ReplyTo));
+                SignalX.Server("Sample3", (request) => request.RespondToAll(request.ReplyTo));
 
 
                 System.Diagnostics.Process.Start(url);
