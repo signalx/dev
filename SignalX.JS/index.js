@@ -282,8 +282,9 @@
                     });
                 },
 				
-            }).always(function(){
-			        context.loadClients();
+            }).fail(function () {
+                //todo log error
+			   context.loadClients();
 			   mailBox.run();
 			   isReady = true;
 			});					

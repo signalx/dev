@@ -1,6 +1,6 @@
 {
   "name": "signalx",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Real time client server communication made easy",
   "main": "SignalX/SignalX.JS/index.js",
   "authors": [

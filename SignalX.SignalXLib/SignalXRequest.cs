@@ -38,12 +38,14 @@ namespace SignalXLib.Lib
         }
         public void RespondToUser(string connectionId, object response)
         {
+            if (connectionId == null) throw new ArgumentNullException(nameof(connectionId));
             if (!string.IsNullOrEmpty(ReplyTo))
-                SignalX.RespondToUser(connectionId, ReplyTo, response);
+                    SignalX.RespondToUser(connectionId, ReplyTo, response);
         }
+
         public void RespondToSender( object response)
         {
-            if (!string.IsNullOrEmpty(UserId))
+            if (!string.IsNullOrEmpty(ConnectionId))
                 SignalX.RespondToUser(ConnectionId, ReplyTo, response);
         }
     }
