@@ -1,8 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{560E9E1D-8A8F-4B7E-9E57-7580F48A75B2}"
+	ProjectSection(SolutionItems) = preProject
+		paket.dependencies = paket.dependencies
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.Tests", "SignalX.Tests\SignalXLib.Tests.csproj", "{895C5069-69E4-48C2-BEDD-7C9F7B1BF93D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.Lib", "SignalX.SignalXLib\SignalXLib.Lib.csproj", "{689AA72B-541C-48F8-BAB9-DF439B1C7108}"
@@ -29,6 +34,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LinqPad", "LinqPad", "{772E
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepRunner", "StepRunner\StepRunner.csproj", "{70247A36-2C1A-41D4-A660-023C137B41AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.Lib.Extensions", "SignalXLib.Lib.Extensions\SignalXLib.Lib.Extensions.csproj", "{4246D50B-6709-470A-B0BF-6AE249EFEE55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -68,6 +75,10 @@ Global
 		{70247A36-2C1A-41D4-A660-023C137B41AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{70247A36-2C1A-41D4-A660-023C137B41AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{70247A36-2C1A-41D4-A660-023C137B41AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4246D50B-6709-470A-B0BF-6AE249EFEE55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4246D50B-6709-470A-B0BF-6AE249EFEE55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4246D50B-6709-470A-B0BF-6AE249EFEE55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4246D50B-6709-470A-B0BF-6AE249EFEE55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,5 +89,8 @@ Global
 		{104285B8-6851-4963-9E72-950BCC96D185} = {D43AD249-FAA7-43A0-9D82-388E2830B8D7}
 		{2A43A64E-78A0-430E-8E10-93AAA25BF60E} = {D43AD249-FAA7-43A0-9D82-388E2830B8D7}
 		{70247A36-2C1A-41D4-A660-023C137B41AE} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {09DD93D1-94F6-4EA5-870C-6E06481BD98D}
 	EndGlobalSection
 EndGlobal

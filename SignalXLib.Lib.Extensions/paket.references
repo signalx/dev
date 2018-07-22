@@ -1,0 +1,6 @@
+Microsoft.AspNet.SignalR.Core
+Microsoft.Owin
+Microsoft.Owin.FileSystems
+Microsoft.Owin.StaticFiles
+Newtonsoft.Json
+Owin

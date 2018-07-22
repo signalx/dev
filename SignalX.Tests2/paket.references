@@ -1,0 +1,9 @@
+Microsoft.AspNet.SignalR.Core
+Microsoft.Owin
+Microsoft.Owin.FileSystems
+Microsoft.Owin.Host.HttpListener
+Microsoft.Owin.Hosting
+Microsoft.Owin.Security
+Microsoft.Owin.StaticFiles
+Newtonsoft.Json
+Owin

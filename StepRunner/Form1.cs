@@ -19,19 +19,34 @@ namespace StepRunner
             InitializeComponent();
         }
 
+        WebBrowser webBrowser1;
         private void Form1_Load(object sender, EventArgs e)
         {
+             webBrowser1 = new System.Windows.Forms.WebBrowser();
+            this.webBrowser1.Dock = DockStyle.Fill;
             
+            this.Controls.Add(this.webBrowser1);
+            this.webBrowser1.ScriptErrorsSuppressed = true;
+
+            webBrowser1.Navigate(url);
+            webBrowser1.Refresh(WebBrowserRefreshOption.Completely);
+            Task.Delay(TimeSpan.FromSeconds(5)).ContinueWith(x => { this.Close(); });
+
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            Task.Delay(TimeSpan.FromSeconds(3)).ContinueWith(x =>
-            {
-                webBrowser1.Navigate(url);
-                webBrowser1.Refresh(WebBrowserRefreshOption.Completely);
-            });
             timer1.Enabled = false;
+            var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
+            Task.Factory.StartNew(()=>{})
+                .ContinueWith(
+                    r =>
+                    {
+
+                    }, scheduler);
+
+
         }
     }
 }

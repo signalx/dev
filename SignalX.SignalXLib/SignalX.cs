@@ -10,11 +10,8 @@ namespace SignalXLib.Lib
 {
     public class SignalX : IDisposable
     {
-        internal  string UiFolder { set; get; }
-        internal  string BaseUiDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
-        public  string UiDirectory => BaseUiDirectory + UiFolder;
         internal static Action<Exception> ExceptionHandler { set; get; }
+        internal static Action<string, object> ConnectionEventsHandler { set; get; }
 
         public static  ConnectionMapping<string> Connections { set; get; }
 
@@ -22,23 +19,23 @@ namespace SignalXLib.Lib
         {
             ExceptionHandler = handler;
         }
-
-        public SignalX( string uiFolder, string baseUiDirectory=null)
+        public static void OnConnectionEvent(Action<string,object> handler)
         {
-            UiFolder = uiFolder;
-            BaseUiDirectory = baseUiDirectory ?? BaseUiDirectory;
+            ConnectionEventsHandler = handler;
+        }
+
+        public SignalX( )
+        {
+         
             HubConfiguration = new HubConfiguration();
         }
 
         public SignalX(HubConfiguration hubConfiguration= null 
-            , string uiFolder=null
-            , string baseUiDirectory = null
             )
         {
             if (hubConfiguration == null) throw new ArgumentNullException(nameof(hubConfiguration));
             HubConfiguration = hubConfiguration;
-            UiFolder = uiFolder;
-            BaseUiDirectory = baseUiDirectory ?? BaseUiDirectory;
+          
         }
 
         public  HubConfiguration HubConfiguration { get; set; }

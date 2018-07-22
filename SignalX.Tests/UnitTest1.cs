@@ -10,11 +10,11 @@ using SignalXLib.Lib;
 
 namespace SignalXLib.Tests
 {
+    using System.Threading;
+
     [TestClass]
     public class UnitTest1
     {
-     
-        
         [TestMethod]
         public void TestMethod1()
         {
@@ -31,24 +31,31 @@ namespace SignalXLib.Tests
                foreach (var index in indexPage)
                {
                     System.IO.File.WriteAllText(TestHelper.FilePath, index);
-
-                    SignalX.Server(serverHandler, request => SignalX.RespondToAll(clientHandler, message));
+                   SignalX.Server(serverHandler, request =>
+                    {
+                        SignalX.RespondToAll(clientHandler, message);
+                    });
                     SignalX.Server(testServerFeedbackHandler, request =>
                     {
                         finalMessage = request.Message as string;
                     });
-               
-                   Task.Factory.StartNew(() =>
-                   {  var Runner=   new StepRunner.Form1()
-                    {
-                        url = "http://localhost:44111/"
-                    };
-                       Runner.Show();
-                   });
+                  
+                    
+                   var t = new Thread(
+                       () =>
+                       {
+                           var Runner = new StepRunner.Form1()
+                           {
+                               url = url
+                           };
+                           Runner.ShowDialog();
+                       });
+                   t.SetApartmentState(ApartmentState.STA);
+                   t.Start();
 
                     TestHelper.AwaitAssert(() => 
                     Assert.AreEqual(message, finalMessage),
-                    TimeSpan.FromSeconds(100), 
+                    TimeSpan.FromSeconds(1000), 
                     () => {});
                 }
 

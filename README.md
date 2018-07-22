@@ -14,11 +14,11 @@ No more worrying about setup, cases, etc, just simple javascript to .NET lambda 
 
 Backend (F#) :-
 
-	SignalX.Server("Sample",fun request -> request.Respond("response"))	
+	SignalX.Server("Sample",fun request -> request.RespondToAll("response"))	
 	
 Backend (C#) :-
 
-	SignalX.Server("Sample",request => request.Respond("response"))	
+	SignalX.Server("Sample",request => request.RespondToAll("response"))	
 	
 	
 FrontEnd :-
@@ -64,7 +64,7 @@ Backend (F#) :-
     let main argv = 
     let url="http://localhost:44111"
     use server=WebApp.Start<Startup>(url)
-	SignalX.Server("Sample",fun request -> request.Respond(request.ReplyTo))	
+	SignalX.Server("Sample",fun request -> request.RespondToAll(request.ReplyTo))	
 	
 	
 
@@ -84,7 +84,7 @@ Backend (C#) :-
 			var url = "http://localhost:44111";
 			using (WebApp.Start<Startup>(url))
 			{
-			   SignalX.Server("Sample", (request) => request.Respond(request.ReplyTo));
+			   SignalX.Server("Sample", (request) => request.RespondToAll(request.ReplyTo));
 			}
 		}
 	}
