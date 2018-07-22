@@ -1,0 +1,3 @@
+update npm
+npm version ...
+npm publish
