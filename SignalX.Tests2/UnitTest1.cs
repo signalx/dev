@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Owin.Hosting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SignalXLib.Lib;
 using System;
-using Microsoft.Owin.Hosting;
 
 namespace SignalXLib.TestsNuget
 {
@@ -11,13 +11,11 @@ namespace SignalXLib.TestsNuget
         [TestMethod]
         public void TestMethod1()
         {
-           
-                var url = "http://localhost:44111";
+            var url = "http://localhost:44111";
 
-
-                using (WebApp.Start(url))
-                {
-                    try
+            using (WebApp.Start(url))
+            {
+                try
                 {
                     SignalX.Server("Sample", request => request.RespondToUser("Myclient", "yooo server : " + request.Message));
                     Console.WriteLine("quiting server in next 5 minute");

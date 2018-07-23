@@ -4,15 +4,16 @@ open System
 open Owin
 open Microsoft.Owin
 open SignalXLib.Lib
+open SignalXLib.Lib.Extensions
 open Microsoft.Owin.Hosting
 
 type public Startup() =
-        member x.Configuration (app:IAppBuilder) = 
+        member x.Configuration (app:IAppBuilder) =
                                       app.UseSignalX( new SignalX()) |> ignore
-                                      app.UseSignalXFileSystem("") |> ignore
+                                      app.UseSignalXFileSystem() |> ignore
 
 [<EntryPoint>]
-let main argv = 
+let main argv =
     let url="http://localhost:44111"
     use server=WebApp.Start<Startup>(url)
     SignalX.Server("Sample",fun request -> request.RespondToUser("Myclient",request.Message ))

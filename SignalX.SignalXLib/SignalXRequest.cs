@@ -26,24 +26,27 @@ namespace SignalXLib.Lib
             if (!string.IsNullOrEmpty(ReplyTo))
                 SignalX.RespondToAll(ReplyTo, response);
         }
+
         public void RespondToAll(string replyTo, object response)
         {
             if (replyTo == null) throw new ArgumentNullException(nameof(replyTo));
             SignalX.RespondToAll(replyTo, response);
         }
+
         public void RespondToUser(string userId, string replyTo, object response)
         {
             if (replyTo == null) throw new ArgumentNullException(nameof(replyTo));
-            SignalX.RespondToUser(userId,replyTo, response);
+            SignalX.RespondToUser(userId, replyTo, response);
         }
+
         public void RespondToUser(string connectionId, object response)
         {
             if (connectionId == null) throw new ArgumentNullException(nameof(connectionId));
             if (!string.IsNullOrEmpty(ReplyTo))
-                    SignalX.RespondToUser(connectionId, ReplyTo, response);
+                SignalX.RespondToUser(connectionId, ReplyTo, response);
         }
 
-        public void RespondToSender( object response)
+        public void RespondToSender(object response)
         {
             if (!string.IsNullOrEmpty(ConnectionId))
                 SignalX.RespondToUser(ConnectionId, ReplyTo, response);

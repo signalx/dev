@@ -1,13 +1,12 @@
 ﻿<!DOCTYPE html>
 <html>
 <body>
-<input id="message" type="text"/>
+<input id="message" type="text" />
 <button id="send1">Send Message To Server 1</button>
 <button id="send2">Send Message To Server 2</button>
     <button id="send3">Send Message To Server 3</button>
     <button id="clear">Clear Console</button>
 <div id="myconsole">
-
 </div>
 <script src="jquery.min.js"></script>
 <script src="jquery.signalr-2.2.0.min.js"></script>
@@ -33,7 +32,7 @@
             writeToMyConsole("WOOOOOOOOOOOOOOOOOOOOOO-    :  " + m);
         });
         writeToMyConsole(signalx.server.sample2(message));
-       
+
     });
 
     $("#send2").on("click", function () {

@@ -1,10 +1,17 @@
 ﻿(function ($, window, undefined) {
     var signalx = {};
-	var context={};
+    var context = {};
+    signalx.logConnections = false;
+
+    signalx.logConnections = function (p) {
+        signalx.error.logConnections = (p || false) && true;
+    };
     signalx.error = function (f) {
         signalx.error.f = f || signalx.error.f;
     };
-    signalx.error.f = function (o) { console.error(o); };
+    signalx.error.f = function (o) {
+        console.error(o);
+    };
 
     signalx.debug = function (f) {
         signalx.debug.f = f;
@@ -14,7 +21,7 @@
     };
     signalx.waitingList = function (n, f) {
         if (n && f) {
-        signalx.waitingList.w[n] = f;
+            signalx.waitingList.w[n] = f;
         }
     };
     signalx.waitingList.w = signalx.waitingList.w || {};
@@ -32,9 +39,9 @@
     }
     var handlers = {};
     var haservers = false;
-   var clientReceiver=function (owner, message) {
+    var clientReceiver = function (owner, message) {
         //debug
-        debuging("successfully received server message meant for  " + owner + " handler . Message is : " + message);
+        debuging("successfully received server message meant for  " + owner + " handler . Message is : " + JSON.stringify(message));
         context.loadClients();
         var own = signalx.waitingList.w[owner];
 
@@ -65,12 +72,12 @@
             });
         }
     };
-    var chatserversend = function (name, message, retTo, sender, mId,f) {
-        
+    var chatserversend = function (name, message, retTo, sender, mId, f) {
         var deferred = $.Deferred();
         window.signalxidgen = window.signalxidgen || function () {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                var r = Math.random() * 16 | 0,
+                    v = c == 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
         };
@@ -88,9 +95,7 @@
             rt = messageId;
         }
 
-
-        debuging("Server on client called  by " + name + " from sender " + sender );
-
+        debuging("Server on client called  by " + name + " from sender " + sender);
 
         var respondTo = function (na, mes) {
             clientReceiver(na, mes);
@@ -113,9 +118,9 @@
             Sender: sender,
             MessageId: mId
         };
-    debuging("Sending Message : " + JSON.stringify(request));
+        debuging("Sending Message : " + JSON.stringify(request));
         try {
-           f(request);
+            f(request);
         } catch (e) {
             signalx.error.f({
                 error: e,
@@ -123,11 +128,10 @@
             });
         }
 
-       
         if (retTo) {
             return messageId;
         } else {
-             return deferred.promise();
+            return deferred.promise();
         }
     };
     var toCamelCase = function (str) {
@@ -137,13 +141,12 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
     };
     signalx.server = function (n, f) {
-        
         if (n && f) {
             haservers = true;
             var nname = toCamelCase(n);
             signalx.server[nname] = (function (f, n) {
                 return function (message, retTo, sender, messageId) {
-                  return  chatserversend(n, message, retTo, sender, messageId,f);
+                    return chatserversend(n, message, retTo, sender, messageId, f);
                 };
             })(f, nname);
             nname = toUnCamelCase(n);
@@ -158,12 +161,12 @@
             });
         }
     };
- 
+
     var hasRun = false;
     var mailBox = [];
 
     mailBox.run = function () {
-	     context.loadClients();
+        context.loadClients();
         if (signalx.server) {
             while (mailBox.length) {
                 var func = mailBox.pop();
@@ -178,7 +181,7 @@
             }
         }
     };
-    
+
     signalx.client = function (name, f) {
         //todo check if is function
         if (name && f) {
@@ -203,32 +206,32 @@
             throw errMsg;
         }
     };
-   
-   context.loadClients=function(){
-	    for (var key in signalx.client) {
-                            if (signalx.client.hasOwnProperty(key)) {
-							if(!handlers[key]){
-								 handlers[key] = signalx.client[key];
-								}
-                               
-                                var camelCase = toCamelCase(key);
-                                if (camelCase !== key) {
-								if(!handlers[camelCase]){
-									handlers[camelCase] = signalx.client[key];}
-                                    
-                                }
 
-                                var unCamelCase = toUnCamelCase(key);
-                                if (unCamelCase !== key) {
-								if(!handlers[unCamelCase]){
-									 handlers[unCamelCase] = signalx.client[key];
-									}
-                                   
-                                }
-                            }
-                        }};
-   
-   var isReady = false;
+    context.loadClients = function () {
+        for (var key in signalx.client) {
+            if (signalx.client.hasOwnProperty(key)) {
+                if (!handlers[key]) {
+                    handlers[key] = signalx.client[key];
+                }
+
+                var camelCase = toCamelCase(key);
+                if (camelCase !== key) {
+                    if (!handlers[camelCase]) {
+                        handlers[camelCase] = signalx.client[key];
+                    }
+                }
+
+                var unCamelCase = toUnCamelCase(key);
+                if (unCamelCase !== key) {
+                    if (!handlers[unCamelCase]) {
+                        handlers[unCamelCase] = signalx.client[key];
+                    }
+                }
+            }
+        }
+    };
+
+    var isReady = false;
     signalx.ready = function (f) {
         f && mailBox.push(f);
         isReady && mailBox.run();
@@ -244,7 +247,7 @@
                         var chat = $.connection.signalXHub;
                         //debug
                         debuging("successfully loaded signalr script from /signalr/hubs ");
-                        
+
                         chat.client.addMessage = function (message) {
                             try {
                                 //debug
@@ -255,7 +258,7 @@
                                         signalx.server[nnn] = server[nnn];
                                     }
                                 }
-                               // signalx.server = eval(message);
+                                // signalx.server = eval(message);
                                 isReady = true;
                                 mailBox.run();
                             } catch (e) {
@@ -268,7 +271,16 @@
                         };
 
                         chat.client.broadcastMessage = clientReceiver;
+                        $.connection.hub.logging = signalx.error.logConnections;
+                        $.connection.logging = signalx.error.logConnections;
+
                         var promise = $.connection.hub.start();
+                        $.connection.hub.error(function (input) {
+                            signalx.error.f({
+                                error: input,
+                                description: "Connection.hub error reporting"
+                            });
+                        });
                         promise.done(function () {
                             //debug
                             debuging("signalr hub started successfully. Now loading signalx script from hub");
@@ -281,18 +293,16 @@
                         });
                     });
                 },
-				
             }).fail(function () {
                 //todo log error
-			   context.loadClients();
-			   mailBox.run();
-			   isReady = true;
-			});					
-			
+                context.loadClients();
+                mailBox.run();
+                isReady = true;
+            });
         }
     };
     window.signalx = signalx;
-    signalx.ready(function () {	
+    signalx.ready(function () {
         for (var key in handlers) {
             if (handlers.hasOwnProperty(key)) {
                 //debug

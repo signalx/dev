@@ -73,7 +73,6 @@
         }
     };
     var chatserversend = function (name, message, retTo, sender, mId, f) {
-
         var deferred = $.Deferred();
         window.signalxidgen = window.signalxidgen || function () {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
@@ -96,9 +95,7 @@
             rt = messageId;
         }
 
-
         debuging("Server on client called  by " + name + " from sender " + sender);
-
 
         var respondTo = function (na, mes) {
             clientReceiver(na, mes);
@@ -131,7 +128,6 @@
             });
         }
 
-
         if (retTo) {
             return messageId;
         } else {
@@ -145,7 +141,6 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
     };
     signalx.server = function (n, f) {
-
         if (n && f) {
             haservers = true;
             var nname = toCamelCase(n);
@@ -224,7 +219,6 @@
                     if (!handlers[camelCase]) {
                         handlers[camelCase] = signalx.client[key];
                     }
-
                 }
 
                 var unCamelCase = toUnCamelCase(key);
@@ -232,7 +226,6 @@
                     if (!handlers[unCamelCase]) {
                         handlers[unCamelCase] = signalx.client[key];
                     }
-
                 }
             }
         }
@@ -300,14 +293,12 @@
                         });
                     });
                 },
-
             }).fail(function () {
                 //todo log error
                 context.loadClients();
                 mailBox.run();
                 isReady = true;
             });
-
         }
     };
     window.signalx = signalx;

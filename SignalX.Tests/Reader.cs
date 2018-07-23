@@ -13,7 +13,7 @@ namespace SignalXLib.Tests
         {
             GetInput = new AutoResetEvent(false);
             GotInput = new AutoResetEvent(false);
-            var inputThread = new Thread(ReaderH) {IsBackground = true};
+            var inputThread = new Thread(ReaderH) { IsBackground = true };
             inputThread.Start();
         }
 

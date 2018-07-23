@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -19,19 +13,19 @@ namespace StepRunner
             InitializeComponent();
         }
 
-        WebBrowser webBrowser1;
+        private WebBrowser webBrowser1;
+
         private void Form1_Load(object sender, EventArgs e)
         {
-             webBrowser1 = new System.Windows.Forms.WebBrowser();
+            webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.webBrowser1.Dock = DockStyle.Fill;
-            
+
             this.Controls.Add(this.webBrowser1);
             this.webBrowser1.ScriptErrorsSuppressed = true;
 
             webBrowser1.Navigate(url);
             webBrowser1.Refresh(WebBrowserRefreshOption.Completely);
             Task.Delay(TimeSpan.FromSeconds(5)).ContinueWith(x => { this.Close(); });
-
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -39,14 +33,11 @@ namespace StepRunner
             timer1.Enabled = false;
             var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
-            Task.Factory.StartNew(()=>{})
+            Task.Factory.StartNew(() => { })
                 .ContinueWith(
                     r =>
                     {
-
                     }, scheduler);
-
-
         }
     }
 }
