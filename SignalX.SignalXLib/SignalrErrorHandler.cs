@@ -13,7 +13,7 @@ namespace SignalXLib.Lib
         {
             protected override void OnIncomingError(ExceptionContext exceptionContext, IHubIncomingInvokerContext invokerContext)
             {
-                SignalX.ExceptionHandler?.Invoke(new Exception("OnIncomingError", exceptionContext?.Error));
+                SignalX.ExceptionHandler?.Invoke("OnIncomingError", exceptionContext?.Error);
                 SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.OnIncomingError.ToString(), exceptionContext?.Error?.Message);
                 base.OnIncomingError(exceptionContext, invokerContext);
             }

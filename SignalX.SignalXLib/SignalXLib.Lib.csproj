@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="AppBuilderExtensions.cs" />
     <Compile Include="AuthenticatedConnection.cs" />
+    <Compile Include="ClientDetails.cs" />
     <Compile Include="ConnectionEvents.cs" />
     <Compile Include="ConnectionMapping.cs" />
     <Compile Include="ServerHandlerDetails.cs" />

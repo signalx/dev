@@ -1,58 +1,58 @@
 ﻿namespace SignalXLib.Lib
 {
-    public enum  ConnectionEvents
+    public enum ConnectionEvents
     {
-         OnAfterDisconnect ,
+        OnAfterDisconnect,
 
-         SignalXIncomingRequest ,
+        SignalXIncomingRequest,
 
-         SignalXIncomingRequestCompleted ,
+        SignalXIncomingRequestCompleted,
 
-         SignalXRequestForMethods ,
+        SignalXRequestForMethods,
 
-         SignalXRequestForMethodsCompleted ,
+        SignalXRequestForMethodsCompleted,
 
-         OnConnected ,
+        OnConnected,
 
-         OnDisconnected ,
+        OnDisconnected,
 
-         OnReconnected ,
+        OnReconnected,
 
-         OnIncomingError ,
+        OnIncomingError,
 
-         OnAfterConnect ,
+        OnAfterConnect,
 
-         BuildRejoiningGroups ,
+        BuildRejoiningGroups,
 
-         BuildReconnect ,
+        BuildReconnect,
 
-         BuildOutgoing ,
+        BuildOutgoing,
 
-         BuildIncoming ,
+        BuildIncoming,
 
-         BuildDisconnect ,
+        BuildDisconnect,
 
-         BuildConnect ,
+        BuildConnect,
 
-         BuildAuthorizeConnect ,
+        BuildAuthorizeConnect,
 
-         OnBeforeReconnect ,
+        OnBeforeReconnect,
 
-         OnBeforeOutgoing ,
+        OnBeforeOutgoing,
 
-         OnBeforeIncoming ,
+        OnBeforeIncoming,
 
-         OnBeforeDisconnect ,
+        OnBeforeDisconnect,
 
-         OnBeforeConnect ,
+        OnBeforeConnect,
 
-         OnBeforeAuthorizeConnect ,
+        OnBeforeAuthorizeConnect,
 
-         OnAfterReconnect ,
+        OnAfterReconnect,
 
-         OnAfterOutgoing ,
+        OnAfterOutgoing,
 
-         OnAfterIncoming ,
+        OnAfterIncoming,
         SignalXRequestAuthorizationFailed
     }
 }

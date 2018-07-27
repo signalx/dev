@@ -4,6 +4,8 @@ using Owin;
 
 namespace SignalXLib.Lib
 {
+    using System;
+
     public static class SignalXAppBuilderExtensions
     {
         /// <summary>
@@ -16,7 +18,15 @@ namespace SignalXLib.Lib
             // Turn cross domain on
             var hubConfig = signalXOptions.HubConfiguration;// new HubConfiguration {EnableDetailedErrors = true, EnableJSONP = true};
 
-            GlobalHost.HubPipeline.AddModule(new SignalXHub.SignalXHubPipelineModule());
+            try
+            {
+                GlobalHost.HubPipeline.AddModule(new SignalXHub.SignalXHubPipelineModule());
+            }
+            catch (Exception e)
+            {
+                SignalX.ExceptionHandler?.Invoke("Unable to add SignalXHubPipelineModule to HubPipeline module. Possibly because it has already been added previously. See exception for more details", e);
+            }
+
             app.MapSignalR(hubConfig);
 
             // if (signalXOptions.UiFolder == null) return;

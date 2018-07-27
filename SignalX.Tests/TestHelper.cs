@@ -1,32 +1,69 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SignalXLib.Tests
 {
+    using Microsoft.Owin.Hosting;
+    using System.Threading;
+
     public class TestHelper
     {
-        public static List<string> GetIndexPages(string message, string clientHandler, string serverHandler, string testServerFeedbackHandler)
+        public static void CheckExpectations(Action operation, string url)
         {
-            var result = new List<string>();
+            using (WebApp.Start<Startup>(url))
+            {
+                var webClient = new NHtmlUnit.WebClient(new NHtmlUnit.BrowserVersion(com.gargoylesoftware.htmlunit.BrowserVersion.CHROME))
+                {
+                    JavaScriptEnabled = true,
+                    ThrowExceptionOnFailingStatusCode = true,
+                    ThrowExceptionOnScriptError = true
+                };
+                var thread = new Thread(() => webClient.GetPage(url).Initialize());
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
 
-            result.Add(@"<!DOCTYPE html>
+                TestHelper.AwaitAssert(
+                    () => operation(),
+                    TimeSpan.FromSeconds(1000));
+                thread?.Abort();
+            }
+        }
+
+        public static TestObject SetUpScriptForTest(Func<TestObject, string> scriptFunc)
+        {
+            var testObject = new TestObject() { };
+            testObject.finalMessage = null;
+            testObject.finalMessage2 = null;
+            testObject.finalMessage3 = null;
+            testObject.finalMessage4 = null;
+            testObject.message = Guid.NewGuid().ToString();
+            testObject.clientHandler = "myclientHandler" + Guid.NewGuid().ToString().Replace("-", "");
+            testObject.serverHandler = "myServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
+            testObject.testServerFeedbackHandler = "myTestServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
+            testObject.testServerFeedbackHandler2 = "myTestServerHandler2" + Guid.NewGuid().ToString().Replace("-", "");
+            testObject.testServerFeedbackHandler3 = "myTestServerHandler3" + Guid.NewGuid().ToString().Replace("-", "");
+            testObject.testServerFeedbackHandler4 = "myTestServerHandler4" + Guid.NewGuid().ToString().Replace("-", "");
+            var script = scriptFunc(testObject);
+
+            testObject.indexPage = TestHelper.WrapScriptInHtml(script);
+
+            System.IO.File.WriteAllText(TestHelper.FilePath, testObject.indexPage);
+            return testObject;
+        }
+
+        public static string WrapScriptInHtml(string script)
+        {
+            return @"<!DOCTYPE html>
 							<html>
 							<body>
 							<script src='https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js'></script>
 							<script src='https://ajax.aspnetcdn.com/ajax/signalr/jquery.signalr-2.2.0.js'></script>
 							<script src='https://unpkg.com/signalx'></script>
 							<script>
-								signalx.client." + clientHandler + @"=function (m) {
-							      signalx.server." + testServerFeedbackHandler + @"(m,function(){});
-							    };
-                               signalx.ready(function (server) {
-							      server." + serverHandler + @"('" + message + @"','" + clientHandler + @"');
-                               });
+                               " + script + @"
 							</script>
 							</body>
-							</html>");
-            return result;
+							</html>";
         }
 
         public static string FilePath = AppDomain.CurrentDomain.BaseDirectory + "\\index.html";

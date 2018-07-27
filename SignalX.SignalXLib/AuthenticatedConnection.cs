@@ -12,6 +12,5 @@
             }
             return base.AuthorizeRequest(request);
         }
-        
     }
 }

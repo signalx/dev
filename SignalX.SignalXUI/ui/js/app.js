@@ -1,4 +1,4 @@
-signalx.client.myclient = function(message) {
+signalx.client.myclient = function (message) {
     console.log(message);
 };
 
@@ -14,6 +14,6 @@ try {
 } catch (e) {
 }
 
-setTimeout(function() {
+setTimeout(function () {
     signalx.server.sample("fhj fhfjh jgk jg");
 }, 5000);
