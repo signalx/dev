@@ -11,3 +11,4 @@ nuget Microsoft.Owin.StaticFiles >= 2.1.0 restriction: >= net452
 nuget Newtonsoft.Json >= 9.0.1
 nuget Owin >= 1.0 restriction: >= net452
 nuget NHtmlUnit
+nuget xunit

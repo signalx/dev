@@ -13,67 +13,12 @@ namespace SignalXLib.Lib
     {
         public void Send(string handler, object message, string replyTo, object sender, string messageId)
         {
-            var user = Context.User;
-            string error = "";
-            try
-            {
-                SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXIncomingRequest.ToString(), new
-                {
-                    handler = handler,
-                    message = message,
-                    replyTo = replyTo,
-                    sender = sender,
-                    messageId = messageId
-                });
-                if (!SignalX.CanProcess(Context, handler))
-                {
-                    SignalX.WarningHandler?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required");
-                    return;
-                }
-
-                if (SignalX.StartCountingInComingMessages)
-                    Interlocked.Increment(ref SignalX.InComingCounter);
-
-                SignalX._signalXServers[handler].Invoke(message, sender, replyTo, messageId, Context?.User?.Identity?.Name, Context?.ConnectionId);
-            }
-            catch (Exception e)
-            {
-                error = "An error occured on the server while processing message " + message + " with id " +
-                           messageId + " received from  " + sender + " [ user = " + user.Identity.Name + "] for a response to " + replyTo + " - ERROR: " +
-                           e.Message;
-                SignalX.RespondToAll("signalx_error", error);
-                if (!string.IsNullOrEmpty(replyTo))
-                {
-                    SignalX.RespondToAll(replyTo, error);
-                }
-                SignalX.ExceptionHandler?.Invoke(error, e);
-            }
-            SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXIncomingRequestCompleted.ToString(), new
-            {
-                handler = handler,
-                message = message,
-                replyTo = replyTo,
-                sender = sender,
-                messageId = messageId,
-                error = error
-            });
+            SignalX.Send(Context, Clients, handler, message, replyTo, sender, messageId);
         }
 
         public void GetMethods()
         {
-            SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestForMethods.ToString(), Context?.User?.Identity?.Name);
-            if (!SignalX.CanProcess(Context, ""))
-            {
-                SignalX.WarningHandler?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required");
-                return;
-            }
-            var methods = SignalX._signalXServers.Aggregate("var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred(); window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})}; window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m,rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")) + "}; $sx; ";
-
-            if (SignalX.StartCountingInComingMessages)
-                Interlocked.Increment(ref SignalX.InComingCounter);
-
-            Clients.Caller.addMessage(methods);
-            SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestForMethodsCompleted.ToString(), methods);
+            SignalX.GetMethods(Context, Clients);
         }
 
         public override Task OnConnected()

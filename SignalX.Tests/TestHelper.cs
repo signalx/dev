@@ -3,32 +3,77 @@ using System.Threading.Tasks;
 
 namespace SignalXLib.Tests
 {
+    using System.Diagnostics;
+    using System.Security.Permissions;
     using Microsoft.Owin.Hosting;
     using System.Threading;
+    using Jint;
+    using NHtmlUnit;
+    using StepRunner;
+    using BrowserVersion = com.gargoylesoftware.htmlunit.BrowserVersion;
 
     public class TestHelper
     {
-        public static void CheckExpectations(Action operation, string url)
-        {
+      
+
+        public  void CheckExpectations(Action operation, string url, string html, bool useNHtmlUnit=true)
+        { 
+             Thread thread;
             using (WebApp.Start<Startup>(url))
             {
-                var webClient = new NHtmlUnit.WebClient(new NHtmlUnit.BrowserVersion(com.gargoylesoftware.htmlunit.BrowserVersion.CHROME))
+                thread = new Thread(() =>
                 {
-                    JavaScriptEnabled = true,
-                    ThrowExceptionOnFailingStatusCode = true,
-                    ThrowExceptionOnScriptError = true
-                };
-                var thread = new Thread(() => webClient.GetPage(url).Initialize());
+                    try
+                    {
+
+                        if (useNHtmlUnit)
+                        {
+                            WebClient webClient = new WebClient(new NHtmlUnit.BrowserVersion(BrowserVersion.CHROME))
+                            {
+                                JavaScriptEnabled = true,
+                                ThrowExceptionOnFailingStatusCode = true,
+                                ThrowExceptionOnScriptError = true
+                            };
+                            webClient.GetPage(url);
+                        }
+                        else
+                        {
+                            Form1 dlg = new Form1(html);
+                            dlg.ShowDialog();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.WriteLine(e);
+                    }
+                });
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
 
+              
                 TestHelper.AwaitAssert(
                     () => operation(),
                     TimeSpan.FromSeconds(1000));
-                thread?.Abort();
+               
+               
+                 KillTheThread(thread);
             }
         }
-
+        [SecurityPermission(SecurityAction.Demand, ControlThread = true)]
+         void KillTheThread(Thread thread)
+        {
+            try
+            {
+                thread?.Interrupt();
+                thread?.Abort();
+                thread = null;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+              
+            }
+        }
         public static TestObject SetUpScriptForTest(Func<TestObject, string> scriptFunc)
         {
             var testObject = new TestObject() { };
@@ -55,7 +100,9 @@ namespace SignalXLib.Tests
         {
             return @"<!DOCTYPE html>
 							<html>
-							<body>
+                            <head></head>
+							<body
+                            <h1> SignalX in motion .....</h1>
 							<script src='https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js'></script>
 							<script src='https://ajax.aspnetcdn.com/ajax/signalr/jquery.signalr-2.2.0.js'></script>
 							<script src='https://unpkg.com/signalx'></script>

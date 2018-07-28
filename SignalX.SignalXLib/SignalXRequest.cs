@@ -51,5 +51,10 @@ namespace SignalXLib.Lib
             if (!string.IsNullOrEmpty(ConnectionId))
                 SignalX.RespondToUser(ConnectionId, ReplyTo, response);
         }
+        public void RespondToOthers(object response)
+        {
+            if (!string.IsNullOrEmpty(ConnectionId))
+                SignalX.RespondToOthers(ConnectionId,ReplyTo, response);
+        }
     }
 }

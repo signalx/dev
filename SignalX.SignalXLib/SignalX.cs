@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNet.SignalR;
-using Microsoft.AspNet.SignalR.Infrastructure;
 using System;
 using System.Collections.Concurrent;
 
@@ -11,13 +10,16 @@ namespace SignalXLib.Lib
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class SignalX : IDisposable
+    public partial class SignalX : IDisposable
     {
-        public SignalX(HubConfiguration hubConfiguration = null
+        private static ISignalXClientReceiver Receiver;
+
+        public SignalX(HubConfiguration hubConfiguration = null, ISignalXClientReceiver receiver = null
         )
         {
-            if (hubConfiguration == null) throw new ArgumentNullException(nameof(hubConfiguration));
-            HubConfiguration = hubConfiguration;
+            Receiver = receiver ?? new DefaultSignalRClientReceiver();
+            Connections = new ConnectionMapping<string>();
+            HubConfiguration = hubConfiguration ?? new HubConfiguration();
         }
 
         internal static void UpdateClient(string clientMethodName, bool status)
@@ -174,12 +176,6 @@ namespace SignalXLib.Lib
         }
 
         internal static bool HasHadAConnection { set; get; }
-
-        public SignalX()
-        {
-            Connections = new ConnectionMapping<string>();
-            HubConfiguration = new HubConfiguration();
-        }
 
         public static bool RequireAuthorizationForAllHandlers { get; set; }
         public static bool RequireAuthorizationForPersistentConnections { get; set; }
@@ -407,8 +403,8 @@ namespace SignalXLib.Lib
             }
             if (StartCountingOutGoingMessages)
                 Interlocked.Increment(ref OutGoingCounter);
-            var hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
-            hubContext.Clients.All.broadcastMessage(name, data);
+
+            Receiver.Receive(name, data);
         }
 
         public static void RespondToUser(string userId, string name, object data)
@@ -419,9 +415,83 @@ namespace SignalXLib.Lib
             }
             if (StartCountingOutGoingMessages)
                 Interlocked.Increment(ref OutGoingCounter);
-            var hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
 
-            hubContext.Clients.User(userId).broadcastMessage(name, data);
+            Receiver.Receive(userId, name, data);
+        }
+        public static void RespondToOthers(string excludedUserId, string name, object data)
+        {
+            if (!AllowToSend(name, data))
+            {
+                return;
+            }
+            if (StartCountingOutGoingMessages)
+                Interlocked.Increment(ref OutGoingCounter);
+
+            Receiver.ReceiveAsOther(name, data, excludedUserId);
+        }
+        internal static void Send(HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, string handler, object message, string replyTo, object sender, string messageId)
+        {
+            var user = context?.User;
+            string error = "";
+            try
+            {
+                SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXIncomingRequest.ToString(), new
+                {
+                    handler = handler,
+                    message = message,
+                    replyTo = replyTo,
+                    sender = sender,
+                    messageId = messageId
+                });
+                if (!SignalX.CanProcess(context, handler))
+                {
+                    SignalX.WarningHandler?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required");
+                    return;
+                }
+
+                if (SignalX.StartCountingInComingMessages)
+                    Interlocked.Increment(ref SignalX.InComingCounter);
+
+                SignalX._signalXServers[handler].Invoke(message, sender, replyTo, messageId, context?.User?.Identity?.Name, context?.ConnectionId);
+            }
+            catch (Exception e)
+            {
+                error = "An error occured on the server while processing message " + message + " with id " +
+                           messageId + " received from  " + sender + " [ user = " + user.Identity.Name + "] for a response to " + replyTo + " - ERROR: " +
+                           e.Message;
+                SignalX.RespondToAll("signalx_error", error);
+                if (!string.IsNullOrEmpty(replyTo))
+                {
+                    SignalX.RespondToAll(replyTo, error);
+                }
+                SignalX.ExceptionHandler?.Invoke(error, e);
+            }
+            SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXIncomingRequestCompleted.ToString(), new
+            {
+                handler = handler,
+                message = message,
+                replyTo = replyTo,
+                sender = sender,
+                messageId = messageId,
+                error = error
+            });
+        }
+        internal static void GetMethods(HubCallerContext context, IHubCallerConnectionContext<dynamic> clients)
+        {
+            SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestForMethods.ToString(), context?.User?.Identity?.Name);
+            if (!SignalX.CanProcess(context, ""))
+            {
+                SignalX.WarningHandler?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required");
+                return;
+            }
+            var methods = SignalX._signalXServers.Aggregate("var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred(); window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})}; window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m,rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")) + "}; $sx; ";
+
+            if (SignalX.StartCountingInComingMessages)
+                Interlocked.Increment(ref SignalX.InComingCounter);
+
+            Receiver.ReceiveScripts(methods, clients);
+            
+            SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestForMethodsCompleted.ToString(), methods);
         }
     }
 }

@@ -17,7 +17,9 @@
         signalx.debug.f = f;
     };
     var debuging = function (o) {
-        signalx.debug.f && signalx.debug.f(o);
+         if(signalx.debug.f){
+             signalx.debug.f(o);
+           }
     };
     signalx.waitingList = function (n, f) {
         if (n && f) {
@@ -32,7 +34,8 @@
             description: "signalx is already included in the page"
         });
         return;
-    } else if (window.signalx) {
+    }
+     if (window.signalx) {
         signalx.error.f({
             description: "signalx variable in windows context, i will override it!"
         });
@@ -63,7 +66,9 @@
             if (typeof own === "object" && typeof own.resolve === "function") {
                 own.resolve(message);
             } else {
-                own && own(message);
+                if(own){
+                    own(message);
+                }
             }
         } catch (e) {
             signalx.error.f({
@@ -208,7 +213,7 @@
     };
 
     context.loadClients = function () {
-        for (var key in signalx.client) {
+        for(var key in signalx.client) {
             if (signalx.client.hasOwnProperty(key)) {
                 if (!handlers[key]) {
                     handlers[key] = signalx.client[key];
@@ -233,8 +238,12 @@
 
     var isReady = false;
     signalx.ready = function (f) {
-        f && mailBox.push(f);
-        isReady && mailBox.run();
+        if(f){
+            mailBox.push(f);
+        }
+        if(isReady){
+            mailBox.run();
+        }
         if (!hasRun) {
             hasRun = true;
             //debug
@@ -292,7 +301,7 @@
                             });
                         });
                     });
-                },
+                }
             }).fail(function () {
                 //todo log error
                 context.loadClients();
@@ -318,5 +327,8 @@
             error: message,
             description: "Error occured on the server"
         });
+    };
+    signalx.getConnectionId=function(){
+        return $.connection.hub.id;
     };
 }(window.jQuery, window));
