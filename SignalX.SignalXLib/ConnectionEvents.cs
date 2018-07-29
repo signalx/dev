@@ -53,6 +53,8 @@
         OnAfterOutgoing,
 
         OnAfterIncoming,
-        SignalXRequestAuthorizationFailed
+        SignalXRequestAuthorizationFailed,
+        SignalXGroupJoin,
+        SignalXGroupLeave
     }
 }

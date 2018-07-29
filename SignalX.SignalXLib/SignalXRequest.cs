@@ -21,16 +21,16 @@ namespace SignalXLib.Lib
         public string UserId { get; }
         public string ConnectionId { get; }
 
-        public void RespondToAll(object response)
+        public void RespondToAll(object response, string groupName = null)
         {
             if (!string.IsNullOrEmpty(ReplyTo))
-                SignalX.RespondToAll(ReplyTo, response);
+                SignalX.RespondToAll(ReplyTo, response, groupName);
         }
 
-        public void RespondToAll(string replyTo, object response)
+        public void RespondToAll(string replyTo, object response, string groupName = null)
         {
             if (replyTo == null) throw new ArgumentNullException(nameof(replyTo));
-            SignalX.RespondToAll(replyTo, response);
+            SignalX.RespondToAll(replyTo, response, groupName);
         }
 
         public void RespondToUser(string userId, string replyTo, object response)
@@ -51,10 +51,11 @@ namespace SignalXLib.Lib
             if (!string.IsNullOrEmpty(ConnectionId))
                 SignalX.RespondToUser(ConnectionId, ReplyTo, response);
         }
-        public void RespondToOthers(object response)
+
+        public void RespondToOthers(object response, string groupName = null)
         {
             if (!string.IsNullOrEmpty(ConnectionId))
-                SignalX.RespondToOthers(ConnectionId,ReplyTo, response);
+                SignalX.RespondToOthers(ConnectionId, ReplyTo, response, groupName);
         }
     }
 }

@@ -17,9 +17,9 @@
         signalx.debug.f = f;
     };
     var debuging = function (o) {
-         if(signalx.debug.f){
-             signalx.debug.f(o);
-           }
+        if (signalx.debug.f) {
+            signalx.debug.f(o);
+        }
     };
     signalx.waitingList = function (n, f) {
         if (n && f) {
@@ -35,7 +35,7 @@
         });
         return;
     }
-     if (window.signalx) {
+    if (window.signalx) {
         signalx.error.f({
             description: "signalx variable in windows context, i will override it!"
         });
@@ -66,7 +66,7 @@
             if (typeof own === "object" && typeof own.resolve === "function") {
                 own.resolve(message);
             } else {
-                if(own){
+                if (own) {
                     own(message);
                 }
             }
@@ -129,7 +129,7 @@
         } catch (e) {
             signalx.error.f({
                 error: e,
-                description: "Error executing server cliend"
+                description: "Error executing server client"
             });
         }
 
@@ -213,7 +213,7 @@
     };
 
     context.loadClients = function () {
-        for(var key in signalx.client) {
+        for (var key in signalx.client) {
             if (signalx.client.hasOwnProperty(key)) {
                 if (!handlers[key]) {
                     handlers[key] = signalx.client[key];
@@ -238,10 +238,10 @@
 
     var isReady = false;
     signalx.ready = function (f) {
-        if(f){
+        if (f) {
             mailBox.push(f);
         }
-        if(isReady){
+        if (isReady) {
             mailBox.run();
         }
         if (!hasRun) {
@@ -256,10 +256,27 @@
                         var chat = $.connection.signalXHub;
                         //debug
                         debuging("successfully loaded signalr script from /signalr/hubs ");
-
+                        chat.client.groupManager = function (msg) {
+                            signalx.groupNotifications = signalx.groupNotifications || [];
+                            for (var gi = 0; gi < signalx.groupNotifications.length; gi++) {
+                                signalx.groupNotifications[gi](msg);
+                            }
+                            signalx.groupNotifications = [];
+                        };
+                        signalx.groups = {
+                            join: function (grpName, f) {
+                                signalx.groupNotifications = [];
+                                signalx.groupNotifications.push(f);
+                                chat.server.joinGroup(grpName);
+                            },
+                            leave: function (grpName, f) {
+                                signalx.groupNotifications = [];
+                                signalx.groupNotifications.push(f);
+                                chat.server.leaveGroup(grpName);
+                            }
+                        };
                         chat.client.addMessage = function (message) {
                             try {
-                                //debug
                                 debuging("successfully loaded signalx script from server : " + message);
                                 var server = eval(message);
                                 for (var nnn in server) {
@@ -267,7 +284,6 @@
                                         signalx.server[nnn] = server[nnn];
                                     }
                                 }
-                                // signalx.server = eval(message);
                                 isReady = true;
                                 mailBox.run();
                             } catch (e) {
@@ -328,7 +344,7 @@
             description: "Error occured on the server"
         });
     };
-    signalx.getConnectionId=function(){
+    signalx.getConnectionId = function () {
         return $.connection.hub.id;
     };
 }(window.jQuery, window));

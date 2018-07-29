@@ -37,6 +37,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StepRunner", "StepRunner\St
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.Lib.Extensions", "SignalXLib.Lib.Extensions\SignalXLib.Lib.Extensions.csproj", "{4246D50B-6709-470A-B0BF-6AE249EFEE55}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.ConsoleTests", "SignalXLib.ConsoleTests\SignalXLib.ConsoleTests.csproj", "{18D2FAD2-0F8E-4CD8-BB0E-37FAB1BE3940}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.TestHelperLib", "SignalXLib.TestHelperLib\SignalXLib.TestHelperLib.csproj", "{48C65CF0-22E8-4000-8BB6-069752918E42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -79,6 +83,14 @@ Global
 		{4246D50B-6709-470A-B0BF-6AE249EFEE55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4246D50B-6709-470A-B0BF-6AE249EFEE55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4246D50B-6709-470A-B0BF-6AE249EFEE55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18D2FAD2-0F8E-4CD8-BB0E-37FAB1BE3940}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18D2FAD2-0F8E-4CD8-BB0E-37FAB1BE3940}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18D2FAD2-0F8E-4CD8-BB0E-37FAB1BE3940}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18D2FAD2-0F8E-4CD8-BB0E-37FAB1BE3940}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48C65CF0-22E8-4000-8BB6-069752918E42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48C65CF0-22E8-4000-8BB6-069752918E42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48C65CF0-22E8-4000-8BB6-069752918E42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48C65CF0-22E8-4000-8BB6-069752918E42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +101,8 @@ Global
 		{104285B8-6851-4963-9E72-950BCC96D185} = {D43AD249-FAA7-43A0-9D82-388E2830B8D7}
 		{2A43A64E-78A0-430E-8E10-93AAA25BF60E} = {D43AD249-FAA7-43A0-9D82-388E2830B8D7}
 		{70247A36-2C1A-41D4-A660-023C137B41AE} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
+		{18D2FAD2-0F8E-4CD8-BB0E-37FAB1BE3940} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
+		{48C65CF0-22E8-4000-8BB6-069752918E42} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09DD93D1-94F6-4EA5-870C-6E06481BD98D}

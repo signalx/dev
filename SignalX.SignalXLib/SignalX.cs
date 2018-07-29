@@ -12,15 +12,7 @@ namespace SignalXLib.Lib
 
     public partial class SignalX : IDisposable
     {
-        private static ISignalXClientReceiver Receiver;
-
-        public SignalX(HubConfiguration hubConfiguration = null, ISignalXClientReceiver receiver = null
-        )
-        {
-            Receiver = receiver ?? new DefaultSignalRClientReceiver();
-            Connections = new ConnectionMapping<string>();
-            HubConfiguration = hubConfiguration ?? new HubConfiguration();
-        }
+        public static ISignalXClientReceiver Receiver = new DefaultSignalRClientReceiver();
 
         internal static void UpdateClient(string clientMethodName, bool status)
         {
@@ -69,7 +61,7 @@ namespace SignalXLib.Lib
 
         internal static bool DisabledAllClients { set; get; }
 
-        public HubConfiguration HubConfiguration { get; set; }
+        public static HubConfiguration HubConfiguration = new HubConfiguration() { EnableDetailedErrors = true };
         internal static bool AllowDynamicServerInternal { set; get; }
 
         /// <summary>
@@ -395,7 +387,7 @@ namespace SignalXLib.Lib
         internal static long OutGoingCounter;
         internal static long InComingCounter;
 
-        public static void RespondToAll(string name, object data)
+        public static void RespondToAll(string name, object data, string groupName = null)
         {
             if (!AllowToSend(name, data))
             {
@@ -404,7 +396,7 @@ namespace SignalXLib.Lib
             if (StartCountingOutGoingMessages)
                 Interlocked.Increment(ref OutGoingCounter);
 
-            Receiver.Receive(name, data);
+            Receiver.Receive(name, data, groupName);
         }
 
         public static void RespondToUser(string userId, string name, object data)
@@ -418,7 +410,8 @@ namespace SignalXLib.Lib
 
             Receiver.Receive(userId, name, data);
         }
-        public static void RespondToOthers(string excludedUserId, string name, object data)
+
+        public static void RespondToOthers(string excludedUserId, string name, object data, string groupName = null)
         {
             if (!AllowToSend(name, data))
             {
@@ -427,9 +420,11 @@ namespace SignalXLib.Lib
             if (StartCountingOutGoingMessages)
                 Interlocked.Increment(ref OutGoingCounter);
 
-            Receiver.ReceiveAsOther(name, data, excludedUserId);
+            Receiver.ReceiveAsOther(name, data, excludedUserId, groupName);
         }
-        internal static void Send(HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, string handler, object message, string replyTo, object sender, string messageId)
+
+        public static void SendMessageToServer(HubCallerContext context,
+            IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, object message, string replyTo, object sender, string messageId)
         {
             var user = context?.User;
             string error = "";
@@ -459,10 +454,10 @@ namespace SignalXLib.Lib
                 error = "An error occured on the server while processing message " + message + " with id " +
                            messageId + " received from  " + sender + " [ user = " + user.Identity.Name + "] for a response to " + replyTo + " - ERROR: " +
                            e.Message;
-                SignalX.RespondToAll("signalx_error", error);
+                SignalX.RespondToUser(context.ConnectionId, "signalx_error", error);
                 if (!string.IsNullOrEmpty(replyTo))
                 {
-                    SignalX.RespondToAll(replyTo, error);
+                    SignalX.RespondToUser(context.ConnectionId, replyTo, error);
                 }
                 SignalX.ExceptionHandler?.Invoke(error, e);
             }
@@ -476,7 +471,11 @@ namespace SignalXLib.Lib
                 error = error
             });
         }
-        internal static void GetMethods(HubCallerContext context, IHubCallerConnectionContext<dynamic> clients)
+
+        public static void RespondToScriptRequest(
+            HubCallerContext context,
+            IHubCallerConnectionContext<dynamic> clients,
+            IGroupManager groups)
         {
             SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestForMethods.ToString(), context?.User?.Identity?.Name);
             if (!SignalX.CanProcess(context, ""))
@@ -489,9 +488,29 @@ namespace SignalXLib.Lib
             if (SignalX.StartCountingInComingMessages)
                 Interlocked.Increment(ref SignalX.InComingCounter);
 
-            Receiver.ReceiveScripts(methods, clients);
-            
+            Receiver.ReceiveScripts(context?.ConnectionId, methods, context, groups, clients);
+
             SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestForMethodsCompleted.ToString(), methods);
+        }
+
+        internal static void JoinGroup(HubCallerContext context,
+            IHubCallerConnectionContext<dynamic> clients,
+            IGroupManager groups, string groupName)
+        {
+            groups.Add(context?.ConnectionId, groupName);
+            SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXGroupJoin.ToString(), groupName);
+
+            Receiver.ReceiveInGroupManager(context?.ConnectionId, groupName, context, clients, groups);
+        }
+
+        internal static void LeaveGroup(HubCallerContext context,
+            IHubCallerConnectionContext<dynamic> clients,
+            IGroupManager groups, string groupName)
+        {
+            groups.Remove(context?.ConnectionId, groupName);
+            SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXGroupLeave.ToString(), groupName);
+
+            Receiver.ReceiveInGroupManager(context?.ConnectionId, groupName, context, clients, groups);
         }
     }
 }

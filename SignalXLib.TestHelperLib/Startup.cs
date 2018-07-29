@@ -9,8 +9,8 @@ namespace SignalXLib.Tests
     {
         public void Configuration(IAppBuilder app)
         {
-            app.UseSignalX(new SignalX());
-            app.UseSignalXFileSystem("");
+            app.UseSignalX();
+            app.UseSignalXFileSystem();
         }
     }
 }

@@ -12,11 +12,10 @@ namespace SignalXLib.Lib
         /// If you already did MapSignalR in your app, then you done need to use this!
         /// </summary>
         public static void UseSignalX(
-            this IAppBuilder app, SignalX signalXOptions = null)
+            this IAppBuilder app)
         {
-            signalXOptions = signalXOptions ?? new SignalX(new HubConfiguration() { EnableDetailedErrors = true });
             // Turn cross domain on
-            var hubConfig = signalXOptions.HubConfiguration;// new HubConfiguration {EnableDetailedErrors = true, EnableJSONP = true};
+            var hubConfig = SignalX.HubConfiguration;// new HubConfiguration {EnableDetailedErrors = true, EnableJSONP = true};
 
             try
             {

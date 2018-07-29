@@ -5,5 +5,5 @@ Microsoft.Owin.Hosting
 Microsoft.Owin.Security
 Newtonsoft.Json
 Owin
-xunit
 NHtmlUnit
+xunit

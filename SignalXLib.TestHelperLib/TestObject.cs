@@ -14,5 +14,7 @@
         public string testServerFeedbackHandler2;
         public string testServerFeedbackHandler3;
         public string testServerFeedbackHandler4;
+        public bool verifiedJoinedGroup;
+        public bool verifiedJoinedGroup2;
     }
 }

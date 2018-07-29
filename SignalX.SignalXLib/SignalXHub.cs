@@ -1,24 +1,31 @@
 ﻿using Microsoft.AspNet.SignalR;
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace SignalXLib.Lib
 {
-    using System.Threading;
-
     //use GlobalHost.HubPipeline.RequireAuthentication(); to lock sown all your hubs
 
     public partial class SignalXHub : Hub
     {
         public void Send(string handler, object message, string replyTo, object sender, string messageId)
         {
-            SignalX.Send(Context, Clients, handler, message, replyTo, sender, messageId);
+            SignalX.SendMessageToServer(Context, Clients, Groups, handler, message, replyTo, sender, messageId);
+        }
+
+        public void JoinGroup(string groupName)
+        {
+            SignalX.JoinGroup(Context, Clients, Groups, groupName);
+        }
+
+        public void LeaveGroup(string groupName)
+        {
+            SignalX.LeaveGroup(Context, Clients, Groups, groupName);
         }
 
         public void GetMethods()
         {
-            SignalX.GetMethods(Context, Clients);
+            SignalX.RespondToScriptRequest(Context, Clients, Groups);
         }
 
         public override Task OnConnected()

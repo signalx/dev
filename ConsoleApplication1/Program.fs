@@ -9,7 +9,7 @@ open Microsoft.Owin.Hosting
 
 type public Startup() =
         member x.Configuration (app:IAppBuilder) =
-                                      app.UseSignalX( new SignalX()) |> ignore
+                                      app.UseSignalX() |> ignore
                                       app.UseSignalXFileSystem() |> ignore
 
 [<EntryPoint>]
