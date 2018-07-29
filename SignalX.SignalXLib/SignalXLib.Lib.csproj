@@ -48,12 +48,14 @@
     <Compile Include="ConnectionMapping.cs" />
     <Compile Include="DefaultSignalRClientReceiver.cs" />
     <Compile Include="ISignalXClientReceiver.cs" />
+    <Compile Include="ReaderWriterLockSlimExtensions.cs" />
     <Compile Include="ServerHandlerDetails.cs" />
     <Compile Include="SignalrErrorHandler.cs" />
     <Compile Include="SignalXHub.cs" />
     <Compile Include="SignalX.cs" />
     <Compile Include="SignalXRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SignalXServerState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

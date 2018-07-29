@@ -259,7 +259,7 @@
                         chat.client.groupManager = function (msg) {
                             signalx.groupNotifications = signalx.groupNotifications || [];
                             for (var gi = 0; gi < signalx.groupNotifications.length; gi++) {
-                                signalx.groupNotifications[gi](msg);
+                              typeof  signalx.groupNotifications[gi] ==="function" && signalx.groupNotifications[gi](msg);
                             }
                             signalx.groupNotifications = [];
                         };

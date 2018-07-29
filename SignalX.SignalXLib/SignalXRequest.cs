@@ -4,7 +4,7 @@ namespace SignalXLib.Lib
 {
     public class SignalXRequest
     {
-        public SignalXRequest(string replyTo, object sender, string messageId, object message, string userId, string connectionId)
+        public SignalXRequest(string replyTo, object sender, string messageId, object message, string userId, string connectionId, string handler)
         {
             ReplyTo = replyTo;
             Sender = sender;
@@ -12,6 +12,7 @@ namespace SignalXLib.Lib
             Message = message;
             UserId = userId;
             ConnectionId = connectionId;
+            this.Handler = handler;
         }
 
         public string ReplyTo { get; }
@@ -20,6 +21,8 @@ namespace SignalXLib.Lib
         public object Message { get; }
         public string UserId { get; }
         public string ConnectionId { get; }
+
+        public string Handler { get; private set; }
 
         public void RespondToAll(object response, string groupName = null)
         {

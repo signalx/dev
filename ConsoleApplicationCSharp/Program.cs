@@ -66,9 +66,9 @@ namespace ConsoleApplicationCSharp
                     });
                 SignalX.Server("DisableAllClients", (request) => { SignalX.DisableAllClients(); });
                 SignalX.Server("Sample2",
-                    (message, sender, replyTo, messageId) =>
+                    (request) =>
                     {
-                        SignalX.RespondToAll(string.IsNullOrEmpty(replyTo) ? "Myclient" : replyTo, messageId + ":" + sender + " sent me this message : " + message + " and asked me to reply to " + replyTo);
+                        SignalX.RespondToAll(string.IsNullOrEmpty(request.ReplyTo) ? "Myclient" : request.ReplyTo, request.MessageId + ":" + request.Sender + " sent me this message : " + request.Message + " and asked me to reply to " + request.ReplyTo);
                     });
 
                 SignalX.Server("Sample3", (request) => request.RespondToAll(request.ReplyTo));

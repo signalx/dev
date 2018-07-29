@@ -18,13 +18,13 @@ namespace SignalXLib.Lib
         {
             if (string.IsNullOrEmpty(clientMethodName))
                 throw new ArgumentNullException(nameof(clientMethodName));
-            if (_signalXClientDetails.ContainsKey(clientMethodName))
+            if (SignalXClientDetails.ContainsKey(clientMethodName))
             {
-                _signalXClientDetails[clientMethodName].Disabled = status;
+                SignalXClientDetails[clientMethodName].Disabled = status;
             }
             else
             {
-                _signalXClientDetails.GetOrAdd(clientMethodName, new ClientDetails() { Disabled = status });
+                SignalXClientDetails.GetOrAdd(clientMethodName, new ClientDetails() { Disabled = status });
             }
         }
 
@@ -39,7 +39,7 @@ namespace SignalXLib.Lib
         public static void DisableAllClients()
         {
             DisabledAllClients = true;
-            foreach (string s in _signalXClientDetails.Select(x => x.Key).ToList())
+            foreach (string s in SignalXClientDetails.Select(x => x.Key).ToList())
             {
                 UpdateClient(s, true);
             }
@@ -53,7 +53,7 @@ namespace SignalXLib.Lib
         public static void EnableAllClients()
         {
             DisabledAllClients = false;
-            foreach (string s in _signalXClientDetails.Select(x => x.Key).ToList())
+            foreach (string s in SignalXClientDetails.Select(x => x.Key).ToList())
             {
                 UpdateClient(s, false);
             }
@@ -78,7 +78,7 @@ namespace SignalXLib.Lib
         internal static bool CanProcess(HubCallerContext context, string serverHandlerName)
         {
             bool result = false;
-            if (SignalX.RequireAuthorizationForAllHandlers || (_signalXServersDetails.ContainsKey(serverHandlerName) && _signalXServersDetails[serverHandlerName].RequiresAuthorization))
+            if (SignalX.RequireAuthorizationForAllHandlers || (SignalXServerExecutionDetails.ContainsKey(serverHandlerName) && SignalXServerExecutionDetails[serverHandlerName].RequiresAuthorization))
             {
                 if (SignalX.AuthenticatedWhen != null)
                 {
@@ -177,73 +177,45 @@ namespace SignalXLib.Lib
             MyApp.Dispose();
         }
 
-        internal static ConcurrentDictionary<string, ClientDetails> _signalXClientDetails = new ConcurrentDictionary<string, ClientDetails>();
+        internal static ConcurrentDictionary<string, ClientDetails> SignalXClientDetails = new ConcurrentDictionary<string, ClientDetails>();
 
-        internal static ConcurrentDictionary<string, ServerHandlerDetails> _signalXServersDetails = new ConcurrentDictionary<string, ServerHandlerDetails>();
+        internal static ConcurrentDictionary<string, ServerHandlerDetails> SignalXServerExecutionDetails = new ConcurrentDictionary<string, ServerHandlerDetails>();
 
-        internal static ConcurrentDictionary<string, Action<object, object, string, string, string, string>> _signalXServers = new ConcurrentDictionary<string, Action<object, object, string, string, string, string>>();
+        protected internal static ConcurrentDictionary<string, Action<SignalXRequest, SignalXServerState>> SignalXServers = new ConcurrentDictionary<string, Action<SignalXRequest, SignalXServerState>>();
 
-        public static void Server(string name, Action<object, object, string, string, string, string> server, bool requireAuthorization = false)
+        public static void Server(string name,
+            Action<SignalXRequest, SignalXServerState> server, bool requireAuthorization = false, bool isSingleWriter = false)
         {
             name = name.Trim();
-            if (_signalXServers.ContainsKey(name) && !AllowDynamicServerInternal)
+            var camelCased = Char.ToLowerInvariant(name[0]) + name.Substring(1);
+            var unCamelCased = Char.ToUpperInvariant(name[0]) + name.Substring(1);
+            if ((SignalXServers.ContainsKey(camelCased) || SignalXServers.ContainsKey(unCamelCased)) && !AllowDynamicServerInternal)
             {
                 throw new Exception("Server with name '" + name + "' already created");
             }
 
             try
             {
-                var camelCased = Char.ToLowerInvariant(name[0]) + name.Substring(1);
-
-                var unCamelCased = Char.ToUpperInvariant(name[0]) + name.Substring(1);
-
-                if (_signalXServers.ContainsKey(camelCased))
+                if (SignalXServers.ContainsKey(camelCased))
                 {
-                    _signalXServers[camelCased] = server;
-                    if (!requireAuthorization)
-                    {
-                        _signalXServersDetails[camelCased] = new ServerHandlerDetails(false);
-                    }
-                    else
-                    {
-                        _signalXServersDetails[camelCased] = new ServerHandlerDetails(true);
-                    }
+                    SignalXServers[camelCased] = server;
+                    SignalXServerExecutionDetails[camelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter);
+
                     if (camelCased != unCamelCased)
                     {
-                        _signalXServers[unCamelCased] = server;
-                        if (!requireAuthorization)
-                        {
-                            _signalXServersDetails[unCamelCased] = new ServerHandlerDetails(false);
-                        }
-                        else
-                        {
-                            _signalXServersDetails[unCamelCased] = new ServerHandlerDetails(true);
-                        }
+                        SignalXServers[unCamelCased] = server;
+                        SignalXServerExecutionDetails[unCamelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter);
                     }
                 }
                 else
                 {
-                    _signalXServers.GetOrAdd(camelCased, server);
-                    if (!requireAuthorization)
-                    {
-                        _signalXServersDetails.GetOrAdd(camelCased, new ServerHandlerDetails(false));
-                    }
-                    else
-                    {
-                        _signalXServersDetails.GetOrAdd(camelCased, new ServerHandlerDetails(true));
-                    }
+                    SignalXServers.GetOrAdd(camelCased, server);
+                    SignalXServerExecutionDetails.GetOrAdd(camelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter));
 
                     if (camelCased != unCamelCased)
                     {
-                        _signalXServers.GetOrAdd(unCamelCased, server);
-                        if (!requireAuthorization)
-                        {
-                            _signalXServersDetails.GetOrAdd(unCamelCased, new ServerHandlerDetails(false));
-                        }
-                        else
-                        {
-                            _signalXServersDetails.GetOrAdd(unCamelCased, new ServerHandlerDetails(true));
-                        }
+                        SignalXServers.GetOrAdd(unCamelCased, server);
+                        SignalXServerExecutionDetails.GetOrAdd(unCamelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter));
                     }
                 }
             }
@@ -253,67 +225,39 @@ namespace SignalXLib.Lib
             }
         }
 
-        public static void ServerAuthorized(string name, Action<object, object, string, string, string, string> server)
+        public static void ServerAuthorized(string name, Action<SignalXRequest> server)
+        {
+            ServerAuthorized(name, (r, s) => server(r));
+        }
+        public static void ServerAuthorizedSingleAccess(string name, Action<SignalXRequest> server)
+        {
+            ServerAuthorizedSingleAccess(name, (r, s) => server(r));
+        }
+
+        public static void Server(string name, Action<SignalXRequest> server, bool requireAuthorization = false)
+        {
+            Server(name, (r, s) => server(r), requireAuthorization);
+        }
+
+        public static void ServerSingleAccess(string name, Action<SignalXRequest> server, bool requireAuthorization = false)
+        {
+            Server(name, (r, s) => server(r), requireAuthorization,true);
+        }
+        public static void ServerAuthorized(string name, Action<SignalXRequest, SignalXServerState> server)
         {
             Server(name, server, true);
         }
-
-        public static void ServerAuthorized(string name, Action<object, object, string, string, string> server)
+        public static void ServerAuthorizedSingleAccess(string name, Action<SignalXRequest, SignalXServerState> server)
         {
-            ServerAuthorized(name, (message, sender, replyTo, messageId, userId, connectionId) => server(message, sender, replyTo, userId, connectionId));
-        }
-
-        public static void ServerAuthorized(string name, Action<object, object, string, string> server)
-        {
-            ServerAuthorized(name, (message, sender, replyTo, messageId, userId, connectionId) => server(message, sender, replyTo, userId));
-        }
-
-        public static void ServerAuthorized(string name, Action<object, object, string> server)
-        {
-            ServerAuthorized(name, (message, sender, replyTo, messageId, userId, connectionId) => server(message, sender, replyTo));
-        }
-
-        public static void ServerAuthorized(string name, Action<object, object> server)
-        {
-            ServerAuthorized(name, (message, sender, replyTo, messageId, userId, connectionId) => server(message, sender));
-        }
-
-        public static void ServerAuthorized(string name, Action<SignalXRequest> server)
-        {
-            ServerAuthorized(name, (message, sender, replyTo, messageId, userId, connectionId) => server(new SignalXRequest(replyTo, sender, messageId, message, userId, connectionId)));
-        }
-
-        public static void Server(string name, Action<object, object, string, string, string> server)
-        {
-            Server(name, (message, sender, replyTo, messageId, userId, connectionId) => server(message, sender, replyTo, userId, connectionId));
-        }
-
-        public static void Server(string name, Action<object, object, string, string> server)
-        {
-            Server(name, (message, sender, replyTo, messageId, userId, connectionId) => server(message, sender, replyTo, userId));
-        }
-
-        public static void Server(string name, Action<object, object, string> server)
-        {
-            Server(name, (message, sender, replyTo, messageId, userId, connectionId) => server(message, sender, replyTo));
-        }
-
-        public static void Server(string name, Action<object, object> server)
-        {
-            Server(name, (message, sender, replyTo, messageId, userId, connectionId) => server(message, sender));
-        }
-
-        public static void Server(string name, Action<SignalXRequest> server)
-        {
-            Server(name, (message, sender, replyTo, messageId, userId, connectionId) => server(new SignalXRequest(replyTo, sender, messageId, message, userId, connectionId)));
+            Server(name, server, true,true);
         }
 
         private static bool AllowToSend(string name, object data)
         {
             if (DisabledAllClients)
             {
-                if (!_signalXClientDetails.ContainsKey(name) ||
-                    (_signalXClientDetails.ContainsKey(name) && _signalXClientDetails[name].Disabled))
+                if (!SignalXClientDetails.ContainsKey(name) ||
+                    (SignalXClientDetails.ContainsKey(name) && SignalXClientDetails[name].Disabled))
                 {
                     SignalX.WarningHandler?.Invoke("DataSendingNotActivated",
                         new
@@ -327,7 +271,7 @@ namespace SignalXLib.Lib
             }
             else
             {
-                if (_signalXClientDetails.ContainsKey(name) && _signalXClientDetails[name].Disabled)
+                if (SignalXClientDetails.ContainsKey(name) && SignalXClientDetails[name].Disabled)
                 {
                     SignalX.WarningHandler?.Invoke("DataSendingNotActivated",
                         new
@@ -430,6 +374,9 @@ namespace SignalXLib.Lib
             string error = "";
             try
             {
+                if (SignalX.StartCountingInComingMessages)
+                    Interlocked.Increment(ref SignalX.InComingCounter);
+
                 SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXIncomingRequest.ToString(), new
                 {
                     handler = handler,
@@ -438,16 +385,24 @@ namespace SignalXLib.Lib
                     sender = sender,
                     messageId = messageId
                 });
+
+                if (string.IsNullOrEmpty(handler) || !SignalXServers.ContainsKey(handler))
+                {
+                    var e = "Error request for unknown server name " + handler;
+                    SignalX.ExceptionHandler?.Invoke(e, new Exception(e));
+                    SignalX.RespondToUser(context?.ConnectionId, replyTo, e);
+                    return;
+                }
+
                 if (!SignalX.CanProcess(context, handler))
                 {
                     SignalX.WarningHandler?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required");
                     return;
                 }
 
-                if (SignalX.StartCountingInComingMessages)
-                    Interlocked.Increment(ref SignalX.InComingCounter);
+                var request = new SignalXRequest(replyTo, sender, messageId, message, context?.User?.Identity?.Name, context?.ConnectionId, handler);
 
-                SignalX._signalXServers[handler].Invoke(message, sender, replyTo, messageId, context?.User?.Identity?.Name, context?.ConnectionId);
+                CallServer(request);
             }
             catch (Exception e)
             {
@@ -472,6 +427,22 @@ namespace SignalXLib.Lib
             });
         }
 
+        private static void CallServer(SignalXRequest request)
+        {
+            var executionDetails = SignalXServerExecutionDetails[request.Handler];
+            if (executionDetails.IsSingleWriter)
+            {
+                using (executionDetails.SingleWriter.Write())
+                {
+                    SignalX.SignalXServers[request.Handler].Invoke(request, SignalXServerExecutionDetails[request.Handler].State);
+                }
+            }
+            else
+            {
+                SignalX.SignalXServers[request.Handler].Invoke(request, SignalXServerExecutionDetails[request.Handler].State);
+            }
+        }
+
         public static void RespondToScriptRequest(
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
@@ -483,7 +454,7 @@ namespace SignalXLib.Lib
                 SignalX.WarningHandler?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required");
                 return;
             }
-            var methods = SignalX._signalXServers.Aggregate("var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred(); window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})}; window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m,rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")) + "}; $sx; ";
+            var methods = SignalX.SignalXServers.Aggregate("var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred(); window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})}; window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m,rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")) + "}; $sx; ";
 
             if (SignalX.StartCountingInComingMessages)
                 Interlocked.Increment(ref SignalX.InComingCounter);
