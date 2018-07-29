@@ -58,7 +58,7 @@ Backend (F#) :-
     open Microsoft.Owin.Hosting
 	
     type public Startup() =
-        member x.Configuration (app:IAppBuilder) = app.UseSignalX( new SignalX()) |> ignore
+        member x.Configuration (app:IAppBuilder) = app.UseSignalX() |> ignore
 		
     [<EntryPoint>]
     let main argv = 
@@ -139,6 +139,18 @@ Return a promise
     getSomethingCompletedPromise.done(function (something) {
         console.log(something);
     });
+ 
+ Join a group
+=========================================================
+
+    signalx.groups.join("mygroup",function(){});
+
+ 
+  Leave a group
+=========================================================
+
+    signalx.groups.leave("mygroup",function(){});
+
  
  
  
