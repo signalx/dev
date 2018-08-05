@@ -2,9 +2,11 @@
 
 namespace SignalXLib.Lib
 {
+    using System.Security.Principal;
+
     public class SignalXRequest
     {
-        public SignalXRequest(string replyTo, object sender, string messageId, object message, string userId, string connectionId, string handler)
+        public SignalXRequest(string replyTo, object sender, string messageId, object message, string userId, string connectionId, string handler, IPrincipal principalUser)
         {
             ReplyTo = replyTo;
             Sender = sender;
@@ -13,6 +15,7 @@ namespace SignalXLib.Lib
             UserId = userId;
             ConnectionId = connectionId;
             this.Handler = handler;
+            this.PrincipalUser = principalUser;
         }
 
         public string ReplyTo { get; }
@@ -21,6 +24,7 @@ namespace SignalXLib.Lib
         public object Message { get; }
         public string UserId { get; }
         public string ConnectionId { get; }
+        public IPrincipal PrincipalUser { get;  }
 
         public string Handler { get; private set; }
 

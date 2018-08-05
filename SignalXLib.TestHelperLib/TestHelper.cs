@@ -9,10 +9,25 @@ namespace SignalXLib.TestHelperLib
     using System.Security.Permissions;
     using System.Threading;
     using System.Threading.Tasks;
+    using Xunit;
     using BrowserVersion = com.gargoylesoftware.htmlunit.BrowserVersion;
 
     public class TestHelper
     {
+     public  static TimeSpan MaxTestWaitTime = TimeSpan.FromSeconds(1000);
+        public static void CheckExpectationsExpectingFailures(Action operation, string url, string html)
+        {
+            try
+            {
+                CheckExpectations(operation, url, html);
+               throw new Exception("Expected test to fail but it passed");
+            }
+            catch (Exception e)
+            {
+               
+            }
+        }
+
         public static void CheckExpectations(Action operation, string url, string html)
         {
             Thread thread;
@@ -40,10 +55,10 @@ namespace SignalXLib.TestHelperLib
 
                 TestHelper.AwaitAssert(
                     () => operation(),
-                    TimeSpan.FromSeconds(1000));
-
+                    MaxTestWaitTime);
+   }
                 KillTheThread(thread);
-            }
+         
         }
 
         [SecurityPermission(SecurityAction.Demand, ControlThread = true)]

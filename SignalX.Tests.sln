@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.ConsoleTests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.TestHelperLib", "SignalXLib.TestHelperLib\SignalXLib.TestHelperLib.csproj", "{48C65CF0-22E8-4000-8BB6-069752918E42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalXLib.TestWithConsoleClient", "SignalXLib.TestWithConsoleClient\SignalXLib.TestWithConsoleClient.csproj", "{76AF74FC-84AB-4EDB-8168-42F34A9CE1F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,10 @@ Global
 		{48C65CF0-22E8-4000-8BB6-069752918E42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48C65CF0-22E8-4000-8BB6-069752918E42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48C65CF0-22E8-4000-8BB6-069752918E42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76AF74FC-84AB-4EDB-8168-42F34A9CE1F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76AF74FC-84AB-4EDB-8168-42F34A9CE1F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76AF74FC-84AB-4EDB-8168-42F34A9CE1F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76AF74FC-84AB-4EDB-8168-42F34A9CE1F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,6 +109,7 @@ Global
 		{70247A36-2C1A-41D4-A660-023C137B41AE} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
 		{18D2FAD2-0F8E-4CD8-BB0E-37FAB1BE3940} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
 		{48C65CF0-22E8-4000-8BB6-069752918E42} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
+		{76AF74FC-84AB-4EDB-8168-42F34A9CE1F9} = {2E5D2FBD-CFBE-4065-A3E0-E9DC84494450}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {09DD93D1-94F6-4EA5-870C-6E06481BD98D}

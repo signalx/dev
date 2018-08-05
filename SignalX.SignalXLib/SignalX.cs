@@ -44,7 +44,25 @@ namespace SignalXLib.Lib
                 UpdateClient(s, true);
             }
         }
-
+        /// <summary>
+        /// This just turns around to set the GlobalHost.Configuration.DefaultMessageBufferSize
+        /// Since messages are stored in the message bus in server memory, reducing the size of messages can also address server memory issues.
+        /// Since SignalR doesn't block when you call client methods, you can invoke client methods very quickly. 
+        /// Unfortunately, the client might not always be ready to receive messages immediately once you send them, so SignalR has to buffer messages
+        /// So by default SignalR will buffer up to 1000 messages per client. 
+        /// Once the client falls behind by over 1000 messages, it will start missing messages
+        /// By default, SignalR retains 1000 messages in memory per hub per connection. 
+        /// If large messages are being used, this may create memory issues which can be 
+        /// alleviated by reducing this value. This setting can be set in the 
+        /// Application_Start event handler in an ASP.NET application, or in the 
+        /// Configuration method of an OWIN startup class in a self-hosted application
+        /// see https://docs.microsoft.com/en-us/aspnet/signalr/overview/performance/signalr-performance#tuning
+        ///  </summary>
+        /// <param name="defaultMessageBufferSize">Default val is 1000 </param>
+        public static void SetGlobalDefaultMessageBufferSize(int defaultMessageBufferSize=1000)
+        {
+            GlobalHost.Configuration.DefaultMessageBufferSize = defaultMessageBufferSize;
+        }
         public static void EnableClient(string clientMethodName)
         {
             UpdateClient(clientMethodName, false);
@@ -69,7 +87,7 @@ namespace SignalXLib.Lib
         /// </summary>
         public static bool AllowDynamicServer
         {
-            set { AllowDynamicServer = value; }
+            set { AllowDynamicServerInternal = value; }
         }
 
         public IDisposable MyApp { get; set; }
@@ -400,7 +418,7 @@ namespace SignalXLib.Lib
                     return;
                 }
 
-                var request = new SignalXRequest(replyTo, sender, messageId, message, context?.User?.Identity?.Name, context?.ConnectionId, handler);
+                var request = new SignalXRequest(replyTo, sender, messageId, message, context?.User?.Identity?.Name, context?.ConnectionId, handler, context?.User);
 
                 CallServer(request);
             }
@@ -454,7 +472,7 @@ namespace SignalXLib.Lib
                 SignalX.WarningHandler?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required");
                 return;
             }
-            var methods = SignalX.SignalXServers.Aggregate("var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred(); window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})}; window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m,rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")) + "}; $sx; ";
+            var methods = SignalX.SignalXServers.Aggregate("window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})};var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")) + "}; $sx; ";
 
             if (SignalX.StartCountingInComingMessages)
                 Interlocked.Increment(ref SignalX.InComingCounter);
