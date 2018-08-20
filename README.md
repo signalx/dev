@@ -154,7 +154,10 @@ Return a promise
  
  
  
+ Setting up a test sample
+ =======================================================
  
+ Do checkout how to reproduce behaviour at https://github.com/signalx/Reproduction
  
  
  
