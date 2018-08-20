@@ -23,6 +23,7 @@ namespace SignalXLib.TestHelperLib
             //setup
             var testObject = TestHelper.SetUpScriptForTest((testData) => script);
             //server
+           
             scenarioDefinition?.Server();
             //test : run and assert
             TestHelper.CheckExpectations(
@@ -31,7 +32,7 @@ namespace SignalXLib.TestHelperLib
                     scenarioDefinition?.Checks();
                 },
                 "http://localhost:44111",
-                testObject.IndexPage);
+                testObject.IndexPage, scenarioDefinition.OnClientLoaded);
         }
 
 
@@ -48,7 +49,7 @@ namespace SignalXLib.TestHelperLib
             }
         }
 
-        public static void CheckExpectations(Action operation, string url, string html)
+        public static void CheckExpectations(Action operation, string url, string html,Action onClientLoaded=null)
         {
             Thread thread;
             using (WebApp.Start<Startup>(url))
@@ -65,8 +66,8 @@ namespace SignalXLib.TestHelperLib
                         };
                         webClient.GetPage(url);
 
-                     
-                        // System.Diagnostics.Process.Start(url);
+                        onClientLoaded?.Invoke();
+                       //System.Diagnostics.Process.Start(url);
                     }
                     catch (Exception e)
                     {

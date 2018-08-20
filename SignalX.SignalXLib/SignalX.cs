@@ -204,14 +204,16 @@ namespace SignalXLib.Lib
         public static void Server(string name,
             Action<SignalXRequest, SignalXServerState> server, 
             bool requireAuthorization = false, 
-            bool isSingleWriter = false)
+            bool isSingleWriter = false,
+            bool allowDynamicServerForThisInstance=false)
         {
             name = name.Trim();
             var camelCased = Char.ToLowerInvariant(name[0]) + name.Substring(1);
             var unCamelCased = Char.ToUpperInvariant(name[0]) + name.Substring(1);
-            if ((SignalXServers.ContainsKey(camelCased) || SignalXServers.ContainsKey(unCamelCased)) && !AllowDynamicServerInternal)
+            
+            if ((SignalXServers.ContainsKey(camelCased) || SignalXServers.ContainsKey(unCamelCased)) && !AllowDynamicServerInternal && !allowDynamicServerForThisInstance)
             {
-                throw new Exception("Server with name '" + name + "' already created");
+                throw new Exception("Server with name '" + name + "' has already been created");
             }
 
             try
@@ -463,6 +465,7 @@ namespace SignalXLib.Lib
             }
         }
 
+        internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT";//+Guid.NewGuid().ToString().Replace("-","");
         public static void RespondToScriptRequest(
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
@@ -474,7 +477,14 @@ namespace SignalXLib.Lib
                 SignalX.WarningHandler?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required");
                 return;
             }
-            var methods = SignalX.SignalXServers.Aggregate("window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})};var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")) + "}; $sx; ";
+
+            var clientAgent = @"
+                 signalx.client."+ SIGNALXCLIENTAGENT + @" = function (message) {
+                    var response ={};
+                   try{  response={ Error : '', Result : eval('(function(){ '+message+' })()') }; }catch(err){  response = {Error : err, Result :'' }   }
+                   signalx.server." + SIGNALXCLIENTAGENT + @"(response,function(messageResponse){  });
+                 };";
+            var methods = SignalX.SignalXServers.Aggregate(clientAgent+"window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})};var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")) + "}; $sx; ";
 
             if (SignalX.StartCountingInComingMessages)
                 Interlocked.Increment(ref SignalX.InComingCounter);
@@ -483,6 +493,23 @@ namespace SignalXLib.Lib
 
             SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestForMethodsCompleted.ToString(), methods);
         }
+        internal static Action<string, SignalXRequest, string> OnResponseAfterScriptRuns { set; get; }
+
+        public static void RunJavaScriptOnAllClients(string script,Action<string,SignalXRequest, string> onResponse, TimeSpan? delay=null)
+        {
+            if (SignalX.OnResponseAfterScriptRuns != null)
+            {
+                //todo do something here to maybe block multiple calls 
+                //todo before a previous one finishes
+                //todo or throw a warning
+            }
+            delay = delay ?? TimeSpan.FromSeconds(0);
+            OnResponseAfterScriptRuns = onResponse;
+               Task.Delay(delay.Value).ContinueWith((c) =>
+               {
+                   SignalX.RespondToAll(SIGNALXCLIENTAGENT, script);
+               });
+            }
 
         internal static void JoinGroup(HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
@@ -503,5 +530,7 @@ namespace SignalXLib.Lib
 
             Receiver.ReceiveInGroupManager(context?.ConnectionId, groupName, context, clients, groups);
         }
+
+      static   SignalXAgents SignalXAgents = new SignalXAgents();
     }
 }

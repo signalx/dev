@@ -3,6 +3,7 @@
 namespace SignalXLib.ConsoleTests
 {
     using Microsoft.Owin.Hosting;
+    using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
     using Xunit;
     using TestObject = SignalXLib.TestHelperLib.TestObject;
@@ -30,7 +31,12 @@ namespace SignalXLib.ConsoleTests
                         Assert.True(testObject.VerifiedJoinedGroup, "verifiedJoinedGroup");
                         Assert.True(testObject.VerifiedJoinedGroup2, "verifiedJoinedGroup2");
                         Console.WriteLine("tests succeeded!");
-                        break;
+                        SignalX.RunJavaScriptOnAllClients($"return 5*10",
+                            (response, request, error) =>
+                            {
+                           var     result = Convert.ToInt32(response);
+                            }, TimeSpan.FromSeconds(2));
+                        //break;
                     }
                     catch (Exception e)
                     {

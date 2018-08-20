@@ -49,8 +49,10 @@
     <Compile Include="DefaultSignalRClientReceiver.cs" />
     <Compile Include="ISignalXClientReceiver.cs" />
     <Compile Include="ReaderWriterLockSlimExtensions.cs" />
+    <Compile Include="ResponseAfterScriptRuns.cs" />
     <Compile Include="ServerHandlerDetails.cs" />
     <Compile Include="SignalrErrorHandler.cs" />
+    <Compile Include="SignalXAgents.cs" />
     <Compile Include="SignalXHub.cs" />
     <Compile Include="SignalX.cs" />
     <Compile Include="SignalXRequest.cs" />

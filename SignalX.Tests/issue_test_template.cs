@@ -10,23 +10,25 @@
         [Fact]
         public void it_should_call_server_from_client()
         {
-            TestHelper.MaxTestWaitTime = TimeSpan.FromSeconds(20);
+            TestHelper.MaxTestWaitTime = TimeSpan.FromSeconds(200);
+            var result = 0;
             var scenario = new ScenarioDefinition(
-                script: @"signalx.ready(function (server) {
-							      server.myServer('abc',function (message) {							         
-							       });
-                                 });",
+                script: "",
                 server: () =>
                 {
-                    SignalX.Server("myServer",
-                        request =>
-                        {
-                            SignalX.RespondToAll(request.ReplyTo, request.Message);
-                        });
+                   
                 },
                 checks: () =>
                 {
-                    Assert.True(true);
+                    Assert.Equal(50, result);
+                },
+                onClientLoaded: () =>
+                {
+                    SignalX.RunJavaScriptOnAllClients($"return 5*10",
+                        (response, request, error) =>
+                        {
+                            result = Convert.ToInt32(response);
+                        }, TimeSpan.FromSeconds(5));
                 }
             );
             TestHelper.RunScenario(scenario);
