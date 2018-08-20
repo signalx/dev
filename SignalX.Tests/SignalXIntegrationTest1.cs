@@ -1,21 +1,44 @@
 ﻿namespace SignalXLib.Tests
 {
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
     using System;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Xunit;
     using Assert = Xunit.Assert;
 
-
     public class SignalXIntegrationTest1
     {
-
         public SignalXIntegrationTest1()
         {
             TestHelper.MaxTestWaitTime = TimeSpan.FromSeconds(20);
         }
 
+        [Fact]
+        public void server_should_be_able_to_run_javascript_on_client()
+        {
+            TestHelper.MaxTestWaitTime = TimeSpan.FromSeconds(200);
+            var result = 0;
+            var scenario = new ScenarioDefinition(
+                script: "",
+                server: () =>
+                {
+                },
+                checks: () =>
+                {
+                    Assert.Equal(50, result);
+                },
+                onClientLoaded: () =>
+                {
+                    SignalX.RunJavaScriptOnAllClients($"return 5*10",
+                        (response, request, error) =>
+                        {
+                            result = Convert.ToInt32(response);
+                        }, TimeSpan.FromSeconds(5));
+                }
+            );
+            TestHelper.RunScenario(scenario);
+        }
 
         /// <summary>
         /// Last server setup will run
@@ -54,11 +77,9 @@
                 finalMessage = message1;
             });
 
-
             //ASSERT
             TestHelper.CheckExpectationsExpectingFailures(() => Assert.Equal(message3, finalMessage), "http://localhost:44111", testObject.IndexPage);
         }
-
 
         [Fact]
         [Timeout(1)]
@@ -97,8 +118,6 @@
             TestHelper.CheckExpectations(() => Assert.Equal(message3, finalMessage), "http://localhost:44111", testObject.IndexPage);
         }
 
-
-
         [Fact]
         [Timeout(1)]
         public void client_dont_need_to_specify_any_argument_to_call_the_server()
@@ -130,8 +149,6 @@
             //ASSERT
             TestHelper.CheckExpectations(() => Assert.Equal(message3, finalMessage), "http://localhost:44111", testObject.IndexPage);
         }
-
-
 
         [Fact]
         [Timeout(1)]
@@ -165,9 +182,6 @@
             TestHelper.CheckExpectations(() => Assert.Equal(message1 + message2, finalMessage), "http://localhost:44111", testObject.IndexPage);
         }
 
-
-
-
         [Fact]
         [Timeout(1)]
         public void client_should_support_anonymous_callback2()
@@ -179,7 +193,7 @@
             TestObject testObject =
                 TestHelper.SetUpScriptForTest((testData) => @"
                                signalx.ready(function (server) {
-							      server." + testData.ServerHandler + @"('" + message1 + @"',function (m) {							          
+							      server." + testData.ServerHandler + @"('" + message1 + @"',function (m) {
 							       });
                                 });");
 
@@ -198,8 +212,6 @@
             //ASSERT
             TestHelper.CheckExpectationsExpectingFailures(() => Assert.Equal(message1 + message2, finalMessage), "http://localhost:44111", testObject.IndexPage);
         }
-
-
 
         [Fact]
         [Timeout(1)]

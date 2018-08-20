@@ -1,8 +1,8 @@
 ﻿namespace SignalXLib.Tests
 {
-    using System;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
+    using System;
     using Xunit;
 
     public class issue_test_template
@@ -16,7 +16,6 @@
                 script: "",
                 server: () =>
                 {
-                   
                 },
                 checks: () =>
                 {
