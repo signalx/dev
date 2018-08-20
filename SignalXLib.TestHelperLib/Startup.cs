@@ -1,8 +1,7 @@
-using Owin;
-using SignalXLib.Lib;
-
-namespace SignalXLib.Tests
+namespace SignalXLib.TestHelperLib
 {
+    using Owin;
+    using SignalXLib.Lib;
     using SignalXLib.Lib.Extensions;
 
     public class Startup

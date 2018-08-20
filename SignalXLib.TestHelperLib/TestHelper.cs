@@ -3,18 +3,38 @@ namespace SignalXLib.TestHelperLib
     using Microsoft.Owin.Hosting;
     using NHtmlUnit;
     using SignalXLib.Lib;
-    using SignalXLib.Tests;
     using System;
     using System.Diagnostics;
     using System.Security.Permissions;
     using System.Threading;
     using System.Threading.Tasks;
-    using Xunit;
+  
     using BrowserVersion = com.gargoylesoftware.htmlunit.BrowserVersion;
 
     public class TestHelper
     {
-     public  static TimeSpan MaxTestWaitTime = TimeSpan.FromSeconds(1000);
+     public  static TimeSpan MaxTestWaitTime = TimeSpan.FromSeconds(10);
+
+
+        public static void RunScenario(ScenarioDefinition scenarioDefinition)
+        {
+            // script
+            var script = scenarioDefinition.Script;
+            //setup
+            var testObject = TestHelper.SetUpScriptForTest((testData) => script);
+            //server
+            scenarioDefinition?.Server();
+            //test : run and assert
+            TestHelper.CheckExpectations(
+                () =>
+                {
+                    scenarioDefinition?.Checks();
+                },
+                "http://localhost:44111",
+                testObject.IndexPage);
+        }
+
+
         public static void CheckExpectationsExpectingFailures(Action operation, string url, string html)
         {
             try
@@ -44,6 +64,9 @@ namespace SignalXLib.TestHelperLib
                             ThrowExceptionOnScriptError = true
                         };
                         webClient.GetPage(url);
+
+                     
+                        // System.Diagnostics.Process.Start(url);
                     }
                     catch (Exception e)
                     {
@@ -76,25 +99,25 @@ namespace SignalXLib.TestHelperLib
             }
         }
 
-        public TestObject SetUpScriptForTest(Func<TestObject, string> scriptFunc)
+        public static TestObject SetUpScriptForTest(Func<TestObject, string> scriptFunc)
         {
             var testObject = new TestObject() { };
-            testObject.finalMessage = null;
-            testObject.finalMessage2 = null;
-            testObject.finalMessage3 = null;
-            testObject.finalMessage4 = null;
-            testObject.message = Guid.NewGuid().ToString();
-            testObject.clientHandler = "myclientHandler" + Guid.NewGuid().ToString().Replace("-", "");
-            testObject.serverHandler = "myServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
-            testObject.testServerFeedbackHandler = "myTestServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
-            testObject.testServerFeedbackHandler2 = "myTestServerHandler2" + Guid.NewGuid().ToString().Replace("-", "");
-            testObject.testServerFeedbackHandler3 = "myTestServerHandler3" + Guid.NewGuid().ToString().Replace("-", "");
-            testObject.testServerFeedbackHandler4 = "myTestServerHandler4" + Guid.NewGuid().ToString().Replace("-", "");
+            testObject.FinalMessage = null;
+            testObject.FinalMessage2 = null;
+            testObject.FinalMessage3 = null;
+            testObject.FinalMessage4 = null;
+            testObject.Message = Guid.NewGuid().ToString();
+            testObject.ClientHandler = "myclientHandler" + Guid.NewGuid().ToString().Replace("-", "");
+            testObject.ServerHandler = "myServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
+            testObject.TestServerFeedbackHandler = "myTestServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
+            testObject.TestServerFeedbackHandler2 = "myTestServerHandler2" + Guid.NewGuid().ToString().Replace("-", "");
+            testObject.TestServerFeedbackHandler3 = "myTestServerHandler3" + Guid.NewGuid().ToString().Replace("-", "");
+            testObject.TestServerFeedbackHandler4 = "myTestServerHandler4" + Guid.NewGuid().ToString().Replace("-", "");
             var script = scriptFunc(testObject);
 
-            testObject.indexPage = TestHelper.WrapScriptInHtml(script);
+            testObject.IndexPage = TestHelper.WrapScriptInHtml(script);
 
-            System.IO.File.WriteAllText(TestHelper.FilePath, testObject.indexPage);
+            System.IO.File.WriteAllText(TestHelper.FilePath, testObject.IndexPage);
             return testObject;
         }
 
@@ -133,12 +156,12 @@ namespace SignalXLib.TestHelperLib
             TestObject testObject = TestHelper.SetUpScriptForTest(
                 (testData) => @"
                                 var promise = {}
-								signalx.client." + testData.clientHandler + @"=function (m) {
-							      signalx.server." + testData.testServerFeedbackHandler + @"(m,function(m2){
-                                     signalx.server." + testData.testServerFeedbackHandler2 + @"(m2,function(m3){
-                                          promise = signalx.server." + testData.testServerFeedbackHandler3 + @"(m3);
+								signalx.client." + testData.ClientHandler + @"=function (m) {
+							      signalx.server." + testData.TestServerFeedbackHandler + @"(m,function(m2){
+                                     signalx.server." + testData.TestServerFeedbackHandler2 + @"(m2,function(m3){
+                                          promise = signalx.server." + testData.TestServerFeedbackHandler3 + @"(m3);
                                           promise.then(function(m4){
-                                             signalx.server." + testData.testServerFeedbackHandler4 + @"(m4);
+                                             signalx.server." + testData.TestServerFeedbackHandler4 + @"(m4);
                                           });
                                      });
                                   });
@@ -150,54 +173,54 @@ namespace SignalXLib.TestHelperLib
                                   signalx.groups.join('" + groupName + @"',function(c){
                                              signalx.server." + groupWatcher + @"(c);
                                           });
-							      server." + testData.serverHandler + @"('" + testData.message + @"','" + testData.clientHandler + @"');
+							      server." + testData.ServerHandler + @"('" + testData.Message + @"','" + testData.ClientHandler + @"');
                                 });");
 
-            testObject.verifiedJoinedGroup = false;
-            testObject.verifiedJoinedGroup2 = false;
+            testObject.VerifiedJoinedGroup = false;
+            testObject.VerifiedJoinedGroup2 = false;
             //SET UP SERVER
             SignalX.Server(
                 groupWatcher,
                 request =>
                 {
-                    testObject.verifiedJoinedGroup = request.Message as string == groupName;
+                    testObject.VerifiedJoinedGroup = request.Message as string == groupName;
                     SignalX.RespondToAll(clientGroupReceiver, request.Message, groupName);
                 });
             SignalX.Server(groupWatcher2,
                 request =>
                 {
-                    testObject.verifiedJoinedGroup2 = request.Message as string == groupName;
+                    testObject.VerifiedJoinedGroup2 = request.Message as string == groupName;
                 });
-            SignalX.Server(testObject.serverHandler,
+            SignalX.Server(testObject.ServerHandler,
                 request =>
                 {
-                    SignalX.RespondToAll(testObject.clientHandler, testObject.message);
-                });
-            SignalX.Server(
-                testObject.testServerFeedbackHandler,
-                request =>
-                {
-                    testObject.finalMessage = request.Message as string;
-                    SignalX.RespondToAll(request.ReplyTo, testObject.finalMessage);
+                    SignalX.RespondToAll(testObject.ClientHandler, testObject.Message);
                 });
             SignalX.Server(
-                testObject.testServerFeedbackHandler2,
+                testObject.TestServerFeedbackHandler,
                 request =>
                 {
-                    testObject.finalMessage2 = request.Message as string;
-                    SignalX.RespondToAll(request.ReplyTo, testObject.finalMessage2);
+                    testObject.FinalMessage = request.Message as string;
+                    SignalX.RespondToAll(request.ReplyTo, testObject.FinalMessage);
                 });
             SignalX.Server(
-                testObject.testServerFeedbackHandler3,
+                testObject.TestServerFeedbackHandler2,
                 request =>
                 {
-                    testObject.finalMessage3 = request.Message as string;
-                    SignalX.RespondToAll(request.ReplyTo, testObject.finalMessage3);
+                    testObject.FinalMessage2 = request.Message as string;
+                    SignalX.RespondToAll(request.ReplyTo, testObject.FinalMessage2);
                 });
-            SignalX.Server(testObject.testServerFeedbackHandler4,
+            SignalX.Server(
+                testObject.TestServerFeedbackHandler3,
                 request =>
                 {
-                    testObject.finalMessage4 = request.Message as string;
+                    testObject.FinalMessage3 = request.Message as string;
+                    SignalX.RespondToAll(request.ReplyTo, testObject.FinalMessage3);
+                });
+            SignalX.Server(testObject.TestServerFeedbackHandler4,
+                request =>
+                {
+                    testObject.FinalMessage4 = request.Message as string;
                 });
 
             return testObject;

@@ -202,7 +202,9 @@ namespace SignalXLib.Lib
         protected internal static ConcurrentDictionary<string, Action<SignalXRequest, SignalXServerState>> SignalXServers = new ConcurrentDictionary<string, Action<SignalXRequest, SignalXServerState>>();
 
         public static void Server(string name,
-            Action<SignalXRequest, SignalXServerState> server, bool requireAuthorization = false, bool isSingleWriter = false)
+            Action<SignalXRequest, SignalXServerState> server, 
+            bool requireAuthorization = false, 
+            bool isSingleWriter = false)
         {
             name = name.Trim();
             var camelCased = Char.ToLowerInvariant(name[0]) + name.Substring(1);

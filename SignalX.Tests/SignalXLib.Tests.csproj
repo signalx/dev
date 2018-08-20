@@ -49,6 +49,7 @@
     </When>
   </Choose>
   <ItemGroup>
+    <Compile Include="issue_test_template.cs" />
     <Compile Include="Reader.cs" />
     <Compile Include="SignalXIntegrationTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

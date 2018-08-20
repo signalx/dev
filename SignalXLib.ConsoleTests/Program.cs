@@ -4,9 +4,8 @@ namespace SignalXLib.ConsoleTests
 {
     using Microsoft.Owin.Hosting;
     using SignalXLib.TestHelperLib;
-    using SignalXLib.Tests;
     using Xunit;
-    using TestObject = SignalXLib.Tests.TestObject;
+    using TestObject = SignalXLib.TestHelperLib.TestObject;
 
     internal class Program
     {
@@ -24,12 +23,12 @@ namespace SignalXLib.ConsoleTests
                     Console.ReadKey();
                     try
                     {
-                        Assert.Equal(testObject.message, testObject.finalMessage);
-                        Assert.Equal(testObject.message, testObject.finalMessage2);
-                        Assert.Equal(testObject.message, testObject.finalMessage3);
-                        Assert.Equal(testObject.message, testObject.finalMessage4);
-                        Assert.True(testObject.verifiedJoinedGroup, "verifiedJoinedGroup");
-                        Assert.True(testObject.verifiedJoinedGroup2, "verifiedJoinedGroup2");
+                        Assert.Equal(testObject.Message, testObject.FinalMessage);
+                        Assert.Equal(testObject.Message, testObject.FinalMessage2);
+                        Assert.Equal(testObject.Message, testObject.FinalMessage3);
+                        Assert.Equal(testObject.Message, testObject.FinalMessage4);
+                        Assert.True(testObject.VerifiedJoinedGroup, "verifiedJoinedGroup");
+                        Assert.True(testObject.VerifiedJoinedGroup2, "verifiedJoinedGroup2");
                         Console.WriteLine("tests succeeded!");
                         break;
                     }

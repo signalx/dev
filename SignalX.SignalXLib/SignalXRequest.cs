@@ -22,6 +22,7 @@ namespace SignalXLib.Lib
         public object Sender { get; }
         public string MessageId { get; }
         public object Message { get; }
+        [Obsolete("Will soon be removed in subsequent versions. Please obtain UserId from PrincipalUser instead")]
         public string UserId { get; }
         public string ConnectionId { get; }
         public IPrincipal PrincipalUser { get;  }
