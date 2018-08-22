@@ -32,7 +32,7 @@ namespace SignalXLib.TestHelperLib
                     scenarioDefinition?.Checks();
                 },
                 "http://localhost:44111",
-                testObject.IndexPage, scenarioDefinition.OnClientLoaded);
+                testObject.IndexPage, scenarioDefinition.OnClientLoaded, scenarioDefinition.OnClientError);
         }
 
 
@@ -49,7 +49,7 @@ namespace SignalXLib.TestHelperLib
             }
         }
 
-        public static void CheckExpectations(Action operation, string url, string html,Action onClientLoaded=null)
+        public static void CheckExpectations(Action operation, string url, string html,Action onClientLoaded=null, Action<Exception> onClientError=null)
         {
             Thread thread;
             using (WebApp.Start<Startup>(url))
@@ -67,11 +67,11 @@ namespace SignalXLib.TestHelperLib
                         webClient.GetPage(url);
 
                         onClientLoaded?.Invoke();
-                       //System.Diagnostics.Process.Start(url);
+                      //  System.Diagnostics.Process.Start(url);
                     }
                     catch (Exception e)
                     {
-                        Debug.WriteLine(e);
+                        onClientError?.Invoke(e);
                     }
                 });
                 thread.SetApartmentState(ApartmentState.STA);
@@ -148,6 +148,7 @@ namespace SignalXLib.TestHelperLib
 
         public static TestObject SetupGeneralTest()
         {
+            TestHelperLib.TestHelper.MaxTestWaitTime= TimeSpan.FromSeconds(60);
             string groupName = Guid.NewGuid().ToString();
             var groupWatcher = "groupWatcher";
             var groupWatcher2 = "groupWatcher2";

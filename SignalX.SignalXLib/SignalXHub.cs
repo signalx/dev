@@ -8,7 +8,7 @@ namespace SignalXLib.Lib
 
     public partial class SignalXHub : Hub
     {
-        public void Send(string handler, object message, string replyTo, object sender, string messageId)
+        public void Send(string handler, dynamic message, string replyTo, dynamic sender, string messageId)
         {
             SignalX.SendMessageToServer(Context, Clients, Groups, handler, message, replyTo, sender, messageId);
         }

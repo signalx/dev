@@ -28,7 +28,7 @@ namespace SignalXLib.Lib
             /// <param name="clientName"></param>
             /// <param name="message"></param>
             /// <param name="groupName"></param>
-            public void Receive(string clientName, dynamic message, string groupName)
+            public void ReceiveByGroup(string clientName, dynamic message, string groupName)
             {
                 IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
                 if (!string.IsNullOrEmpty(groupName))
@@ -85,7 +85,7 @@ namespace SignalXLib.Lib
             /// <param name="replyTo"></param>
             /// <param name="sender"></param>
             /// <param name="messageId"></param>
-            public void SendMessageToServer(HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, object message, string replyTo, object sender, string messageId)
+            public void SendMessageToServer(HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId)
             {
                 SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId);
             }

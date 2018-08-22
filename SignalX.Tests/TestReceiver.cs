@@ -21,7 +21,7 @@
             this.LastMessageReceived.Message = message;
         }
 
-        public void Receive(string clientName, dynamic message, string groupName = null)
+        public void ReceiveByGroup(string clientName, dynamic message, string groupName = null)
         {
             this.LastMessageReceived = new TestMessageModel();
             this.LastMessageReceived.GroupName = groupName;
@@ -57,7 +57,7 @@
             SignalX.RespondToScriptRequest(context, clients, groups);
         }
 
-        public void SendMessageToServer(HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, object message, string replyTo, object sender, string messageId)
+        public void SendMessageToServer(HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId)
         {
             SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId);
         }

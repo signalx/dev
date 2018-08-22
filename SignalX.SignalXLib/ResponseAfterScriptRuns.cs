@@ -4,6 +4,6 @@
     {
         public string Error { get; set; }
 
-        public string Result { get; set; }
+        public dynamic Result { get; set; }
     }
 }

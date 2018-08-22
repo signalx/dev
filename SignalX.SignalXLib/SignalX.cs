@@ -353,7 +353,7 @@ namespace SignalXLib.Lib
         internal static long OutGoingCounter;
         internal static long InComingCounter;
 
-        public static void RespondToAll(string name, object data, string groupName = null)
+        public static void RespondToAll(string name, dynamic data, string groupName = null)
         {
             if (!AllowToSend(name, data))
             {
@@ -362,7 +362,7 @@ namespace SignalXLib.Lib
             if (StartCountingOutGoingMessages)
                 Interlocked.Increment(ref OutGoingCounter);
 
-            Receiver.Receive(name, data, groupName);
+            Receiver.ReceiveByGroup(name, data , groupName);
         }
 
         public static void RespondToUser(string userId, string name, object data)
@@ -390,7 +390,7 @@ namespace SignalXLib.Lib
         }
 
         public static void SendMessageToServer(HubCallerContext context,
-            IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, object message, string replyTo, object sender, string messageId)
+            IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId)
         {
             var user = context?.User;
             string error = "";
@@ -422,7 +422,7 @@ namespace SignalXLib.Lib
                     return;
                 }
 
-                var request = new SignalXRequest(replyTo, sender, messageId, message, context?.User?.Identity?.Name, context?.ConnectionId, handler, context?.User);
+                var request = new SignalXRequest(replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User);
 
                 CallServer(request);
             }
@@ -493,9 +493,10 @@ namespace SignalXLib.Lib
 
             SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestForMethodsCompleted.ToString(), methods);
         }
-        internal static Action<string, SignalXRequest, string> OnResponseAfterScriptRuns { set; get; }
+        //todo make this allow for multiple instances
+        internal static Action<dynamic, SignalXRequest, string> OnResponseAfterScriptRuns { set; get; }
 
-        public static void RunJavaScriptOnAllClients(string script,Action<string,SignalXRequest, string> onResponse, TimeSpan? delay=null)
+        public static void RunJavaScriptOnAllClients(string script,Action<dynamic,SignalXRequest, string> onResponse, TimeSpan? delay=null)
         {
             if (SignalX.OnResponseAfterScriptRuns != null)
             {

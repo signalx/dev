@@ -34,7 +34,11 @@
                         (response, request, error) =>
                         {
                             result = Convert.ToInt32(response);
-                        }, TimeSpan.FromSeconds(5));
+                        }, TimeSpan.FromSeconds(10));
+                },
+                onClientError: (e) =>
+                {
+                    var error = e;
                 }
             );
             TestHelper.RunScenario(scenario);
@@ -284,6 +288,7 @@
         public void COMPLETE_TEST_it_should_be_able_to_communicate_back_and_forth_with_the_client()
 
         {
+
             TestObject testObject = TestHelper.SetupGeneralTest();
 
             Assert.NotEqual(testObject.Message, testObject.FinalMessage);

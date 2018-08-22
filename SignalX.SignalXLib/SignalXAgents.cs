@@ -12,15 +12,23 @@
                 {
                     try
                     {
-                        var response = JsonConvert.DeserializeObject<ResponseAfterScriptRuns>(JsonConvert.SerializeObject(request.Message));
+                        var str = request.Message.ToString();
+                        var response = JsonConvert.DeserializeObject<ResponseAfterScriptRuns>(str);
                         SignalX.OnResponseAfterScriptRuns ?.Invoke(response.Result, request, response.Error);
+                        /*
+                          todo check why this is not working as dynamic
+                          todo maybe needs to specify/check serialization for hub 
+                          SignalX.OnResponseAfterScriptRuns ?.Invoke(request.Message.Result, request, request.Message.Error);
+                   
+                         */
+
                     }
                     catch (Exception e)
                     {
                         SignalX.OnResponseAfterScriptRuns?.Invoke(null, request, e.Message);
                     }
-
-                    SignalX.OnResponseAfterScriptRuns = null;
+                    //removed coz of possibility of result aggregation from clients
+                   // SignalX.OnResponseAfterScriptRuns = null;
                 }, false, false, true);
         }
     }

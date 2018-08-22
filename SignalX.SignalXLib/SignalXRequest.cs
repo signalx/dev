@@ -6,13 +6,13 @@ namespace SignalXLib.Lib
 
     public class SignalXRequest
     {
-        public SignalXRequest(string replyTo, object sender, string messageId, object message, string userId, string connectionId, string handler, IPrincipal principalUser)
+        public SignalXRequest(string replyTo, object sender, string messageId, dynamic message,  string connectionId, string handler, IPrincipal principalUser)
         {
             ReplyTo = replyTo;
             Sender = sender;
             MessageId = messageId;
             Message = message;
-            UserId = userId;
+            //UserId = userId;
             ConnectionId = connectionId;
             this.Handler = handler;
             this.PrincipalUser = principalUser;
@@ -21,9 +21,9 @@ namespace SignalXLib.Lib
         public string ReplyTo { get; }
         public object Sender { get; }
         public string MessageId { get; }
-        public object Message { get; }
-        [Obsolete("Will soon be removed in subsequent versions. Please obtain UserId from PrincipalUser instead")]
-        public string UserId { get; }
+        public dynamic Message { get; }
+        //[Obsolete("Will soon be removed in subsequent versions. Please obtain UserId from PrincipalUser instead")]
+        //public string UserId { get; }
         public string ConnectionId { get; }
         public IPrincipal PrincipalUser { get;  }
 

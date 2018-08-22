@@ -9,7 +9,7 @@
         {
             void Receive(string userId, string clientName, dynamic message);
 
-            void Receive(string clientName, dynamic message, string groupName = null);
+            void ReceiveByGroup(string clientName, dynamic message, string groupName = null);
 
             void ReceiveAsOther(string clientName, dynamic message, string excludedConnection, string groupName = null);
 
@@ -26,7 +26,7 @@
                 IHubCallerConnectionContext<dynamic> clients,
                 IGroupManager groups,
                 string handler,
-                object message,
+                dynamic message,
                 string replyTo,
                 object sender,
                 string messageId);

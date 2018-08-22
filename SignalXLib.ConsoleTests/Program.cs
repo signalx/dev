@@ -31,12 +31,12 @@ namespace SignalXLib.ConsoleTests
                         Assert.True(testObject.VerifiedJoinedGroup, "verifiedJoinedGroup");
                         Assert.True(testObject.VerifiedJoinedGroup2, "verifiedJoinedGroup2");
                         Console.WriteLine("tests succeeded!");
-                        SignalX.RunJavaScriptOnAllClients($"return 5*10",
+                        SignalX.RunJavaScriptOnAllClients("alert('yo');for(i=0;i<10000;i++) {console.log(Math.pow(999, Math.pow(9, 2)));}",
                             (response, request, error) =>
                             {
                            var     result = Convert.ToInt32(response);
-                            }, TimeSpan.FromSeconds(2));
-                        //break;
+                            }, TimeSpan.FromSeconds(5));
+                        break;
                     }
                     catch (Exception e)
                     {
