@@ -13,3 +13,5 @@ nuget Owin >= 1.0 restriction: >= net452
 nuget NHtmlUnit
 nuget xunit
 nuget Microsoft.AspNet.SignalR.Client
+nuget MSTest.TestAdapter
+nuget MSTest.TestFramework 

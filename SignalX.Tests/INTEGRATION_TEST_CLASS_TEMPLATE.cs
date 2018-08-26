@@ -1,12 +1,13 @@
 ﻿namespace SignalXLib.Tests
 {
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using Xunit;
-
+    
+    [TestClass]
     public class INTEGRATION_TEST_CLASS_TEMPLATE
     {
-        [Fact]
+        [TestMethod]
         public void TEST_TEMPLATE()
         {
             SignalXTester.Run(
