@@ -1,13 +1,14 @@
 ﻿namespace SignalXLib.Tests
 {
-    using System;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using SignalXLib.Lib;
+    using System;
 
     public class TestReceiver : ISignalXClientReceiver
     {
-        SignalX SignalX;
+        private SignalX SignalX;
+
         public TestReceiver(SignalX signalX)
         {
             SignalX = signalX ?? throw new ArgumentNullException(nameof(signalX));
@@ -55,12 +56,12 @@
             this.LastMessageReceived.Message = message;
         }
 
-        public void RequestScripts(SignalX SignalX,HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
+        public void RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
         {
             SignalX.RespondToScriptRequest(context, clients, groups);
         }
 
-        public void SendMessageToServer(SignalX SignalX,HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId)
+        public void SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId)
         {
             SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId);
         }

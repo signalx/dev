@@ -12,7 +12,7 @@ namespace SignalXLib.ConsoleTests
     {
         private static void Main(string[] args)
         {
-            TestObject testObject = TestHelper.SetupGeneralTest();
+            TestObject testObject = SignalXTester.SetupGeneralTest();
 
             var url = "http://localhost:44111";
             using (WebApp.Start<Startup>(url))

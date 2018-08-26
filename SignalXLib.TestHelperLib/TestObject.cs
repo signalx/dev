@@ -2,14 +2,14 @@
 {
     public class TestObject
     {
+        public string ClientHandler;
+        public string FileName;
         public string FinalMessage;
-        public string Message;
         public string FinalMessage2;
         public string FinalMessage3;
         public string FinalMessage4;
+        public string Message;
         public string PageHtml;
-        public string FileName;
-        public string ClientHandler;
         public string ServerHandler;
         public string TestServerFeedbackHandler;
         public string TestServerFeedbackHandler2;

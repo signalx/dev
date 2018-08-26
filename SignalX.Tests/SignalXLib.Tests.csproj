@@ -28,6 +28,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,6 +37,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -51,14 +53,21 @@
     </When>
   </Choose>
   <ItemGroup>
-    <Compile Include="issue_test_template.cs" />
-    <Compile Include="Reader.cs" />
-    <Compile Include="SignalXIntegrationTest1.cs" />
+    <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server8.cs" />
+    <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server1.cs" />
+    <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server10.cs" />
+    <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server2.cs" />
+    <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server3.cs" />
+    <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server4.cs" />
+    <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server5.cs" />
+    <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server6.cs" />
+    <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server7.cs" />
+    <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server9.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestMessageModel.cs" />
-    <Compile Include="TestReceiver.cs" />
-    <Compile Include="TEST_CLASS_TEMPLATE.cs" />
-    <Compile Include="when_signalx_is_used.cs" />
+    <Compile Include="TestModels\TestMessageModel.cs" />
+    <Compile Include="Mocks\TestReceiver.cs" />
+    <Compile Include="INTEGRATION_TEST_CLASS_TEMPLATE.cs" />
+    <Compile Include="UnitTests\when_signalx_is_used.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

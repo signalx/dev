@@ -15,9 +15,7 @@ namespace SignalXLib.Lib
         }
         static SignalX instance { set; get; }
         public static object padlock=new object();
-
-
-
+        
         
         public static SignalX Instance()
         {
@@ -168,8 +166,6 @@ namespace SignalXLib.Lib
 
         public  void RespondToAll( string name, dynamic data, string groupName = null)
         {
-            //todo object here coz : extesntion method cannot be dynamically dispatched
-            //todo will consider moving it to main class
             if (!AllowToSend(name, data))
             {
                 return;
