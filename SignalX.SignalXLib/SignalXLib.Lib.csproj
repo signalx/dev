@@ -53,11 +53,13 @@
     <Compile Include="ServerHandlerDetails.cs" />
     <Compile Include="SignalrErrorHandler.cs" />
     <Compile Include="SignalXAgents.cs" />
+    <Compile Include="SignalXExtensions.cs" />
     <Compile Include="SignalXHub.cs" />
     <Compile Include="SignalX.cs" />
     <Compile Include="SignalXRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SignalXServerState.cs" />
+    <Compile Include="SignalXSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -17,6 +17,7 @@ namespace SignalXLib.ConsoleTests
             var url = "http://localhost:44111";
             using (WebApp.Start<Startup>(url))
             {
+                SignalX SignalX = SignalX.Instance();
                 System.Diagnostics.Process.Start(url);
                 while (true)
                 {

@@ -6,6 +6,7 @@
 
     public class ConnectionMapping<T>
     {
+     
         private readonly ConcurrentDictionary<T, HashSet<string>> _connections = new ConcurrentDictionary<T, HashSet<string>>();
 
         public int Count
@@ -16,9 +17,9 @@
             }
         }
 
-        public void Add(T key, string connectionId)
+        public void Add(SignalX SignalX,T key, string connectionId)
         {
-            if (!SignalX.ManageUserConnections)
+            if (!SignalX.Settings.ManageUserConnections)
             {
                 return;
             }
@@ -42,9 +43,9 @@
             return Enumerable.Empty<string>();
         }
 
-        public void Remove(T key, string connectionId)
+        public void Remove(SignalX SignalX,T key, string connectionId)
         {
-            if (!SignalX.ManageUserConnections)
+            if (!SignalX.Settings.ManageUserConnections)
             {
                 return;
             }
@@ -59,6 +60,12 @@
             {
                 this._connections.TryRemove(key, out connections);
             }
+        }
+
+        public void RemoveAll(SignalX SignalX)
+        {
+            this._connections.Clear();
+            SignalX.Settings.HasOneOrMoreConnections = false;
         }
     }
 }

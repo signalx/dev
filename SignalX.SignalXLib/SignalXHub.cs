@@ -8,6 +8,7 @@ namespace SignalXLib.Lib
 
     public partial class SignalXHub : Hub
     {
+        SignalX SignalX = Lib.SignalX.Instance();
         public void Send(string handler, dynamic message, string replyTo, dynamic sender, string messageId)
         {
             SignalX.SendMessageToServer(Context, Clients, Groups, handler, message, replyTo, sender, messageId);
@@ -30,35 +31,37 @@ namespace SignalXLib.Lib
 
         public override Task OnConnected()
         {
-            SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.OnConnected.ToString(), null);
+            SignalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.OnConnected.ToString(), null);
             string name = Context?.User?.Identity?.Name;
 
             if (name != null)
-                SignalX.Connections?.Add(name, Context?.ConnectionId);
-            SignalX.HasHadAConnection = true;
+                SignalX.Settings.Connections?.Add(SignalX,name, Context?.ConnectionId);
+            
+            SignalX.Settings.HasOneOrMoreConnections = true;
+
             return base.OnConnected();
         }
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.OnDisconnected.ToString(), null);
+            SignalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.OnDisconnected.ToString(), null);
             string name = Context?.User?.Identity?.Name;
 
             if (name != null)
-                SignalX.Connections?.Remove(name, Context?.ConnectionId);
+                SignalX.Settings.Connections?.Remove(SignalX,name, Context?.ConnectionId);
 
             return base.OnDisconnected(stopCalled);
         }
 
         public override Task OnReconnected()
         {
-            SignalX.ConnectionEventsHandler?.Invoke(ConnectionEvents.OnReconnected.ToString(), null);
+            SignalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.OnReconnected.ToString(), null);
             string name = Context?.User?.Identity?.Name;
 
             if (name != null)
-                if (SignalX.Connections != null && !SignalX.Connections.GetConnections(name).Contains(Context?.ConnectionId))
+                if (SignalX.Settings.Connections != null && !SignalX.Settings.Connections.GetConnections(name).Contains(Context?.ConnectionId))
                 {
-                    SignalX.Connections?.Add(name, Context?.ConnectionId);
+                    SignalX.Settings.Connections?.Add(SignalX,name, Context?.ConnectionId);
                 }
 
             return base.OnReconnected();

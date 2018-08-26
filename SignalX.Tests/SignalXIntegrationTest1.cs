@@ -15,33 +15,86 @@
         }
 
         [Fact]
+        public void server_should_be_able_to_run_javascript_on_client2()
+        {
+            
+              TestHelper.RunScenario((SignalX) =>
+                {
+                    TestHelper.MaxTestWaitTime = TimeSpan.FromSeconds(20);
+                  
+                    var result = 0;
+                    return new SignalXTestDefinition(
+                        script: "",
+                        server: () =>
+                        {
+                        },
+                        checks: () =>
+                        {
+                           
+                            TestHelper.ExpectEqual(result,3);
+                        },
+                        onClientLoaded: () =>
+                        {
+                            SignalX.RunJavaScriptOnAllClients(@"
+                                    var grades = [1,2,3,4,5];
+                                    var total = 0;
+                                    for(var i = 0; i < grades.length; i++) {
+                                        total += grades[i];
+                                    }
+                                    var avg = total / grades.length;
+                                    return avg;
+                            ",
+                                (response, request, error) =>
+                                {
+                                    result = Convert.ToInt32(response);
+                                }, TimeSpan.FromSeconds(10));
+                        },
+                        onClientError: (e) => throw e, browserType: BrowserType.Unknown,onCheckSucceeded: null
+                        );
+                });
+
+
+
+        }
+        
+        [Fact]
         public void server_should_be_able_to_run_javascript_on_client()
         {
-            TestHelper.MaxTestWaitTime = TimeSpan.FromSeconds(200);
-            var result = 0;
-            var scenario = new ScenarioDefinition(
-                script: "",
-                server: () =>
+
+            TestHelper.RunScenario(
+                (SignalX) =>
                 {
-                },
-                checks: () =>
-                {
-                    Assert.Equal(50, result);
-                },
-                onClientLoaded: () =>
-                {
-                    SignalX.RunJavaScriptOnAllClients($"return 5*10",
-                        (response, request, error) =>
+                    TestHelper.MaxTestWaitTime = TimeSpan.FromSeconds(200);
+                    var result = 0;
+                    
+                    return new SignalXTestDefinition(
+                        script: "",
+                        server: () =>
                         {
-                            result = Convert.ToInt32(response);
-                        }, TimeSpan.FromSeconds(10));
-                },
-                onClientError: (e) =>
-                {
-                    var error = e;
-                }
-            );
-            TestHelper.RunScenario(scenario);
+                        },
+                        checks: () =>
+                        {
+
+                            TestHelper.ExpectEqual(50, result);
+                        },
+                        onClientLoaded: () =>
+                        {
+                            SignalX.RunJavaScriptOnAllClients($"return 5*10",
+                                (response, request, error) =>
+                                {
+                                    result = Convert.ToInt32(response);
+                                }, TimeSpan.FromSeconds(15));
+                        },
+                        onClientError: (e) =>
+                        {
+                            throw e;
+                        },
+                        onCheckSucceeded: () => { },
+                        onCheckFailures: (e) => { });
+                });
+            
+            
+
         }
 
         /// <summary>
@@ -51,7 +104,11 @@
         [Timeout(1)]
         public void can_allow_dynamic_server_on_serverside2()
         {
+            SignalX SignalX = SignalX.Instance();
+
             TestHelper TestHelper = new TestHelper();
+            TestHelper.SetSignalXInstance(SignalX);
+
             var message1 = Guid.NewGuid().ToString();
             var message3 = Guid.NewGuid().ToString();
             //SET UP CLIENT
@@ -82,14 +139,18 @@
             });
 
             //ASSERT
-            TestHelper.CheckExpectationsExpectingFailures(() => Assert.Equal(message3, finalMessage), "http://localhost:44111", testObject.IndexPage);
+            TestHelper.CheckExpectationsExpectingFailures(() => Assert.Equal(message3, finalMessage), "http://localhost:" + TestHelper.FreeTcpPort(), testObject);
         }
 
         [Fact]
         [Timeout(1)]
         public void can_allow_dynamic_server_on_serverside()
         {
+            SignalX SignalX = SignalX.Instance();
+
             TestHelper TestHelper = new TestHelper();
+            TestHelper.SetSignalXInstance(SignalX);
+
             var message1 = Guid.NewGuid().ToString();
             var message3 = Guid.NewGuid().ToString();
             //SET UP CLIENT
@@ -119,14 +180,18 @@
             });
 
             //ASSERT
-            TestHelper.CheckExpectations(() => Assert.Equal(message3, finalMessage), "http://localhost:44111", testObject.IndexPage);
+            TestHelper.CheckExpectations(() => Assert.Equal(message3, finalMessage), "http://localhost:" + TestHelper.FreeTcpPort(), testObject);
         }
 
         [Fact]
         [Timeout(1)]
         public void client_dont_need_to_specify_any_argument_to_call_the_server()
         {
+            SignalX SignalX = SignalX.Instance();
+
             TestHelper TestHelper = new TestHelper();
+            TestHelper.SetSignalXInstance(SignalX);
+
             var message1 = Guid.NewGuid().ToString();
             var message3 = Guid.NewGuid().ToString();
             //SET UP CLIENT
@@ -151,14 +216,18 @@
             });
 
             //ASSERT
-            TestHelper.CheckExpectations(() => Assert.Equal(message3, finalMessage), "http://localhost:44111", testObject.IndexPage);
+            TestHelper.CheckExpectations(() => Assert.Equal(message3, finalMessage), "http://localhost:" + TestHelper.FreeTcpPort(), testObject);
         }
 
         [Fact]
         [Timeout(1)]
         public void client_dont_need_to_specify_callback()
         {
+            SignalX SignalX = SignalX.Instance();
+
             TestHelper TestHelper = new TestHelper();
+            TestHelper.SetSignalXInstance(SignalX);
+
             var message1 = Guid.NewGuid().ToString();
             var message2 = Guid.NewGuid().ToString();
             //SET UP CLIENT
@@ -183,14 +252,18 @@
             });
 
             //ASSERT
-            TestHelper.CheckExpectations(() => Assert.Equal(message1 + message2, finalMessage), "http://localhost:44111", testObject.IndexPage);
+            TestHelper.CheckExpectations(() => Assert.Equal(message1 + message2, finalMessage), "http://localhost:" + TestHelper.FreeTcpPort(), testObject);
         }
 
         [Fact]
         [Timeout(1)]
         public void client_should_support_anonymous_callback2()
         {
+            SignalX SignalX = SignalX.Instance();
+
             TestHelper TestHelper = new TestHelper();
+            TestHelper.SetSignalXInstance(SignalX);
+
             var message1 = Guid.NewGuid().ToString();
             var message2 = Guid.NewGuid().ToString();
             //SET UP CLIENT
@@ -214,14 +287,18 @@
             });
 
             //ASSERT
-            TestHelper.CheckExpectationsExpectingFailures(() => Assert.Equal(message1 + message2, finalMessage), "http://localhost:44111", testObject.IndexPage);
+            TestHelper.CheckExpectationsExpectingFailures(() => Assert.Equal(message1 + message2, finalMessage), "http://localhost:" + TestHelper.FreeTcpPort(), testObject);
         }
 
         [Fact]
         [Timeout(1)]
         public void client_should_support_anonymous_callback()
         {
+            SignalX SignalX = SignalX.Instance();
+
             TestHelper TestHelper = new TestHelper();
+            TestHelper.SetSignalXInstance(SignalX);
+
             var message1 = Guid.NewGuid().ToString();
             var message2 = Guid.NewGuid().ToString();
             //SET UP CLIENT
@@ -246,14 +323,18 @@
             });
 
             //ASSERT
-            TestHelper.CheckExpectations(() => Assert.Equal(message1 + message2, finalMessage), "http://localhost:44111", testObject.IndexPage);
+            TestHelper.CheckExpectations(() => Assert.Equal(message1 + message2, finalMessage), "http://localhost:" + TestHelper.FreeTcpPort(), testObject);
         }
 
         [Fact]
         [Timeout(1)]
         public void client_should_support_named_callback()
         {
+            SignalX SignalX = SignalX.Instance();
+
             TestHelper TestHelper = new TestHelper();
+            TestHelper.SetSignalXInstance(SignalX);
+
             var message1 = Guid.NewGuid().ToString();
             var message2 = Guid.NewGuid().ToString();
             var groupName = Guid.NewGuid().ToString();
@@ -280,15 +361,14 @@
             });
 
             //ASSERT
-            TestHelper.CheckExpectations(() => Assert.Equal(message1 + message2, finalMessage), "http://localhost:44111", testObject.IndexPage);
+            TestHelper.CheckExpectations(() => Assert.Equal(message1 + message2, finalMessage), "http://localhost:" + TestHelper.FreeTcpPort(), testObject);
         }
 
         [Fact]
         [Timeout(1)]
-        public void COMPLETE_TEST_it_should_be_able_to_communicate_back_and_forth_with_the_client()
+        public void COMPLETE_SANITY_TEST_it_should_be_able_to_communicate_back_and_forth_with_the_client()
 
         {
-
             TestObject testObject = TestHelper.SetupGeneralTest();
 
             Assert.NotEqual(testObject.Message, testObject.FinalMessage);
@@ -306,7 +386,7 @@
                       Assert.Equal(testObject.Message, testObject.FinalMessage4);
                       Assert.True(testObject.VerifiedJoinedGroup, "verifiedJoinedGroup");
                       Assert.True(testObject.VerifiedJoinedGroup2, "verifiedJoinedGroup2");
-                  }, "http://localhost:44111", testObject.IndexPage);
+                  }, "http://localhost:" + TestHelper.FreeTcpPort(), testObject);
         }
     }
 }

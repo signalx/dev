@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System;
-using SignalR.Client.Hubs;
+
 namespace SignalXLib.TestWithConsoleClient
 {
+    using Microsoft.AspNet.SignalR.Client;
 
     internal class Program
     {

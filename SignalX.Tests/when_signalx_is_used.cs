@@ -8,8 +8,8 @@
         [Fact]
         public void Test()
         {
-            var receiver = new TestReceiver();
-            SignalX.Receiver = receiver;
+            var receiver = new TestReceiver(SignalX.Instance());
+            SignalX.Instance().Settings.Receiver = receiver;
         }
     }
 }

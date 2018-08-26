@@ -5,8 +5,10 @@
 
     internal class SignalXAgents
     {
-        public SignalXAgents()
+        public void SetUpAgents(SignalX SignalX)
         {
+            if (SignalX == null)
+                throw new ArgumentNullException(nameof(SignalX));
             SignalX.Server(SignalX.SIGNALXCLIENTAGENT,
                 (request, state) =>
                 {
@@ -14,7 +16,7 @@
                     {
                         var str = request.Message.ToString();
                         var response = JsonConvert.DeserializeObject<ResponseAfterScriptRuns>(str);
-                        SignalX.OnResponseAfterScriptRuns ?.Invoke(response.Result, request, response.Error);
+                        SignalX.Settings.OnResponseAfterScriptRuns ?.Invoke(response.Result, request, response.Error);
                         /*
                           todo check why this is not working as dynamic
                           todo maybe needs to specify/check serialization for hub 
@@ -25,11 +27,12 @@
                     }
                     catch (Exception e)
                     {
-                        SignalX.OnResponseAfterScriptRuns?.Invoke(null, request, e.Message);
+                        SignalX.Settings.ExceptionHandler?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e);
+
                     }
                     //removed coz of possibility of result aggregation from clients
-                   // SignalX.OnResponseAfterScriptRuns = null;
-                }, false, false, true);
+                    // SignalX.OnResponseAfterScriptRuns = null;
+                }, requireAuthorization: false, isSingleWriter: false, allowDynamicServerForThisInstance: true);
         }
     }
 }

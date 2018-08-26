@@ -4,9 +4,11 @@
 
     public class AuthenticatedConnection : PersistentConnection
     {
+        SignalX SignalX = SignalX.Instance();
         protected override bool AuthorizeRequest(IRequest request)
         {
-            if (SignalX.RequireAuthorizationForPersistentConnections)
+           
+            if (SignalX.Settings.RequireAuthorizationForPersistentConnections)
             {
                 return SignalX.IsAuthenticated(request);
             }

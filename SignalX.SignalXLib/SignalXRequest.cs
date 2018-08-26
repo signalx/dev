@@ -6,8 +6,10 @@ namespace SignalXLib.Lib
 
     public class SignalXRequest
     {
-        public SignalXRequest(string replyTo, object sender, string messageId, dynamic message,  string connectionId, string handler, IPrincipal principalUser)
+        SignalX SignalX;
+        public SignalXRequest(SignalX signalX,string replyTo, object sender, string messageId, dynamic message,  string connectionId, string handler, IPrincipal principalUser)
         {
+            SignalX = signalX ?? throw new ArgumentNullException(nameof(signalX));
             ReplyTo = replyTo;
             Sender = sender;
             MessageId = messageId;
