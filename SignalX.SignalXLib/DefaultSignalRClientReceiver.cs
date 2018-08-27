@@ -14,14 +14,14 @@ namespace SignalXLib.Lib
         /// <summary>
         /// Called by framework
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="user"></param>
         /// <param name="replyTo"></param>
         /// <param name="message"></param>
-        public void Receive(string userId, string replyTo, dynamic message)
+        public void Receive(string user, string replyTo, dynamic message)
         {
             IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
 
-            hubContext.Clients.User(userId).broadcastMessage(replyTo, message);
+            hubContext.Clients.Client(user).broadcastMessage(replyTo, message);
         }
 
         /// <summary>

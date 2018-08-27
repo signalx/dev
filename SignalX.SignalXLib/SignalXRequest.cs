@@ -7,20 +7,20 @@ namespace SignalXLib.Lib
     public class SignalXRequest
     {
         SignalX SignalX;
-        public SignalXRequest(SignalX signalX,string replyTo, object sender, string messageId, dynamic message,  string connectionId, string handler, IPrincipal principalUser)
+        public SignalXRequest(SignalX signalX,string replyTo, object sender, string messageId, dynamic message,  string user, string handler, IPrincipal principalUser)
         {
             SignalX = signalX ?? throw new ArgumentNullException(nameof(signalX));
             ReplyTo = replyTo;
             Sender = sender;
             MessageId = messageId;
             Message = message;
-            UserId = principalUser?.Identity?.Name;
-            ConnectionId = connectionId;
+            //UserId = principalUser?.Identity?.Name;
+            this.User = user;
             this.Handler = handler;
             this.PrincipalUser = principalUser;
         }
 
-        public string UserId { get; set; }
+       // public string UserId { get; set; }
 
         public string ReplyTo { get; }
         public object Sender { get; }
@@ -28,7 +28,10 @@ namespace SignalXLib.Lib
         public dynamic Message { get; }
         //[Obsolete("Will soon be removed in subsequent versions. Please obtain UserId from PrincipalUser instead")]
         //public string UserId { get; }
-        public string ConnectionId { get; }
+        /// <summary>
+        /// This user is actually connection id
+        /// </summary>
+        public string User { get; }
         public IPrincipal PrincipalUser { get;  }
 
         public string Handler { get; private set; }
@@ -54,13 +57,13 @@ namespace SignalXLib.Lib
         /// <summary>
         /// Reply to a specific client 
         /// </summary>
-        /// <param name="connectionId"></param>
+        /// <param name="user"></param>
         /// <param name="response"></param>
-        public void RespondToUser(string connectionId, object response)
+        public void RespondToUser(string user, object response)
         {
-            if (connectionId == null) throw new ArgumentNullException(nameof(connectionId));
+            if (user == null) throw new ArgumentNullException(nameof(user));
             if (!string.IsNullOrEmpty(ReplyTo))
-                SignalX.RespondToUser(connectionId, ReplyTo, response);
+                SignalX.RespondToUser(user, ReplyTo, response);
         }
 
         /// <summary>
@@ -69,8 +72,8 @@ namespace SignalXLib.Lib
         /// <param name="response"></param>
         public void RespondToSender(object response)
         {
-            if (!string.IsNullOrEmpty(UserId))
-                SignalX.RespondToUser(UserId, ReplyTo, response);
+            if (!string.IsNullOrEmpty(this.User))
+                SignalX.RespondToUser(this.User, ReplyTo, response);
         }
 
         /// <summary>
@@ -80,8 +83,8 @@ namespace SignalXLib.Lib
         /// <param name="groupName"></param>
         public void RespondToOthers(object response, string groupName = null)
         {
-            if (!string.IsNullOrEmpty(ConnectionId))
-                SignalX.RespondToOthers(ConnectionId, ReplyTo, response, groupName);
+            if (!string.IsNullOrEmpty(this.User))
+                SignalX.RespondToOthers(this.User, ReplyTo, response, groupName);
         }
     }
 }

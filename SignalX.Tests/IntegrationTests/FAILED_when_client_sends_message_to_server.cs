@@ -26,7 +26,7 @@
                                 (request) =>
                                 {
                                     assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
-                                    request.RespondToUser(request.ReplyTo, 100);
+                                    request.RespondToUser(request.User, 100);
                                 });
                             signalx.Server("sample2",
                                 (request) =>
@@ -129,7 +129,7 @@
                                 (request) =>
                                 {
                                     assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
-                                    request.RespondToUser(request.ReplyTo, 100);
+                                    request.RespondToUser(request.User, 100);
                                 });
                             signalx.Server("sample2",
                                 (request) =>
@@ -199,7 +199,7 @@
                                 (request) =>
                                 {
                                     assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
-                                    request.RespondToUser(request.ReplyTo, 100);
+                                    request.RespondToUser(request.User, 100);
                                 });
                             signalx.Server("sample2",
                                 (request) =>
@@ -267,7 +267,7 @@
                                 (request) =>
                                 {
                                     assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
-                                    signalx.RespondToUser(request.ConnectionId, request.ReplyTo, 100);
+                                    signalx.RespondToUser(request.User, request.ReplyTo, 100);
                                 });
                             signalx.Server("sample2",
                                 (request) =>
@@ -301,7 +301,7 @@
                                 (request) =>
                                 {
                                     assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
-                                    signalx.RespondToUser(request.ConnectionId, request.ReplyTo, 100);
+                                    signalx.RespondToUser(request.User, request.ReplyTo, 100);
                                 });
                             signalx.Server("sample2",
                                 (request) =>
@@ -336,7 +336,7 @@
                                 (request) =>
                                 {
                                     assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
-                                    signalx.RespondToUser(request.ConnectionId, request.ReplyTo, 100);
+                                    signalx.RespondToUser(request.User, request.ReplyTo, 100);
                                 });
                             signalx.Server("sample2",
                                 (request) =>

@@ -5,7 +5,7 @@
 
     public interface ISignalXClientReceiver
     {
-        void Receive(string userId, string clientName, dynamic message);
+        void Receive(string user, string clientName, dynamic message);
 
         void ReceiveByGroup(string clientName, dynamic message, string groupName = null);
 

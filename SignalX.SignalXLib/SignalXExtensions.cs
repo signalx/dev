@@ -270,10 +270,10 @@
         /// Reply to a specific client
         /// </summary>
         /// <param name="signalX"></param>
-        /// <param name="userId"></param>
+        /// <param name="user"></param>
         /// <param name="name"></param>
         /// <param name="data"></param>
-        public static void RespondToUser(this SignalX signalX, string userId, string name, object data)
+        public static void RespondToUser(this SignalX signalX, string user, string name, object data)
         {
             if (!signalX.AllowToSend(name, data))
             {
@@ -282,7 +282,7 @@
             if (signalX.Settings.StartCountingOutGoingMessages)
                 Interlocked.Increment(ref signalX.Settings.OutGoingCounter);
 
-            signalX.Settings.Receiver.Receive(userId, name, data);
+            signalX.Settings.Receiver.Receive(user, name, data);
         }
 
         /// <summary>
