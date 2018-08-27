@@ -49,6 +49,11 @@ namespace SignalXLib.Lib
             SignalX.RespondToUser(userId, replyTo, response);
         }
 
+        /// <summary>
+        /// Reply to a specific client 
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <param name="response"></param>
         public void RespondToUser(string connectionId, object response)
         {
             if (connectionId == null) throw new ArgumentNullException(nameof(connectionId));
@@ -56,12 +61,21 @@ namespace SignalXLib.Lib
                 SignalX.RespondToUser(connectionId, ReplyTo, response);
         }
 
+        /// <summary>
+        /// Reply to the handler that the client has specified
+        /// </summary>
+        /// <param name="response"></param>
         public void RespondToSender(object response)
         {
             if (!string.IsNullOrEmpty(ConnectionId))
                 SignalX.RespondToUser(ConnectionId, ReplyTo, response);
         }
 
+        /// <summary>
+        /// Reply to every other clients but the sender
+        /// </summary>
+        /// <param name="response"></param>
+        /// <param name="groupName"></param>
         public void RespondToOthers(object response, string groupName = null)
         {
             if (!string.IsNullOrEmpty(ConnectionId))

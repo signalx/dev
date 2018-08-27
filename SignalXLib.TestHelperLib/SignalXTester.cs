@@ -15,26 +15,23 @@ namespace SignalXLib.TestHelperLib
 
     public class SignalXTester
     {
-        private static SignalX SignalX;
-        public static TimeSpan MaxTestWaitTime = TimeSpan.FromSeconds(20);
-
-        public static string FileName;
-        public static string FilePath;
-
-        public static void SetSignalXInstance(SignalX signalX)
+        public static TimeSpan MaxTestWaitTime = TimeSpan.FromMinutes(1);
+        public static void RunAndExpectFailure(Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun)
         {
-            SignalX = signalX;
+            try
+            {
+                using (var isolated = new Isolated<IsolationFacade>())
+                {
+                    isolated.Value.a = fun;
+                    isolated.Value.DoSomething();
+                }
+                throw  new Exception("Expected run to fail , but it succeeded");
+            }
+            catch (Exception e)
+            {
+                
+            }
         }
-
-        public static int FreeTcpPort()
-        {
-            var l = new TcpListener(IPAddress.Loopback, 0);
-            l.Start();
-            int port = ((IPEndPoint)l.LocalEndpoint).Port;
-            l.Stop();
-            return port;
-        }
-
         public static void Run(Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun)
         {
             using (var isolated = new Isolated<IsolationFacade>())
@@ -43,7 +40,25 @@ namespace SignalXLib.TestHelperLib
                 isolated.Value.DoSomething();
             }
         }
+        private static SignalX SignalX;
+        internal static string FileName;
+        internal static string FilePath;
 
+        internal static void SetSignalXInstance(SignalX signalX)
+        {
+            SignalX = signalX;
+        }
+
+        internal static int FreeTcpPort()
+        {
+            var l = new TcpListener(IPAddress.Loopback, 0);
+            l.Start();
+            int port = ((IPEndPoint)l.LocalEndpoint).Port;
+            l.Stop();
+            return port;
+        }
+
+       
         internal static void Run(SignalX signalX, SignalXTestDefinition scenarioDefinition)
 
         {
@@ -57,29 +72,18 @@ namespace SignalXLib.TestHelperLib
             //test : run and assert
 
             scenarioDefinition.TestEvents = scenarioDefinition.TestEvents ?? new TestEventHandler();
-            scenarioDefinition.TestEvents.OnAppStarted = () => { scenarioDefinition?.Server(); };
+            scenarioDefinition.TestEvents.OnAppStarted = () => { scenarioDefinition?.Server?.Invoke(); };
             scenarioDefinition.TestEvents.OnFinally = (e) => { signalX.Dispose(); };
             CheckExpectations(
-                () => { scenarioDefinition?.Checks(); },
+                () => { scenarioDefinition?.Checks?.Invoke(); },
                 "http://localhost:" + FreeTcpPort(),
                 testObject,
                 scenarioDefinition.BrowserType,
                 scenarioDefinition.TestEvents);
         }
 
-        public static void CheckExpectationsExpectingFailures(Action operation, string url, TestObject html)
-        {
-            try
-            {
-                CheckExpectations(operation, url, html);
-                throw new Exception("Expected test to fail but it passed");
-            }
-            catch (Exception e)
-            {
-            }
-        }
-
-        public static void CheckExpectations(Action operation, string url, TestObject testObject, BrowserType browserType = BrowserType.Unknown, TestEventHandler events = null)
+        
+        internal static void CheckExpectations(Action operation, string url, TestObject testObject, BrowserType browserType = BrowserType.Unknown, TestEventHandler events = null)
         {
             Thread thread;
             Process browserProcess = null;
@@ -179,7 +183,7 @@ namespace SignalXLib.TestHelperLib
             }
         }
 
-        public static TestObject SetUpScriptForTest(Func<TestObject, string> scriptFunc)
+        internal static TestObject SetUpScriptForTest(Func<TestObject, string> scriptFunc)
         {
             var testObject = new TestObject();
             testObject.FinalMessage = null;
@@ -203,7 +207,7 @@ namespace SignalXLib.TestHelperLib
             return testObject;
         }
 
-        public static string WrapScriptInHtml(string script)
+        internal static string WrapScriptInHtml(string script)
         {
             return @"<!DOCTYPE html>
 							<html>
@@ -220,89 +224,13 @@ namespace SignalXLib.TestHelperLib
 							</html>";
         }
 
-        public static void AwaitAssert(Action operation, Action cleanUpOperation)
+        internal static void AwaitAssert(Action operation, Action cleanUpOperation)
         {
             AwaitAssert(operation, null, cleanUpOperation);
         }
 
-        public static TestObject SetupGeneralTest()
-        {
-            MaxTestWaitTime = TimeSpan.FromSeconds(60);
-            SignalX = SignalX.Instance();
-            string groupName = Guid.NewGuid().ToString();
-            string groupWatcher = "groupWatcher";
-            string groupWatcher2 = "groupWatcher2";
-            string clientGroupReceiver = "groupClient";
-            var TestHelper = new SignalXTester();
-            //SET UP CLIENT
-            TestObject testObject = SetUpScriptForTest(
-                testData => @"
-                                var promise = {}
-								signalx.client." + testData.ClientHandler + @"=function (m) {
-							      signalx.server." + testData.TestServerFeedbackHandler + @"(m,function(m2){
-                                     signalx.server." + testData.TestServerFeedbackHandler2 + @"(m2,function(m3){
-                                          promise = signalx.server." + testData.TestServerFeedbackHandler3 + @"(m3);
-                                          promise.then(function(m4){
-                                             signalx.server." + testData.TestServerFeedbackHandler4 + @"(m4);
-                                          });
-                                     });
-                                  });
-							    };
-                                signalx.client." + clientGroupReceiver + @"=function(c){
-                                  signalx.server." + groupWatcher2 + @"(c,function(){});
-                                };
-                               signalx.ready(function (server) {
-                                  signalx.groups.join('" + groupName + @"',function(c){
-                                             signalx.server." + groupWatcher + @"(c);
-                                          });
-							      server." + testData.ServerHandler + @"('" + testData.Message + @"','" + testData.ClientHandler + @"');
-                                });");
-
-            testObject.VerifiedJoinedGroup = false;
-            testObject.VerifiedJoinedGroup2 = false;
-            //SET UP SERVER
-            SignalX.Server(
-                groupWatcher,
-                request =>
-                {
-                    testObject.VerifiedJoinedGroup = request.Message as string == groupName;
-                    SignalX.RespondToAll(clientGroupReceiver, request.Message, groupName);
-                });
-            SignalX.Server(
-                groupWatcher2,
-                request => { testObject.VerifiedJoinedGroup2 = request.Message as string == groupName; });
-            SignalX.Server(
-                testObject.ServerHandler,
-                request => { SignalX.RespondToAll(testObject.ClientHandler, testObject.Message); });
-            SignalX.Server(
-                testObject.TestServerFeedbackHandler,
-                request =>
-                {
-                    testObject.FinalMessage = request.Message as string;
-                    SignalX.RespondToAll(request.ReplyTo, testObject.FinalMessage);
-                });
-            SignalX.Server(
-                testObject.TestServerFeedbackHandler2,
-                request =>
-                {
-                    testObject.FinalMessage2 = request.Message as string;
-                    SignalX.RespondToAll(request.ReplyTo, testObject.FinalMessage2);
-                });
-            SignalX.Server(
-                testObject.TestServerFeedbackHandler3,
-                request =>
-                {
-                    testObject.FinalMessage3 = request.Message as string;
-                    SignalX.RespondToAll(request.ReplyTo, testObject.FinalMessage3);
-                });
-            SignalX.Server(
-                testObject.TestServerFeedbackHandler4,
-                request => { testObject.FinalMessage4 = request.Message as string; });
-
-            return testObject;
-        }
-
-        public static void AwaitAssert(Action operation, TimeSpan? maxDuration = null, Action cleanUpOperation = null, Action<Exception> onFinally = null, Action<Exception> onEveryFailure = null)
+      
+        internal static void AwaitAssert(Action operation, TimeSpan? maxDuration = null, Action cleanUpOperation = null, Action<Exception> onFinally = null, Action<Exception> onEveryFailure = null)
         {
             maxDuration = maxDuration ?? TimeSpan.FromSeconds(5);
             DateTime start = DateTime.Now;

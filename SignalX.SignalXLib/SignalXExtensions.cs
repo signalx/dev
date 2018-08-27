@@ -265,8 +265,14 @@
         }
 
 
-     
 
+        /// <summary>
+        /// Reply to a specific client
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="userId"></param>
+        /// <param name="name"></param>
+        /// <param name="data"></param>
         public static void RespondToUser(this SignalX signalX, string userId, string name, object data)
         {
             if (!signalX.AllowToSend(name, data))
@@ -279,6 +285,14 @@
             signalX.Settings.Receiver.Receive(userId, name, data);
         }
 
+        /// <summary>
+        ///  Reply to every other clients but the sender
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="excludedUserId"></param>
+        /// <param name="name"></param>
+        /// <param name="data"></param>
+        /// <param name="groupName"></param>
         public static void RespondToOthers(this SignalX signalX, string excludedUserId, string name, object data, string groupName = null)
         {
             if (!signalX.AllowToSend(name, data))

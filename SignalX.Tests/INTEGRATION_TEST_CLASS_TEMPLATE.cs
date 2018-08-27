@@ -15,7 +15,9 @@
                 {
                     var actual = 0;
                     return new SignalXTestDefinition(
-                        script: "",
+                        script: @"signalx.ready(function (server) {
+                                     
+                                   }); ",
                         server: () => { },
                         browserType: BrowserType.Unknown,
                         checks: () => { assert.Equal(10000, actual); },

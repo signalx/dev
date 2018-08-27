@@ -51,16 +51,21 @@
     </When>
   </Choose>
   <ItemGroup>
+    <Compile Include="IntegrationTests\when_client_sends_message_to_server.cs" />
     <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestModels\TestMessageModel.cs" />
     <Compile Include="Mocks\TestReceiver.cs" />
     <Compile Include="INTEGRATION_TEST_CLASS_TEMPLATE.cs" />
+    <Compile Include="test_parallelism_configuration.cs" />
     <Compile Include="UnitTests\when_signalx_is_used.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="GenericTest1.GenericTest">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="paket.references" />
   </ItemGroup>
