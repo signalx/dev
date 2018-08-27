@@ -14,11 +14,13 @@ namespace SignalXLib.Lib
             Sender = sender;
             MessageId = messageId;
             Message = message;
-            //UserId = userId;
+            UserId = principalUser?.Identity?.Name;
             ConnectionId = connectionId;
             this.Handler = handler;
             this.PrincipalUser = principalUser;
         }
+
+        public string UserId { get; set; }
 
         public string ReplyTo { get; }
         public object Sender { get; }
@@ -67,8 +69,8 @@ namespace SignalXLib.Lib
         /// <param name="response"></param>
         public void RespondToSender(object response)
         {
-            if (!string.IsNullOrEmpty(ConnectionId))
-                SignalX.RespondToUser(ConnectionId, ReplyTo, response);
+            if (!string.IsNullOrEmpty(UserId))
+                SignalX.RespondToUser(UserId, ReplyTo, response);
         }
 
         /// <summary>

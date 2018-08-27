@@ -424,7 +424,7 @@ namespace SignalXLib.Tests
         }
 
         [TestMethod]
-        public void DIRTY_SANITY_TEST2()
+        public void DIRTY_SANITY_TEST_COMPLICATED_SETUP_SCENARIO()
 
         {
             SignalXTester.Run((signalX, assert) =>

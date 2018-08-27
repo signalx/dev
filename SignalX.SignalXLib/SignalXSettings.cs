@@ -53,6 +53,8 @@
         //todo make this allow for multiple instances
         internal  Action<dynamic, SignalXRequest, string> OnResponseAfterScriptRuns { set; get; }
 
+       
+
         public void Dispose()
         {
             this.MyApp?.Dispose();

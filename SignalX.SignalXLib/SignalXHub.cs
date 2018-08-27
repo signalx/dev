@@ -1,5 +1,6 @@
 ﻿namespace SignalXLib.Lib
 {
+    using System;
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNet.SignalR;
@@ -39,7 +40,7 @@
                 this.signalX.Settings.Connections?.Add(this.signalX, name, this.Context?.ConnectionId);
 
             this.signalX.Settings.HasOneOrMoreConnections = true;
-
+            this.signalX.CurrentNumberOfConnections++;
             return base.OnConnected();
         }
 
@@ -50,6 +51,16 @@
 
             if (name != null)
                 this.signalX.Settings.Connections?.Remove(this.signalX, name, this.Context?.ConnectionId);
+
+            try
+            {
+                if (this.signalX.CurrentNumberOfConnections != 0)
+                    this.signalX.CurrentNumberOfConnections--;
+            }
+            catch (Exception)
+            {
+
+            }
 
             return base.OnDisconnected(stopCalled);
         }
@@ -62,7 +73,7 @@
             if (name != null)
                 if (this.signalX.Settings.Connections != null && !this.signalX.Settings.Connections.GetConnections(name).Contains(this.Context?.ConnectionId))
                     this.signalX.Settings.Connections?.Add(this.signalX, name, this.Context?.ConnectionId);
-
+            this.signalX.CurrentNumberOfConnections++;
             return base.OnReconnected();
         }
     }

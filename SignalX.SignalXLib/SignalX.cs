@@ -15,8 +15,9 @@ namespace SignalXLib.Lib
         }
         static SignalX instance { set; get; }
         public static object padlock=new object();
-        
-        
+
+        public ulong CurrentNumberOfConnections { get; internal set; }
+
         public static SignalX Instance()
         {
             if (instance != null)
@@ -164,16 +165,16 @@ namespace SignalXLib.Lib
             return true;
         }
 
-        public  void RespondToAll( string name, dynamic data, string groupName = null)
+        public  void RespondToAll( string replyTo, dynamic responseData, string groupName = null)
         {
-            if (!AllowToSend(name, data))
+            if (!AllowToSend(replyTo, responseData))
             {
                 return;
             }
             if (Settings.StartCountingOutGoingMessages)
                 Interlocked.Increment(ref Settings.OutGoingCounter);
 
-          this.Settings.  Receiver.ReceiveByGroup(name, data, groupName);
+          this.Settings.  Receiver.ReceiveByGroup(replyTo, responseData, groupName);
         }
     }
 }

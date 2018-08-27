@@ -20,9 +20,9 @@ namespace SignalXLib.TestHelperLib
         {
             try
             {
-                using (var isolated = new Isolated<IsolationFacade>())
+                using (var isolated = new Isolated<IsolationContainer>())
                 {
-                    isolated.Value.a = fun;
+                    isolated.Value.MethodBody = fun;
                     isolated.Value.DoSomething();
                 }
                 throw  new Exception("Expected run to fail , but it succeeded");
@@ -32,11 +32,12 @@ namespace SignalXLib.TestHelperLib
                 
             }
         }
+       
         public static void Run(Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun)
         {
-            using (var isolated = new Isolated<IsolationFacade>())
+            using (var isolated = new Isolated<IsolationContainer>())
             {
-                isolated.Value.a = fun;
+                isolated.Value.MethodBody = fun;
                 isolated.Value.DoSomething();
             }
         }
@@ -74,7 +75,7 @@ namespace SignalXLib.TestHelperLib
             scenarioDefinition.TestEvents = scenarioDefinition.TestEvents ?? new TestEventHandler();
             scenarioDefinition.TestEvents.OnAppStarted = () => { scenarioDefinition?.Server?.Invoke(); };
             scenarioDefinition.TestEvents.OnFinally = (e) => { signalX.Dispose(); };
-            CheckExpectations(
+            CheckExpectations(scenarioDefinition.NumberOfClients,
                 () => { scenarioDefinition?.Checks?.Invoke(); },
                 "http://localhost:" + FreeTcpPort(),
                 testObject,
@@ -82,9 +83,24 @@ namespace SignalXLib.TestHelperLib
                 scenarioDefinition.TestEvents);
         }
 
-        
-        internal static void CheckExpectations(Action operation, string url, TestObject testObject, BrowserType browserType = BrowserType.Unknown, TestEventHandler events = null)
+        public static string CDN = "https://unpkg.com/signalx";
+        internal static void CheckExpectations(int numberOfClients, Action operation, string url, TestObject testObject, BrowserType browserType = BrowserType.Unknown, TestEventHandler events = null)
         {
+            try
+            {
+                using (var client = new System.Net. WebClient())
+                {
+                    if (string.IsNullOrEmpty(client.DownloadString(CDN)))
+                    {
+                        throw new Exception("Empty source returned from cdn : "+ CDN);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("It seems there is an issue connecting to the internet : "+ CDN +" - "+ e.Message);
+            }
+           
             Thread thread;
             Process browserProcess = null;
             SignalX.Settings.LogAgentMessagesOnClient = true;
@@ -98,8 +114,13 @@ namespace SignalXLib.TestHelperLib
                     {
                         try
                         {
-                            if (browserType == BrowserType.Unknown ||browserType == BrowserType.DefaultSystemBrowser )
-                                browserProcess = Process.Start(url + testObject.FileName);
+                            for (int i = 0; i < numberOfClients; i++)
+                            {
+                                if (browserType == BrowserType.Unknown || browserType == BrowserType.DefaultSystemBrowser)
+                                {
+                                    browserProcess = Process.Start(url + testObject.FileName);
+                                }
+
                             if (browserType == BrowserType.HeadlessBrowser)
                             {
                                 var webClient = new WebClient(new NHtmlUnit.BrowserVersion(BrowserVersion.CHROME))
@@ -110,11 +131,13 @@ namespace SignalXLib.TestHelperLib
                                 };
                                 webClient.GetPage(url + testObject.FileName.Replace("\\", "/"));
                             }
+                            }
 
+                            
                             AwaitAssert(
                                 () =>
                                 {
-                                    if (!SignalX.Settings.HasOneOrMoreConnections)
+                                    if (!SignalX.Settings.HasOneOrMoreConnections ||SignalX.CurrentNumberOfConnections < (ulong)numberOfClients)
                                         throw new Exception("No connection received from any client");
                                 },
                                 TimeSpan.FromSeconds(10));

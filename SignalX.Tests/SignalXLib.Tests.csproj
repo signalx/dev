@@ -51,6 +51,7 @@
     </When>
   </Choose>
   <ItemGroup>
+    <Compile Include="IntegrationTests\FAILED_when_client_sends_message_to_server.cs" />
     <Compile Include="IntegrationTests\when_client_sends_message_to_server.cs" />
     <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

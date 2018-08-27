@@ -9,13 +9,14 @@ namespace SignalXLib.TestHelperLib
             Action server,
             BrowserType browserType = BrowserType.Unknown,
             Action checks = null,
-            TestEventHandler events = null)
+            TestEventHandler events = null, int numberOfClients=1)
         {
             this.Script = script;
             this.Server = server;
             this.Checks = checks;
             this.BrowserType = browserType;
             this.TestEvents = events;
+            NumberOfClients = numberOfClients;
         }
 
         public TestEventHandler TestEvents { get; set; }
@@ -26,5 +27,7 @@ namespace SignalXLib.TestHelperLib
         public Action Checks { get; }
 
         public BrowserType BrowserType { get; }
+
+        public int NumberOfClients { get; set; }
     }
 }
