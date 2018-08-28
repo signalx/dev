@@ -1,17 +1,17 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using SignalXLib.Lib;
-    using System;
 
     public class TestReceiver : ISignalXClientReceiver
     {
-        private SignalX SignalX;
+        SignalX SignalX;
 
         public TestReceiver(SignalX signalX)
         {
-            SignalX = signalX ?? throw new ArgumentNullException(nameof(signalX));
+            this.SignalX = signalX ?? throw new ArgumentNullException(nameof(signalX));
             this.LastMessageReceived = new TestMessageModel();
         }
 

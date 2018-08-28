@@ -8,7 +8,7 @@ namespace SignalXLib.Lib
 
     internal class DefaultSignalRClientReceiver : ISignalXClientReceiver
     {
-       // SignalX SignalX= Lib.SignalX.Instance();
+       // SignalX SignalX= Lib.SignalX.Instance;
 
         
         /// <summary>

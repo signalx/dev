@@ -4,7 +4,7 @@ namespace SignalXLib.TestHelperLib
 
     public class TestEventHandler
     {
-        public Action OnAppStarted { set; get; }
+        internal Action OnAppStarted { set; get; }
 
         public TestEventHandler(Action onClientLoaded = null, Action<Exception> onClientError = null, Action onCheckSucceeded = null, Action<Exception> onCheckFailures = null)
         {
@@ -13,21 +13,29 @@ namespace SignalXLib.TestHelperLib
             this.OnCheckSucceeded = onCheckSucceeded;
             this.OnCheckFailures = onCheckFailures;
         }
-
-        public Action OnClientLoaded { get; }
+        /// <summary>
+        /// This is called once after all the clients have been loaded and verifies
+        /// </summary>
+        public Action OnClientLoaded { get; set; }
 
         /// <summary>
-        ///     Called when check succeeds
+        /// This is called once when test succeeds
         /// </summary>
-        public Action OnCheckSucceeded { get; }
+        public Action OnCheckSucceeded { get; set; }
 
         /// <summary>
-        ///     Called, possibly many times after each attempt to try check fails
+        /// This is called, possibly, many times after each attempt to try check fails
         /// </summary>
-        public Action<Exception> OnCheckFailures { get; }
+        public Action<Exception> OnCheckFailures { get; set; }
 
-        public Action<Exception> OnClientError { get; }
+        /// <summary>
+        /// This is called once after the test fails
+        /// </summary>
+        public Action<Exception> OnClientError { get; set; }
 
+        /// <summary>
+        /// This is called no matter what, whether test succeeds or fails
+        /// </summary>
         public Action<Exception> OnFinally { get; set; }
     }
 }

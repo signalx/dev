@@ -15,7 +15,7 @@ namespace ConsoleApplicationCSharp
 
             using (WebApp.Start(url))
             {
-                SignalX SignalX = SignalX.Instance();
+                SignalX SignalX = SignalX.Instance;
                 SignalX.Settings.RequireAuthorizationForAllHandlers = false;
                 SignalX.AuthenticationHandler((r) => true);
 

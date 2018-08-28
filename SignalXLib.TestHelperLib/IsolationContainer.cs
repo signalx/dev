@@ -9,7 +9,8 @@ namespace SignalXLib.TestHelperLib
 
         public void DoSomething()
         {
-            SignalX sx = SignalX.Instance();
+            SignalX sx = SignalX.Instance;
+            sx.Settings.LogAgentMessagesOnClient = true;
             if (this.MethodBody != null)
             {
                 SignalXTester.Run(sx, this.MethodBody?.Invoke(sx, new SignalXAssertionLib()));

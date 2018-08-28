@@ -73,7 +73,7 @@ namespace SignalXLib.TestHelperLib
             //test : run and assert
 
             scenarioDefinition.TestEvents = scenarioDefinition.TestEvents ?? new TestEventHandler();
-            scenarioDefinition.TestEvents.OnAppStarted = () => { scenarioDefinition?.Server?.Invoke(); };
+            scenarioDefinition.TestEvents.OnAppStarted = () => { scenarioDefinition?.OnAppStarted?.Invoke(); };
             scenarioDefinition.TestEvents.OnFinally = (e) => { signalX.Dispose(); };
             CheckExpectations(scenarioDefinition.NumberOfClients,
                 () => { scenarioDefinition?.Checks?.Invoke(); },
@@ -84,7 +84,7 @@ namespace SignalXLib.TestHelperLib
         }
 
         public static string CDN = "https://unpkg.com/signalx";
-        internal static void CheckExpectations(int numberOfClients, Action operation, string url, TestObject testObject, BrowserType browserType = BrowserType.Unknown, TestEventHandler events = null)
+        internal static void CheckExpectations(int numberOfClients, Action operation, string url, TestObject testObject, BrowserType browserType = BrowserType.Default, TestEventHandler events = null)
         {
             try
             {
@@ -116,7 +116,7 @@ namespace SignalXLib.TestHelperLib
                         {
                             for (int i = 0; i < numberOfClients; i++)
                             {
-                                if (browserType == BrowserType.Unknown || browserType == BrowserType.DefaultSystemBrowser)
+                                if (browserType == BrowserType.Default || browserType == BrowserType.SystemBrowser)
                                 {
                                     browserProcess = Process.Start(url + testObject.FileName);
                                 }

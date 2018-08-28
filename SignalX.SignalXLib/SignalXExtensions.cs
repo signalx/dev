@@ -88,12 +88,12 @@
                 {
                     result = context.User.Identity.IsAuthenticated;
                     if (!result)
-                        signalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestAuthorizationFailed.ToString(), $"Authorization failed after checking with context.User.Identity.IsAuthenticated. Custom Authorization check is not yet setup ");
+                        signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestAuthorizationFailed.ToString(), $"Authorization failed after checking with context.User.Identity.IsAuthenticated. Custom Authorization check is not yet setup "));
                 }
             }
             else
             {
-                signalX.Settings.WarningHandler?.Invoke("AuthorizationNotSet", "Try setting an authorization handler to prevent anonymous access into your server");
+                signalX.Settings.WarningHandler.ForEach(h => h?.Invoke("AuthorizationNotSet", "Try setting an authorization handler to prevent anonymous access into your server"));
                 result = true;
             }
             return result;
@@ -108,13 +108,13 @@
                 //var ip = request?.Environment["server.RemoteIpAddress"]?.ToString();
                 result = signalX.Settings.AuthenticatedWhen(request);
                 if (!result)
-                    signalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestAuthorizationFailed.ToString(), "Authorization failed after checking with Custom Authorization provided");
+                    signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestAuthorizationFailed.ToString(), "Authorization failed after checking with Custom Authorization provided"));
             }
             catch (Exception e)
             {
                 result = false;
-                signalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestAuthorizationFailed.ToString(), "Custom Authorization threw an exception " + e.Message);
-                signalX.Settings.ExceptionHandler?.Invoke("Authentication failed", e);
+                signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestAuthorizationFailed.ToString(), "Custom Authorization threw an exception " + e.Message));
+                signalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke("Authentication failed", e));
             }
 
             return result;
@@ -138,31 +138,57 @@
             signalX.Settings.AuthenticatedWhen = handler;
         }
 
+        /// <summary>
+        /// Adds a warning handler
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="handler"></param>
         public static void OnWarning(this SignalX signalX, Action<string, object> handler)
         {
-            signalX.Settings.WarningHandler = handler;
+            signalX.Settings.WarningHandler .Add(handler); 
         }
 
-
+        /// <summary>
+        /// Adds an exception handler
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="handler"></param>
         public static void OnException(this SignalX signalX, Action<Exception> handler)
         {
-            signalX.Settings.ExceptionHandler = (m, e) => handler.Invoke(e);
+            signalX.Settings.ExceptionHandler.Add((m, e) => handler.Invoke(e)); 
         }
-
+        /// <summary>
+        /// Adds an exception handler
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="handler"></param>
         public static void OnException(this SignalX signalX, Action<string, Exception> handler)
         {
-            signalX.Settings.ExceptionHandler = handler;
+            signalX.Settings.ExceptionHandler .Add(handler); 
         }
 
+        /// <summary>
+        /// Adds a connection event handler
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="handler"></param>
         public static void OnConnectionEvent(this SignalX signalX, Action<string, object> handler)
         {
-            signalX.Settings.ConnectionEventsHandler = handler;
+            signalX.Settings.ConnectionEventsHandler .Add(handler); 
         }
 
 
 
 
-
+        /// <summary>
+        /// Sets up a server
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
+        /// <param name="server"></param>
+        /// <param name="requireAuthorization">Indicates if the set authorization should be checked before allowing access to the server</param>
+        /// <param name="isSingleWriter">Set whether or not requests should be queued and only one allowed in at a time</param>
+        /// <param name="allowDynamicServerForThisInstance">Sets if it is allowed for another server to be created with same name. In such a case, the existing server will be discarded</param>
 
         public static void Server(this SignalX signalX, string name,
             Action<SignalXRequest, SignalXServerState> server,
@@ -206,32 +232,67 @@
             }
             catch (Exception e)
             {
-                signalX.Settings.ExceptionHandler?.Invoke($"Error while creating server {name}", e);
+                signalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while creating server {name}", e));
             }
         }
-
+        /// <summary>
+        /// Sets us a server that requires authorization to be checked before it is called
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
+        /// <param name="server"></param>
         public static void ServerAuthorized(this SignalX signalX, string name, Action<SignalXRequest> server)
         {
             signalX.ServerAuthorized(name, (r, s) => server(r));
         }
+        /// <summary>
+        /// Sets up a server where authorization is checked before access and requests should be queued with only one allowed in at a time
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
+        /// <param name="server"></param>
         public static void ServerAuthorizedSingleAccess(this SignalX signalX, string name, Action<SignalXRequest> server)
         {
             signalX.ServerAuthorizedSingleAccess(name, (r, s) => server(r));
         }
-
+        /// <summary>
+        /// Sets up a server
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
+        /// <param name="server"></param>
+        /// <param name="requireAuthorization"></param>
         public static void Server(this SignalX signalX, string name, Action<SignalXRequest> server, bool requireAuthorization = false)
         {
             signalX.Server(name, (r, s) => server(r), requireAuthorization);
         }
-
+        /// <summary>
+        /// Sets up a server where requests should be queued with only one allowed in at a time
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
+        /// <param name="server"></param>
+        /// <param name="requireAuthorization"></param>
         public static void ServerSingleAccess(this SignalX signalX, string name, Action<SignalXRequest> server, bool requireAuthorization = false)
         {
             signalX.Server(name, (r, s) => server(r), requireAuthorization, true);
         }
+        /// <summary>
+        /// Sets up a server where authorization is checked before access 
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
+        /// <param name="server"></param>
         public static void ServerAuthorized(this SignalX signalX, string name, Action<SignalXRequest, SignalXServerState> server)
         {
             signalX.Server(name, server, true);
         }
+        /// <summary>
+        /// Sets up a server where authorization is checked before access and requests should be queued with only one allowed in at a time
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
+        /// <param name="server"></param>
         public static void ServerAuthorizedSingleAccess(this SignalX signalX, string name, Action<SignalXRequest, SignalXServerState> server)
         {
             signalX.Server(name, server, true, true);
@@ -353,10 +414,10 @@
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups)
         {
-            signalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestForMethods.ToString(), context?.User?.Identity?.Name);
+            signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestForMethods.ToString(), context?.User?.Identity?.Name));
             if (!signalX.CanProcess(context, ""))
             {
-                signalX.Settings.WarningHandler?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required");
+                signalX.Settings.WarningHandler.ForEach(h => h?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required"));
                 return;
             }
 
@@ -377,7 +438,7 @@
 
             signalX.Settings.Receiver.ReceiveScripts(context?.ConnectionId, methods, context, groups, clients);
 
-            signalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXRequestForMethodsCompleted.ToString(), methods);
+            signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestForMethodsCompleted.ToString(), methods));
         }
 
         internal static void JoinGroup(this SignalX signalX, HubCallerContext context,
@@ -385,7 +446,7 @@
             IGroupManager groups, string groupName)
         {
             groups.Add(context?.ConnectionId, groupName);
-            signalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXGroupJoin.ToString(), groupName);
+            signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXGroupJoin.ToString(), groupName));
 
             signalX.Settings.Receiver.ReceiveInGroupManager(context?.ConnectionId, groupName, context, clients, groups);
         }
@@ -395,7 +456,7 @@
             IGroupManager groups, string groupName)
         {
             groups.Remove(context?.ConnectionId, groupName);
-            signalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXGroupLeave.ToString(), groupName);
+            signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXGroupLeave.ToString(), groupName));
 
             signalX.Settings.Receiver.ReceiveInGroupManager(context?.ConnectionId, groupName, context, clients, groups);
         }

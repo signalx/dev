@@ -8,7 +8,7 @@ namespace SignalXLib.Lib
 
     public static class SignalXAppBuilderExtensions
     {
-        static SignalX SignalX = SignalX.Instance();
+        static SignalX SignalX = SignalX.Instance;
         /// <summary>
         /// If you already did MapSignalR in your app, then you done need to use this!
         /// </summary>
@@ -24,7 +24,7 @@ namespace SignalXLib.Lib
             }
             catch (Exception e)
             {
-                SignalX.Settings.ExceptionHandler?.Invoke("Unable to add SignalXHubPipelineModule to HubPipeline module. Possibly because it has already been added previously. See exception for more details", e);
+                SignalX.Settings.ExceptionHandler.ForEach(h=>h?.Invoke("Unable to add SignalXHubPipelineModule to HubPipeline module. Possibly because it has already been added previously. See exception for more details", e));
             }
 
             app.MapSignalR(hubConfig);

@@ -27,7 +27,7 @@
                     }
                     catch (Exception e)
                     {
-                        SignalX.Settings.ExceptionHandler?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e);
+                        SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
 
                     }
                     //removed coz of possibility of result aggregation from clients

@@ -9,7 +9,7 @@
 
     public partial class SignalXHub : Hub
     {
-        readonly SignalX signalX = SignalX.Instance();
+        readonly SignalX signalX = SignalX.Instance;
 
         public void Send(string handler, dynamic message, string replyTo, dynamic sender, string messageId)
         {
@@ -33,7 +33,7 @@
 
         public override Task OnConnected()
         {
-            this.signalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.OnConnected.ToString(), null);
+            this.signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.OnConnected.ToString(), null));
             string name = this.Context?.User?.Identity?.Name;
 
             if (name != null)
@@ -46,7 +46,7 @@
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            this.signalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.OnDisconnected.ToString(), null);
+            this.signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.OnDisconnected.ToString(), null));
             string name = this.Context?.User?.Identity?.Name;
 
             if (name != null)
@@ -67,7 +67,7 @@
 
         public override Task OnReconnected()
         {
-            this.signalX.Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.OnReconnected.ToString(), null);
+            this.signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.OnReconnected.ToString(), null));
             string name = this.Context?.User?.Identity?.Name;
 
             if (name != null)

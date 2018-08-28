@@ -1,0 +1,17 @@
+﻿Test that server can choose to send to a 
+particular handler different from the one 
+specified by client request
+
+Test multiple clients scenarios
+
+on all tests make server send data to client console log
+
+create sample chat app to demonstrate how to use library
+
+send message to other apps other than web apps
+
+clearly state what each public api is and does
+
+investigate SetUpAgents with SIGNALXCLIENTAGENT
+
+test various types of server config such as single writer

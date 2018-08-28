@@ -4,7 +4,7 @@
 
     public class AuthenticatedConnection : PersistentConnection
     {
-        SignalX SignalX = SignalX.Instance();
+        SignalX SignalX = SignalX.Instance;
         protected override bool AuthorizeRequest(IRequest request)
         {
            

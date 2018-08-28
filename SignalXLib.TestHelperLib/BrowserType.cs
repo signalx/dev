@@ -2,10 +2,8 @@ namespace SignalXLib.TestHelperLib
 {
     public enum BrowserType
     {
-        Unknown,
+        Default=0,
         HeadlessBrowser,
-
-        DefaultSystemBrowser
-        // HeadlessChrome
+        SystemBrowser
     }
 }

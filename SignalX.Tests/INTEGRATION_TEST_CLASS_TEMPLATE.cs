@@ -3,7 +3,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    
+
     [TestClass]
     public class INTEGRATION_TEST_CLASS_TEMPLATE
     {
@@ -13,25 +13,24 @@
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
-                    var actual = 0;
+                    int actual = 0;
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                      
                                    }); ",
-                        server: () => { },
-                        browserType: BrowserType.Unknown,
-                        checks: () => { assert.Equal(10000, actual); },
-                        events: new TestEventHandler(onClientLoaded: () =>
-                             {
-                                 signalx.RunJavaScriptOnAllClients($"return 100*100",
-                                     (answer) =>
-                                     {
-                                         actual = (int)answer;
-                                     });
-                             },
-                            onClientError: (e) => { throw e; },
-                            onCheckSucceeded: () => { },
-                            onCheckFailures: (e) => { }));
+                        () => { },
+                        () => { assert.Equal(10000, actual); },
+                        new TestEventHandler(
+                            () =>
+                            {
+                                signalx.RunJavaScriptOnAllClients(
+                                    $"return 100*100",
+                                    answer => { actual = (int)answer; });
+                            },
+                            e => { throw e; },
+                            () => { },
+                            e => { }),
+                        browserType: BrowserType.Default);
                 });
         }
     }

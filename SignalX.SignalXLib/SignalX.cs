@@ -1,93 +1,102 @@
-﻿using System;
-
-namespace SignalXLib.Lib
+﻿namespace SignalXLib.Lib
 {
+    using System;
+    using System.Security.Principal;
     using System.Threading;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
 
- 
-    public  class SignalX : IDisposable
+    public class SignalX : IDisposable
     {
-        private SignalX()
+        internal static object padlock = new object();
+
+        static readonly SignalXAgents SignalXAgents = new SignalXAgents();
+        internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT"; //+Guid.NewGuid().ToString().Replace("-","");
+
+        public SignalXSettings Settings = new SignalXSettings();
+
+        SignalX()
         {
-           
         }
+
         static SignalX instance { set; get; }
-        public static object padlock=new object();
 
         public ulong CurrentNumberOfConnections { get; internal set; }
 
-        public static SignalX Instance()
+        public static SignalX Instance
         {
-            if (instance != null)
-                return instance;
-
-            lock (padlock)
+            get
             {
                 if (instance != null)
                     return instance;
-                instance = new SignalX();
-                SignalXAgents.SetUpAgents(instance);
+
+                lock (padlock)
+                {
+                    if (instance != null)
+                        return instance;
+                    instance = new SignalX();
+                    SignalXAgents.SetUpAgents(instance);
+                }
+
+                return instance;
             }
-
-            return instance;
         }
- 
-        public SignalXSettings Settings = new SignalXSettings();
-        
-        static SignalXAgents SignalXAgents = new SignalXAgents();
 
-
-
+        /// <summary>
+        ///     Powerful when this is true, you will be able to change behaviour of a server by name at run time
+        /// </summary>
+        public bool AllowDynamicServer
+        {
+            set => this.Settings.AllowDynamicServerInternal = value;
+        }
 
         public void Dispose()
         {
             instance = null;
-            Settings.Dispose();
+            this.Settings.Dispose();
         }
 
-        
-
-        /// <summary>
-        /// Powerful when this is true, you will be able to redefine a server by name at run time
-        /// </summary>
-        public  bool AllowDynamicServer
+        [Obsolete("Not intended for client use")]
+        public void SendMessageToServer(
+            HubCallerContext context,
+            IHubCallerConnectionContext<dynamic> clients,
+            IGroupManager groups,
+            string handler,
+            dynamic message,
+            string replyTo,
+            object sender,
+            string messageId)
         {
-            set { Settings. AllowDynamicServerInternal = value; }
-        }
-        internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT";//+Guid.NewGuid().ToString().Replace("-","");
-
-        public void SendMessageToServer( HubCallerContext context,
-            IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId)
-        {
-            var user = context?.User;
+            IPrincipal user = context?.User;
             string error = "";
             try
             {
-                if (Settings.StartCountingInComingMessages)
-                    Interlocked.Increment(ref Settings.InComingCounter);
+                if (this.Settings.StartCountingInComingMessages)
+                    Interlocked.Increment(ref this.Settings.InComingCounter);
 
-                Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXIncomingRequest.ToString(), new
-                {
-                    handler = handler,
-                    message = message,
-                    replyTo = replyTo,
-                    sender = sender,
-                    messageId = messageId
-                });
+                this.Settings.ConnectionEventsHandler.ForEach(
+                    h => h?.Invoke(
+                        ConnectionEvents.SignalXIncomingRequest.ToString(),
+                        new
+                        {
+                            handler = handler,
+                            message = message,
+                            replyTo = replyTo,
+                            sender = sender,
+                            messageId = messageId
+                        }));
 
-                if (string.IsNullOrEmpty(handler) || !Settings.SignalXServers.ContainsKey(handler))
+                if (string.IsNullOrEmpty(handler) || !this.Settings.SignalXServers.ContainsKey(handler))
                 {
-                    var e = "Error request for unknown server name " + handler;
-                    Settings.ExceptionHandler?.Invoke(e, new Exception(e));
+                    string e = "Error request for unknown server name " + handler;
+                    this.Settings.ExceptionHandler.ForEach(h => h?.Invoke(e, new Exception(e)));
                     this.RespondToUser(context?.ConnectionId, replyTo, e);
                     return;
                 }
 
                 if (!this.CanProcess(context, handler))
                 {
-                    Settings.WarningHandler?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required");
+                    this.Settings.WarningHandler.ForEach(h => h?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required"));
                     return;
                 }
 
@@ -102,79 +111,86 @@ namespace SignalXLib.Lib
                     e.Message;
                 this.RespondToUser(context.ConnectionId, "signalx_error", error);
                 if (!string.IsNullOrEmpty(replyTo))
-                {
                     this.RespondToUser(context.ConnectionId, replyTo, error);
-                }
-                this.Settings.ExceptionHandler?.Invoke(error, e);
+                this.Settings.ExceptionHandler.ForEach(h => h?.Invoke(error, e));
             }
-            Settings.ConnectionEventsHandler?.Invoke(ConnectionEvents.SignalXIncomingRequestCompleted.ToString(), new
-            {
-                handler = handler,
-                message = message,
-                replyTo = replyTo,
-                sender = sender,
-                messageId = messageId,
-                error = error
-            });
+
+            this.Settings.ConnectionEventsHandler.ForEach(
+                h => h?.Invoke(
+                    ConnectionEvents.SignalXIncomingRequestCompleted.ToString(),
+                    new
+                    {
+                        handler = handler,
+                        message = message,
+                        replyTo = replyTo,
+                        sender = sender,
+                        messageId = messageId,
+                        error = error
+                    }));
         }
 
-        internal  bool AllowToSend( string name, dynamic data)
+        internal bool AllowToSend(string name, dynamic data)
         {
-            if (Settings.DisabledAllClients)
+            if (this.Settings.DisabledAllClients)
             {
-                if (!Settings.SignalXClientDetails.ContainsKey(name) ||
-                    (Settings.SignalXClientDetails.ContainsKey(name) && Settings.SignalXClientDetails[name].Disabled))
+                if (!this.Settings.SignalXClientDetails.ContainsKey(name) ||
+                    this.Settings.SignalXClientDetails.ContainsKey(name) && this.Settings.SignalXClientDetails[name].Disabled)
                 {
-                    Settings.WarningHandler?.Invoke("DataSendingNotActivated",
-                        new
-                        {
-                            Name = name,
-                            Data = data,
-                            Issue = $"Sending message to client {name} has been disabled. DisabledAllClients is activated"
-                        });
+                    this.Settings.WarningHandler.ForEach(
+                        h => h?.Invoke(
+                            "DataSendingNotActivated",
+                            new
+                            {
+                                Name = name,
+                                Data = data,
+                                Issue = $"Sending message to client {name} has been disabled. DisabledAllClients is activated"
+                            }));
                     return false;
                 }
             }
             else
             {
-                if (Settings.SignalXClientDetails.ContainsKey(name) && Settings.SignalXClientDetails[name].Disabled)
+                if (this.Settings.SignalXClientDetails.ContainsKey(name) && this.Settings.SignalXClientDetails[name].Disabled)
                 {
-                    Settings.WarningHandler?.Invoke("DataSendingNotActivated",
-                        new
-                        {
-                            Name = name,
-                            Data = data,
-                            Issue = $"Sending message to client {name} has been disabled"
-                        });
+                    this.Settings.WarningHandler.ForEach(
+                        h => h?.Invoke(
+                            "DataSendingNotActivated",
+                            new
+                            {
+                                Name = name,
+                                Data = data,
+                                Issue = $"Sending message to client {name} has been disabled"
+                            }));
                     return false;
                 }
             }
 
-            if (!Settings.HasOneOrMoreConnections)
+            if (!this.Settings.HasOneOrMoreConnections)
             {
-                Settings.WarningHandler?.Invoke("DataSendingNotActivated",
-                    new
-                    {
-                        UserId = "",
-                        Name = name,
-                        Data = data,
-                        Issue = "Cannot send message to client since no client connection has been obtained"
-                    });
+                this.Settings.WarningHandler.ForEach(
+                    h => h?.Invoke(
+                        "DataSendingNotActivated",
+                        new
+                        {
+                            UserId = "",
+                            Name = name,
+                            Data = data,
+                            Issue = "Cannot send message to client since no client connection has been obtained"
+                        }));
                 return false;
             }
+
             return true;
         }
 
-        public  void RespondToAll( string replyTo, dynamic responseData, string groupName = null)
+        public void RespondToAll(string replyTo, dynamic responseData, string groupName = null)
         {
             if (!AllowToSend(replyTo, responseData))
-            {
                 return;
-            }
-            if (Settings.StartCountingOutGoingMessages)
-                Interlocked.Increment(ref Settings.OutGoingCounter);
+            if (this.Settings.StartCountingOutGoingMessages)
+                Interlocked.Increment(ref this.Settings.OutGoingCounter);
 
-          this.Settings.  Receiver.ReceiveByGroup(replyTo, responseData, groupName);
+            this.Settings.Receiver.ReceiveByGroup(replyTo, responseData, groupName);
         }
     }
 }

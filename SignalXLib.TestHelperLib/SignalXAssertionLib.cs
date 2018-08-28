@@ -2,6 +2,7 @@ namespace SignalXLib.TestHelperLib
 {
     using Newtonsoft.Json;
     using System;
+    using System.Threading.Tasks;
 
     public class SignalXAssertionLib
     {
@@ -43,6 +44,20 @@ namespace SignalXLib.TestHelperLib
         {
             if (expectation)
                 throw new Exception($"Expected result to be not true " + message);
+        }
+
+        public void Fail()
+        {
+            throw  new Exception("This line was not expected to be reached");
+        }
+
+        public void WaitFor(TimeSpan fromSeconds)
+        {
+            DateTime start = DateTime.Now;
+            while ((DateTime.Now - start).TotalMilliseconds < fromSeconds.TotalMilliseconds)
+            {
+               Task.Delay(TimeSpan.FromMilliseconds(50)).Wait();
+            }
         }
     }
 }

@@ -7,7 +7,6 @@
     [TestClass]
     public class when_client_sends_message_to_server
     {
-        
         [TestMethod]
         public void server_response_with_upperlevel_api_to_all_must_work_with_a_named_handler()
         {
@@ -16,34 +15,30 @@
                 {
                     int result = 0;
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                      signalx.client.getSomethingCompleted=function (something) {
                                             signalx.server.sample2(10);
                                        };
                                      signalx.server.sample(100,'getSomethingCompleted');
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
-                                    assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
+                                    assert.Equal(100, (int)request.Message, "server must get the correct message");
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    result = (int)request.Message;
-                                });
-                        }, browserType: BrowserType.Unknown,
-                        checks: () =>
-                        {
-                            assert.Equal(result, 10);
-                        });
+                            signalx.Server(
+                                "sample2",
+                                request => { result = (int)request.Message; });
+                        },
+                        () => { assert.Equal(result, 10); },
+                        browserType: BrowserType.Default);
                 });
         }
 
-       
         [TestMethod]
         public void server_response_with_upperlevel_api_to_all_must_work_with_a_promise()
         {
@@ -52,34 +47,30 @@
                 {
                     int result = 0;
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                      var getSomethingCompletedPromise = signalx.server.sample(100);
                                      getSomethingCompletedPromise.done(function (something) {
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
-                                    assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
+                                    assert.Equal(100, (int)request.Message, "server must get the correct message");
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    result = (int)request.Message;
-                                });
-                        }, browserType: BrowserType.Unknown,
-                        checks: () =>
-                        {
-                            assert.Equal(result, 10);
-                        });
+                            signalx.Server(
+                                "sample2",
+                                request => { result = (int)request.Message; });
+                        },
+                        () => { assert.Equal(result, 10); },
+                        browserType: BrowserType.Default);
                 });
         }
 
-       
         [TestMethod]
         public void server_response_with_upperlevel_api_to_all_must_work_with_a_callback()
         {
@@ -88,29 +79,26 @@
                 {
                     int result = 0;
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function(something) {
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
-                                    assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
+                                    assert.Equal(100, (int)request.Message, "server must get the correct message");
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    result = (int)request.Message;
-                                });
-                        }, browserType: BrowserType.Unknown,
-                        checks: () =>
-                        {
-                            assert.Equal(result, 10);
-                        });
+                            signalx.Server(
+                                "sample2",
+                                request => { result = (int)request.Message; });
+                        },
+                        () => { assert.Equal(result, 10); },
+                        browserType: BrowserType.Default);
                 });
         }
 
@@ -122,29 +110,26 @@
                 {
                     int result = 0;
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function (something) {
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
                                     assert.Equal<int>(100, request.Message, "server must get the correct message");
                                     signalx.RespondToOthers(request.User, request.ReplyTo, 100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    result = (int)request.Message;
-                                });
-                        }, browserType: BrowserType.Unknown,
-                        checks: () =>
-                        {
-                            assert.Equal(result, 10);
-                        });
+                            signalx.Server(
+                                "sample2",
+                                request => { result = (int)request.Message; });
+                        },
+                        () => { assert.Equal(result, 10); },
+                        browserType: BrowserType.Default);
                 });
         }
 
@@ -155,24 +140,23 @@
                 (signalx, assert) =>
                 {
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function (something) {
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
                                     assert.Equal<int>(100, request.Message, "server must get the correct message");
                                     signalx.RespondToUser(request.User, request.ReplyTo, 100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    assert.Equal<int>(10, request.Message);
-                                });
+                            signalx.Server(
+                                "sample2",
+                                request => { assert.Equal<int>(10, request.Message); });
                         });
                 });
         }
@@ -184,29 +168,27 @@
                 (signalx, assert) =>
                 {
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function (something) {
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
                                     assert.Equal<int>(100, request.Message, "server must get the correct message");
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    assert.Equal<int>(10, request.Message);
-                                });
+                            signalx.Server(
+                                "sample2",
+                                request => { assert.Equal<int>(10, request.Message); });
                         });
                 });
         }
 
-       
         [TestMethod]
         public void server_response_to_all_must_work_with_a_named_handler()
         {
@@ -215,34 +197,30 @@
                 {
                     int result = 0;
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                      signalx.client.getSomethingCompleted=function (something) {
                                             signalx.server.sample2(10);
                                        };
                                      signalx.server.sample(100,'getSomethingCompleted');
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
-                                    assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
+                                    assert.Equal(100, (int)request.Message, "server must get the correct message");
                                     request.RespondToAll(100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    result = (int)request.Message;
-                                });
-                        }, browserType: BrowserType.Unknown,
-                        checks: () =>
-                        {
-                            assert.Equal(result, 10);
-                        });
+                            signalx.Server(
+                                "sample2",
+                                request => { result = (int)request.Message; });
+                        },
+                        () => { assert.Equal(result, 10); },
+                        browserType: BrowserType.Default);
                 });
         }
 
-       
         [TestMethod]
         public void server_response_to_all_must_work_with_a_promise()
         {
@@ -251,34 +229,30 @@
                 {
                     int result = 0;
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                      var getSomethingCompletedPromise = signalx.server.sample(100);
                                      getSomethingCompletedPromise.done(function (something) {
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
-                                    assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
+                                    assert.Equal(100, (int)request.Message, "server must get the correct message");
                                     request.RespondToAll(100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    result = (int)request.Message;
-                                });
-                        }, browserType: BrowserType.Unknown,
-                        checks: () =>
-                        {
-                            assert.Equal(result, 10);
-                        });
+                            signalx.Server(
+                                "sample2",
+                                request => { result = (int)request.Message; });
+                        },
+                        () => { assert.Equal(result, 10); },
+                        browserType: BrowserType.Default);
                 });
         }
 
-        
         [TestMethod]
         public void server_response_to_all_must_work_with_a_callback()
         {
@@ -287,33 +261,29 @@
                 {
                     int result = 0;
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function(something) {
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
-                                    assert.Equal<int>(100, (int)request.Message, "server must get the correct message");
+                                    assert.Equal(100, (int)request.Message, "server must get the correct message");
                                     request.RespondToAll(100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    result = (int)request.Message;
-                                });
-                        }, browserType: BrowserType.Unknown,
-                        checks: () =>
-                        {
-                            assert.Equal(result, 10);
-                        });
+                            signalx.Server(
+                                "sample2",
+                                request => { result = (int)request.Message; });
+                        },
+                        () => { assert.Equal(result, 10); },
+                        browserType: BrowserType.Default);
                 });
         }
 
-       
         [TestMethod]
         public void server_reply_to_others_should_exclude_sender()
         {
@@ -322,29 +292,26 @@
                 {
                     int result = 0;
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function (something) {
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
                                     assert.Equal<int>(100, request.Message, "server must get the correct message");
                                     request.RespondToOthers(100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    result = (int)request.Message;
-                                });
-                        }, browserType: BrowserType.Unknown,
-                        checks: () =>
-                        {
-                            assert.Equal(result, 10);
-                        });
+                            signalx.Server(
+                                "sample2",
+                                request => { result = (int)request.Message; });
+                        },
+                        () => { assert.Equal(result, 10); },
+                        browserType: BrowserType.Default);
                 });
         }
 
@@ -355,24 +322,23 @@
                 (signalx, assert) =>
                 {
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function (something) {
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
                                     assert.Equal<int>(100, request.Message, "server must get the correct message");
                                     request.RespondToSender(100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    assert.Equal<int>(10, request.Message);
-                                });
+                            signalx.Server(
+                                "sample2",
+                                request => { assert.Equal<int>(10, request.Message); });
                         });
                 });
         }
@@ -384,24 +350,23 @@
                 (signalx, assert) =>
                 {
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function (something) {
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
                                     assert.Equal<int>(100, request.Message, "server must get the correct message");
                                     request.RespondToUser(request.ReplyTo, 100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    assert.Equal<int>(10, request.Message);
-                                });
+                            signalx.Server(
+                                "sample2",
+                                request => { assert.Equal<int>(10, request.Message); });
                         });
                 });
         }
@@ -413,24 +378,23 @@
                 (signalx, assert) =>
                 {
                     return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
+                        @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function (something) {
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        server: () =>
+                        () =>
                         {
-                            signalx.Server("sample",
-                                (request) =>
+                            signalx.Server(
+                                "sample",
+                                request =>
                                 {
                                     assert.Equal<int>(100, request.Message, "server must get the correct message");
                                     request.RespondToAll(request.ReplyTo, 100);
                                 });
-                            signalx.Server("sample2",
-                                (request) =>
-                                {
-                                    assert.Equal<int>(10, request.Message);
-                                });
+                            signalx.Server(
+                                "sample2",
+                                request => { assert.Equal<int>(10, request.Message); });
                         });
                 });
         }
