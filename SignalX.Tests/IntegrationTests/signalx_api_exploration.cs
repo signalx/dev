@@ -47,7 +47,7 @@
                             signalx.ServerAuthorizedSingleAccess(Guid.NewGuid().ToString(), request => { });
                             signalx.ServerSingleAccess(Guid.NewGuid().ToString(), request => { });
                         },
-                        TestEvents = new TestEventHandler(() => { assert.Equal(1, (int)signalx.CurrentNumberOfConnections); })
+                        TestEvents = new TestEventHandler(() => { assert.AreEqual(1, (int)signalx.CurrentNumberOfConnections); })
                     };
                 });
         }

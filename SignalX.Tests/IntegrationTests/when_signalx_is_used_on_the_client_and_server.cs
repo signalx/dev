@@ -21,18 +21,18 @@
                                             signalx.server.sample2(something*7);
                                        });
                                    }); ",
-                        () =>
+                        onAppStarted: () =>
                         {
                             signalx.Server(
                                 "sample",
                                 request =>
                                 {
-                                    assert.Equal<string>("GetSomething", request.Message, "server must get the correct message");
+                                    assert.AreEqual<string>("GetSomething", request.Message, "server must get the correct message");
                                     request.RespondToAll(request.ReplyTo, 100);
                                 });
                             signalx.Server(
                                 "sample2",
-                                request => { assert.Equal<int>(700, request.Message); });
+                                request => { assert.AreEqual<int>(700, request.Message); });
                         });
                 });
         }
@@ -49,18 +49,18 @@
                                             signalx.server.sample2(something*7);
                                        });
                                    }); ",
-                        () =>
+                        onAppStarted: () =>
                         {
                             signalx.Server(
                                 "sample",
                                 request =>
                                 {
-                                    assert.Equal<string>("GetSomething", request.Message, "server must get the correct message");
+                                    assert.AreEqual<string>("GetSomething", request.Message, "server must get the correct message");
                                     request.RespondToAll(request.ReplyTo, 100);
                                 });
                             signalx.Server(
                                 "sample2",
-                                request => { assert.Equal<int>(700, request.Message); });
+                                request => { assert.AreEqual<int>(700, request.Message); });
                         });
                 });
         }
@@ -78,18 +78,18 @@
                                             signalx.server.sample2(something*7);
                                        });
                                    }); ",
-                        () =>
+                        onAppStarted: () =>
                         {
                             signalx.Server(
                                 "sample",
                                 request =>
                                 {
-                                    assert.Equal<string>("GetSomething", request.Message, "server must get the correct message");
+                                    assert.AreEqual<string>("GetSomething", request.Message, "server must get the correct message");
                                     request.RespondToAll(request.ReplyTo, 100);
                                 });
                             signalx.Server(
                                 "sample2",
-                                request => { assert.Equal<int>(700, request.Message); });
+                                request => { assert.AreEqual<int>(700, request.Message); });
                         });
                 });
         }
@@ -113,13 +113,13 @@
                                signalx.ready(function (server) {
 							      server." + "ServerHandler" + @"('" + message1 + @"','" + "ClientHandler" + @"');
                                 });",
-                        () =>
+                        onAppStarted: () =>
                         {
                             signalX.Server("ServerHandler", request => { signalX.RespondToAll("ClientHandler", request.Message); });
 
                             signalX.Server("TestServerFeedbackHandler", request => { finalMessage = request.Message as string; });
                         },
-                        () => { assert.Equal(message1 + message2, finalMessage); });
+                        checks: () => { assert.AreEqual(message1 + message2, finalMessage); });
                 });
         }
 
@@ -139,13 +139,13 @@
                                             server.TestServerFeedbackHandler(m +'" + message2 + @"' ,function(){});
 							       });
                                 });",
-                        () =>
+                        onAppStarted: () =>
                         {
                             signalX.Server("ServerHandler", request => { signalX.RespondToAll(request.ReplyTo, request.Message); });
 
                             signalX.Server("TestServerFeedbackHandler", request => { finalMessage = request.Message as string; });
                         },
-                        () => { assert.Equal(message1 + message2, finalMessage); });
+                        checks: () => { assert.AreEqual(message1 + message2, finalMessage); });
                 });
         }
 
@@ -164,13 +164,13 @@
                                             server.TestServerFeedbackHandler(m);
 							       });
                                 });",
-                        () =>
+                        onAppStarted: () =>
                         {
                             signalX.Server("ServerHandler", request => { signalX.RespondToAll(request.ReplyTo, request.Message); });
 
                             signalX.Server("TestServerFeedbackHandler", request => { finalMessage = request.Message as string; });
                         },
-                        () => { assert.Equal(message1, finalMessage); });
+                        checks: () => { assert.AreEqual(message1, finalMessage); });
                 });
         }
 
@@ -190,19 +190,19 @@
 							          signalx.server." + "TestServerFeedbackHandler" + @"(m +'" + message2 + @"');
 							       });
                                 });",
-                        () =>
+                        onAppStarted: () =>
                         {
                             signalx.Server("ServerHandler", request => { signalx.RespondToAll(request.ReplyTo, request.Message); });
 
                             signalx.Server("TestServerFeedbackHandler", request => { finalMessage = request.Message as string; });
                         },
-                        () => { assert.Equal(message1 + message2, finalMessage); },
-                        new TestEventHandler(
+                        checks: () => { assert.AreEqual(message1 + message2, finalMessage); },
+                        events: new TestEventHandler(
                             () => { },
                             e => { throw e; },
                             () => { },
-                            e => { }),
-                        browserType: BrowserType.Default);
+                            e => { })
+                        );
                 });
         }
 
@@ -222,14 +222,14 @@
 							          signalx.server.TestServerFeedbackHandler ();
 							       });
                                 });",
-                        () =>
+                        onAppStarted: () =>
                         {
                             signalx.Server("ServerHandler", request => { signalx.RespondToAll(request.ReplyTo, request.Message); });
 
                             signalx.Server("TestServerFeedbackHandler", request => { finalMessage = message3; });
                         },
-                        () => { assert.Equal(message3, finalMessage); },
-                        browserType: BrowserType.Default);
+                        checks: () => { assert.AreEqual(message3, finalMessage); }
+                        );
                 });
         }
 
@@ -251,7 +251,7 @@
 							          signalx.server.TestServerFeedbackHandler ();
 							       });
                                 });",
-                        () =>
+                        onAppStarted: () =>
                         {
                             signalX.AllowDynamicServer = false;
                             //SET UP SERVER
@@ -267,10 +267,10 @@
                             {
                             }
                         },
-                        () =>
+                        checks: () =>
                         {
-                            assert.NotEqual(message1, finalMessage);
-                            assert.Equal(message3, finalMessage);
+                            assert.AreNotEqual(message1, finalMessage);
+                            assert.AreEqual(message3, finalMessage);
                         });
                 });
         }
@@ -296,7 +296,7 @@
 							          signalx.server.TestServerFeedbackHandler ();
 							       });
                                 });",
-                        () =>
+                        onAppStarted: () =>
                         {
                             signalX.AllowDynamicServer = true;
                             //SET UP SERVER
@@ -306,12 +306,12 @@
                             //this server will run
                             signalX.Server("TestServerFeedbackHandler", request => { finalMessage = message1; });
                         },
-                        () =>
+                        checks: () =>
                         {
-                            assert.Equal(message1, finalMessage);
-                            assert.NotEqual(message3, finalMessage);
+                            assert.AreEqual(message1, finalMessage);
+                            assert.AreNotEqual(message3, finalMessage);
                         },
-                        new TestEventHandler(
+                        events: new TestEventHandler(
                             () => { },
                             e => { throw e; },
                             () =>
@@ -332,9 +332,9 @@
 
                     return new SignalXTestDefinition(
                         "",
-                        () => { },
-                        () => { assert.Equal(50, result); },
-                        new TestEventHandler(
+                        onAppStarted: () => { },
+                        checks: () => { assert.AreEqual(50, result); },
+                        events: new TestEventHandler(
                             () =>
                             {
                                 signalX.RunJavaScriptOnAllClients(
@@ -356,33 +356,33 @@
                     string groupWatcher = "groupWatcher";
                     string groupWatcher2 = "groupWatcher2";
                     string clientGroupReceiver = "groupClient";
-                    var testObject = new TestObject();
-                    testObject.FinalMessage = null;
-                    testObject.FinalMessage2 = null;
-                    testObject.FinalMessage3 = null;
-                    testObject.FinalMessage4 = null;
-                    testObject.Message = Guid.NewGuid().ToString();
-                    testObject.ClientHandler = "myclientHandler" + Guid.NewGuid().ToString().Replace("-", "");
-                    testObject.ServerHandler = "myServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
-                    testObject.TestServerFeedbackHandler = "myTestServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
-                    testObject.TestServerFeedbackHandler2 = "myTestServerHandler2" + Guid.NewGuid().ToString().Replace("-", "");
-                    testObject.TestServerFeedbackHandler3 = "myTestServerHandler3" + Guid.NewGuid().ToString().Replace("-", "");
-                    testObject.TestServerFeedbackHandler4 = "myTestServerHandler4" + Guid.NewGuid().ToString().Replace("-", "");
-                    assert.NotEqual(testObject.Message, testObject.FinalMessage);
-                    assert.NotEqual(testObject.Message, testObject.FinalMessage2);
-                    assert.NotEqual(testObject.Message, testObject.FinalMessage3);
-                    assert.NotEqual(testObject.Message, testObject.FinalMessage4);
-                    testObject.VerifiedJoinedGroup = false;
-                    testObject.VerifiedJoinedGroup2 = false;
+                   // var testObject = new TestObject();
+                    string FinalMessage = null;
+                    string FinalMessage2 = null;
+                    string FinalMessage3 = null;
+                    string FinalMessage4 = null;
+                    var Message = Guid.NewGuid().ToString();
+                    var ClientHandler = "myclientHandler" + Guid.NewGuid().ToString().Replace("-", "");
+                    string ServerHandler = "myServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
+                    string TestServerFeedbackHandler = "myTestServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
+                    string TestServerFeedbackHandler2 = "myTestServerHandler2" + Guid.NewGuid().ToString().Replace("-", "");
+                    string TestServerFeedbackHandler3 = "myTestServerHandler3" + Guid.NewGuid().ToString().Replace("-", "");
+                    string TestServerFeedbackHandler4 = "myTestServerHandler4" + Guid.NewGuid().ToString().Replace("-", "");
+                    assert.AreNotEqual(Message, FinalMessage);
+                    assert.AreNotEqual(Message, FinalMessage2);
+                    assert.AreNotEqual(Message, FinalMessage3);
+                    assert.AreNotEqual(Message, FinalMessage4);
+                    var VerifiedJoinedGroup = false;
+                    var VerifiedJoinedGroup2 = false;
                     return new SignalXTestDefinition(
                         @"
                                 var promise = {}
-								signalx.client." + testObject.ClientHandler + @"=function (m) {
-							      signalx.server." + testObject.TestServerFeedbackHandler + @"(m,function(m2){
-                                     signalx.server." + testObject.TestServerFeedbackHandler2 + @"(m2,function(m3){
-                                          promise = signalx.server." + testObject.TestServerFeedbackHandler3 + @"(m3);
+								signalx.client." + ClientHandler + @"=function (m) {
+							      signalx.server." + TestServerFeedbackHandler + @"(m,function(m2){
+                                     signalx.server." + TestServerFeedbackHandler2 + @"(m2,function(m3){
+                                          promise = signalx.server." + TestServerFeedbackHandler3 + @"(m3);
                                           promise.then(function(m4){
-                                             signalx.server." + testObject.TestServerFeedbackHandler4 + @"(m4);
+                                             signalx.server." + TestServerFeedbackHandler4 + @"(m4);
                                           });
                                      });
                                   });
@@ -394,60 +394,60 @@
                                   signalx.groups.join('" + groupName + @"',function(c){
                                              signalx.server." + groupWatcher + @"(c);
                                           });
-							      server." + testObject.ServerHandler + @"('" + testObject.Message + @"','" + testObject.ClientHandler + @"');
+							      server." + ServerHandler + @"('" + Message + @"','" + ClientHandler + @"');
                                 });",
-                        () =>
+                        onAppStarted: () =>
                         {
                             //SET UP SERVER
                             signalX.Server(
                                 groupWatcher,
                                 request =>
                                 {
-                                    testObject.VerifiedJoinedGroup = request.Message as string == groupName;
+                                    VerifiedJoinedGroup = request.Message as string == groupName;
                                     signalX.RespondToAll(clientGroupReceiver, request.Message, groupName);
                                 });
                             signalX.Server(
                                 groupWatcher2,
-                                request => { testObject.VerifiedJoinedGroup2 = request.Message as string == groupName; });
+                                request => { VerifiedJoinedGroup2 = request.Message as string == groupName; });
                             signalX.Server(
-                                testObject.ServerHandler,
-                                request => { signalX.RespondToAll(testObject.ClientHandler, testObject.Message); });
+                                ServerHandler,
+                                request => { signalX.RespondToAll(ClientHandler, Message); });
                             signalX.Server(
-                                testObject.TestServerFeedbackHandler,
+                                TestServerFeedbackHandler,
                                 request =>
                                 {
-                                    testObject.FinalMessage = request.Message as string;
-                                    signalX.RespondToAll(request.ReplyTo, testObject.FinalMessage);
+                                    FinalMessage = request.Message as string;
+                                    signalX.RespondToAll(request.ReplyTo, FinalMessage);
                                 });
                             signalX.Server(
-                                testObject.TestServerFeedbackHandler2,
+                                TestServerFeedbackHandler2,
                                 request =>
                                 {
-                                    testObject.FinalMessage2 = request.Message as string;
-                                    signalX.RespondToAll(request.ReplyTo, testObject.FinalMessage2);
+                                    FinalMessage2 = request.Message as string;
+                                    signalX.RespondToAll(request.ReplyTo, FinalMessage2);
                                 });
                             signalX.Server(
-                                testObject.TestServerFeedbackHandler3,
+                                TestServerFeedbackHandler3,
                                 request =>
                                 {
-                                    testObject.FinalMessage3 = request.Message as string;
-                                    signalX.RespondToAll(request.ReplyTo, testObject.FinalMessage3);
+                                    FinalMessage3 = request.Message as string;
+                                    signalX.RespondToAll(request.ReplyTo, FinalMessage3);
                                 });
                             signalX.Server(
-                                testObject.TestServerFeedbackHandler4,
-                                request => { testObject.FinalMessage4 = request.Message as string; });
+                                TestServerFeedbackHandler4,
+                                request => { FinalMessage4 = request.Message as string; });
                         },
-                        () =>
+                        checks: () =>
                         {
-                            assert.Equal(testObject.Message, testObject.FinalMessage);
-                            assert.Equal(testObject.Message, testObject.FinalMessage2);
-                            assert.Equal(testObject.Message, testObject.FinalMessage3);
-                            assert.Equal(testObject.Message, testObject.FinalMessage4);
-                            assert.IsTrue(testObject.VerifiedJoinedGroup, "verifiedJoinedGroup");
-                            assert.IsTrue(testObject.VerifiedJoinedGroup2, "verifiedJoinedGroup2");
+                            assert.AreEqual(Message, FinalMessage);
+                            assert.AreEqual(Message, FinalMessage2);
+                            assert.AreEqual(Message, FinalMessage3);
+                            assert.AreEqual(Message, FinalMessage4);
+                            assert.IsTrue(VerifiedJoinedGroup, "verifiedJoinedGroup");
+                            assert.IsTrue(VerifiedJoinedGroup2, "verifiedJoinedGroup2");
                         },
-                        new TestEventHandler(() => { }),
-                        browserType: BrowserType.Default);
+                        events: new TestEventHandler(() => { })
+                        );
                 });
         }
 
@@ -460,9 +460,9 @@
                     int result = 0;
                     return new SignalXTestDefinition(
                         "",
-                        () => { },
-                        () => { assert.Equal(result, 3); },
-                        new TestEventHandler(
+                        onAppStarted: () => { },
+                        checks: () => { assert.AreEqual(result, 3); },
+                        events: new TestEventHandler(
                             () =>
                             {
                                 signalX.RunJavaScriptOnAllClients(
@@ -477,9 +477,9 @@
                             ",
                                     (response, request, error) => { result = Convert.ToInt32(response); },
                                     TimeSpan.FromSeconds(10));
-                            }),
-                        browserType: BrowserType.Default);
-                });
+                            })
+                        );
+                },1);
         }
     }
 }

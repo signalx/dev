@@ -4,8 +4,10 @@ namespace SignalXLib.TestHelperLib
     using Microsoft.Owin.Hosting;
     using SignalXLib.Lib;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Security.Permissions;
@@ -16,34 +18,57 @@ namespace SignalXLib.TestHelperLib
     public class SignalXTester
     {
         public static TimeSpan MaxTestWaitTime = TimeSpan.FromMinutes(1);
-        public static void RunAndExpectFailure(Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun)
+
+        public static void RunAndExpectFailure(Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun, int numberOfRetryOnTestFailure = 0, int numberOfMustRetryNoMatterWhat = 0)
         {
             try
             {
-                using (var isolated = new Isolated<IsolationContainer>())
-                {
-                    isolated.Value.MethodBody = fun;
-                    isolated.Value.DoSomething();
-                }
-                throw  new Exception("Expected run to fail , but it succeeded");
+                RunInternal(fun,true, numberOfRetryOnTestFailure, numberOfMustRetryNoMatterWhat );
+                throw new Exception("Expected run to fail , but it succeeded");
             }
             catch (Exception e)
             {
-                
             }
         }
-       
-        public static void Run(Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun)
+
+        public static void Run(Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun, int numberOfRetryOnTestFailure = 0, int numberOfMustRetryNoMatterWhat = 0)
         {
-            using (var isolated = new Isolated<IsolationContainer>())
+            RunInternal(fun,false,  numberOfRetryOnTestFailure ,  numberOfMustRetryNoMatterWhat );
+        }
+        static void RunInternal(Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun, bool expectFailure, int numberOfRetryOnTestFailure=0, int numberOfMustRetryNoMatterWhat=0)
+        {
+            for (int i = 0; i < numberOfMustRetryNoMatterWhat+1; i++)
             {
-                isolated.Value.MethodBody = fun;
-                isolated.Value.DoSomething();
+                var failures = 0;
+                var succeeded = false;
+                while (failures<=numberOfRetryOnTestFailure && !succeeded)
+                {
+                    try
+                    {
+                        using (var isolated = new Isolated<IsolationContainer>())
+                        {
+                            isolated.Value.MethodBody = fun;
+                            isolated.Value.DoSomething();
+                        }
+
+                        succeeded = true;
+                    }
+                    catch (Exception e)
+                    {
+                        if (!expectFailure)
+                        {
+                            failures++;
+                        }
+                        break;
+                    }
+                }
             }
         }
+
         private static SignalX SignalX;
-        internal static string FileName;
-        internal static string FilePath;
+
+        // internal static string FileName;
+        //internal static string FilePath;
 
         internal static void SetSignalXInstance(SignalX signalX)
         {
@@ -58,19 +83,86 @@ namespace SignalXLib.TestHelperLib
             l.Stop();
             return port;
         }
+        internal static string signalxScriptDownload { set; get; }
+        internal static string signalRScriptDownload { set; get; }
+        internal static string JQueryScriptDownload { set; get; }
+        public static string CDNSignalX = "https://unpkg.com/signalx";
+        public static string CDNjQuery = "https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js";
+        public static string CDNSignalR = "https://ajax.aspnetcdn.com/ajax/signalr/jquery.signalr-2.2.0.js";
+        
+        static string DownLoadScript(string cdn)
+        {
+            try
+            {
+                using (var client = new System.Net.WebClient())
+                {
+                    var script = client.DownloadString(cdn);
+                    if (string.IsNullOrEmpty(script))
+                    {
+                        throw new Exception("Empty source returned from cdn : " + CDNSignalX);
+                    }
+                    else
+                    {
+                        return script.Replace(@"\\""", @"""").Replace(@"\\'", @"'");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("It seems there is an issue connecting to the internet : " + CDNSignalX + " - " + e.Message);
+            }
+        }
 
-       
+
         internal static void Run(SignalX signalX, SignalXTestDefinition scenarioDefinition)
 
         {
-            var testHelper = new SignalXTester();
             SetSignalXInstance(signalX);
-            // script
-            string script = scenarioDefinition.Script;
             //setup
-            TestObject testObject = SetUpScriptForTest(testData => script);
-            //server
-            //test : run and assert
+            var testObjects = new List<TestObject>();
+            // script
+            var scriptTags = "";
+            if (scenarioDefinition.EmbedeLibraryScripts)
+            {
+                JQueryScriptDownload = JQueryScriptDownload ?? DownLoadScript(CDNjQuery);
+                signalRScriptDownload = signalRScriptDownload ?? DownLoadScript(CDNSignalR);
+                signalxScriptDownload = signalxScriptDownload ?? DownLoadScript(CDNSignalX);
+
+                scriptTags = @"
+                            <script >" + JQueryScriptDownload + @"</script>
+							<script >" + signalRScriptDownload + @"</script>
+							<script >" + signalxScriptDownload + @"</script>
+                            ";
+            }
+            else
+            {
+                scriptTags = @"
+                            <script src='" + CDNjQuery + @"'></script>
+							<script src='" + CDNSignalR + @"'></script>
+							<script src='" + CDNSignalX + @"'></script>
+                            ";
+            }
+             
+
+            for (int i = 0; i < scenarioDefinition.NumberOfClients; i++)
+            {
+                string script = scenarioDefinition.Script.Count==1? 
+                    scenarioDefinition.Script[0]: 
+                    scenarioDefinition.Script[i];
+
+                var testObject = new TestObject() { };
+                testObject.BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                testObject.FileName = "\\index" + Guid.NewGuid() + ".html";
+                testObject.PageHtml = WrapScriptInHtml(script, scriptTags, "<h1>Signalx tests running ....</h1>");
+
+                testObject = scenarioDefinition.OnClientPrepared == null ? 
+                    testObject : 
+                    scenarioDefinition.OnClientPrepared.Invoke(testObject);
+
+                var FilePath = testObject.BaseDirectory + testObject.FileName;
+                File.WriteAllText(FilePath, testObject.PageHtml);
+                testObjects.Add(testObject);
+            }
 
             scenarioDefinition.TestEvents = scenarioDefinition.TestEvents ?? new TestEventHandler();
             scenarioDefinition.TestEvents.OnAppStarted = () => { scenarioDefinition?.OnAppStarted?.Invoke(); };
@@ -78,29 +170,15 @@ namespace SignalXLib.TestHelperLib
             CheckExpectations(scenarioDefinition.NumberOfClients,
                 () => { scenarioDefinition?.Checks?.Invoke(); },
                 "http://localhost:" + FreeTcpPort(),
-                testObject,
+                testObjects,
                 scenarioDefinition.BrowserType,
                 scenarioDefinition.TestEvents);
         }
 
-        public static string CDN = "https://unpkg.com/signalx";
-        internal static void CheckExpectations(int numberOfClients, Action operation, string url, TestObject testObject, BrowserType browserType = BrowserType.Default, TestEventHandler events = null)
+       
+
+        internal static void CheckExpectations(int numberOfClients, Action operation, string url, List<TestObject> testObjects, BrowserType browserType = BrowserType.Default, TestEventHandler events = null)
         {
-            try
-            {
-                using (var client = new System.Net. WebClient())
-                {
-                    if (string.IsNullOrEmpty(client.DownloadString(CDN)))
-                    {
-                        throw new Exception("Empty source returned from cdn : "+ CDN);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                throw new Exception("It seems there is an issue connecting to the internet : "+ CDN +" - "+ e.Message);
-            }
-           
             Thread thread;
             Process browserProcess = null;
             SignalX.Settings.LogAgentMessagesOnClient = true;
@@ -114,30 +192,30 @@ namespace SignalXLib.TestHelperLib
                     {
                         try
                         {
-                            for (int i = 0; i < numberOfClients; i++)
+                            for (int i = 0; i < testObjects.Count; i++)
                             {
+                                var testObject = testObjects[i];
                                 if (browserType == BrowserType.Default || browserType == BrowserType.SystemBrowser)
                                 {
                                     browserProcess = Process.Start(url + testObject.FileName);
                                 }
 
-                            if (browserType == BrowserType.HeadlessBrowser)
-                            {
-                                var webClient = new WebClient(new NHtmlUnit.BrowserVersion(BrowserVersion.CHROME))
+                                if (browserType == BrowserType.HeadlessBrowser)
                                 {
-                                    JavaScriptEnabled = true,
-                                    ThrowExceptionOnFailingStatusCode = true,
-                                    ThrowExceptionOnScriptError = true
-                                };
-                                webClient.GetPage(url + testObject.FileName.Replace("\\", "/"));
-                            }
+                                    var webClient = new WebClient(new NHtmlUnit.BrowserVersion(BrowserVersion.CHROME))
+                                    {
+                                        JavaScriptEnabled = true,
+                                        ThrowExceptionOnFailingStatusCode = true,
+                                        ThrowExceptionOnScriptError = true
+                                    };
+                                    webClient.GetPage(url + testObject.FileName.Replace("\\", "/"));
+                                }
                             }
 
-                            
                             AwaitAssert(
                                 () =>
                                 {
-                                    if (!SignalX.Settings.HasOneOrMoreConnections ||SignalX.CurrentNumberOfConnections < (ulong)numberOfClients)
+                                    if (!SignalX.Settings.HasOneOrMoreConnections || SignalX.CurrentNumberOfConnections < (ulong)numberOfClients)
                                         throw new Exception("No connection received from any client");
                                 },
                                 TimeSpan.FromSeconds(10));
@@ -171,14 +249,17 @@ namespace SignalXLib.TestHelperLib
                         catch (Exception e)
                         {
                         }
-
-                        try
+                        foreach (TestObject testObject in testObjects)
                         {
-                            File.Delete(FilePath);
+                            try
+                            {
+                                File.Delete(testObject.BaseDirectory + testObject.FileName);
+                            }
+                            catch (Exception e)
+                            {
+                            }
                         }
-                        catch (Exception e)
-                        {
-                        }
+                       
 
                         try
                         {
@@ -206,40 +287,16 @@ namespace SignalXLib.TestHelperLib
             }
         }
 
-        internal static TestObject SetUpScriptForTest(Func<TestObject, string> scriptFunc)
+       
+        internal static string WrapScriptInHtml(string script,string concatScriptsTags, string bodyHtml)
         {
-            var testObject = new TestObject();
-            testObject.FinalMessage = null;
-            testObject.FinalMessage2 = null;
-            testObject.FinalMessage3 = null;
-            testObject.FinalMessage4 = null;
-            testObject.Message = Guid.NewGuid().ToString();
-            testObject.ClientHandler = "myclientHandler" + Guid.NewGuid().ToString().Replace("-", "");
-            testObject.ServerHandler = "myServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
-            testObject.TestServerFeedbackHandler = "myTestServerHandler" + Guid.NewGuid().ToString().Replace("-", "");
-            testObject.TestServerFeedbackHandler2 = "myTestServerHandler2" + Guid.NewGuid().ToString().Replace("-", "");
-            testObject.TestServerFeedbackHandler3 = "myTestServerHandler3" + Guid.NewGuid().ToString().Replace("-", "");
-            testObject.TestServerFeedbackHandler4 = "myTestServerHandler4" + Guid.NewGuid().ToString().Replace("-", "");
-            string script = scriptFunc(testObject);
 
-            testObject.PageHtml = WrapScriptInHtml(script);
-            FileName = "\\index" + Guid.NewGuid() + ".html";
-            FilePath = AppDomain.CurrentDomain.BaseDirectory + FileName;
-            File.WriteAllText(FilePath, testObject.PageHtml);
-            testObject.FileName = FileName;
-            return testObject;
-        }
-
-        internal static string WrapScriptInHtml(string script)
-        {
             return @"<!DOCTYPE html>
 							<html>
                             <head></head>
 							<body
-                            <h1> SignalX in motion .....</h1>
-							<script src='https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.min.js'></script>
-							<script src='https://ajax.aspnetcdn.com/ajax/signalr/jquery.signalr-2.2.0.js'></script>
-							<script src='https://unpkg.com/signalx'></script>
+                            "+bodyHtml+@"
+							"+concatScriptsTags+@"
 							<script>
                                " + script + @"
 							</script>
@@ -252,7 +309,6 @@ namespace SignalXLib.TestHelperLib
             AwaitAssert(operation, null, cleanUpOperation);
         }
 
-      
         internal static void AwaitAssert(Action operation, TimeSpan? maxDuration = null, Action cleanUpOperation = null, Action<Exception> onFinally = null, Action<Exception> onEveryFailure = null)
         {
             maxDuration = maxDuration ?? TimeSpan.FromSeconds(5);

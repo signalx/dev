@@ -6,19 +6,19 @@ namespace SignalXLib.TestHelperLib
 
     public class SignalXAssertionLib
     {
-        public void NotEqual<T>(T item1, T item2, string message = "")
+        public void AreNotEqual<T>(T item1, T item2, string message = "")
         {
             if (item1.Equals(item2))
                 throw new Exception($"Expected {item1} to be not equal to {item2} " + message);
         }
 
-        public void Equal<T>(T item1, T item2, string message = "")
+        public void AreEqual<T>(T item1, T item2, string message = "")
         {
             if (!item1.Equals(item2))
                 throw new Exception($"Expected {item1} to be equal to {item2} " + message);
         }
 
-        public void TheSame(object item1, object item2, string message = "")
+        public void AreTheSame(object item1, object item2, string message = "")
         {
             var obj1 = JsonConvert.SerializeObject(item1);
             var obj2 = JsonConvert.SerializeObject(item2);
@@ -26,7 +26,7 @@ namespace SignalXLib.TestHelperLib
                 throw new Exception($"Expected {obj1} to be equal to {obj2} " + message);
         }
 
-        public void Different(object item1, object item2, string message = "")
+        public void AreDifferent(object item1, object item2, string message = "")
         {
             var obj1 = JsonConvert.SerializeObject(item1);
             var obj2 = JsonConvert.SerializeObject(item2);
@@ -51,7 +51,7 @@ namespace SignalXLib.TestHelperLib
             throw  new Exception("This line was not expected to be reached");
         }
 
-        public void WaitFor(TimeSpan fromSeconds)
+        public void WaitForSomeTime(TimeSpan fromSeconds)
         {
             DateTime start = DateTime.Now;
             while ((DateTime.Now - start).TotalMilliseconds < fromSeconds.TotalMilliseconds)

@@ -1,4 +1,4 @@
-﻿namespace SignalXLib.Tests
+﻿namespace SignalXLib.Tests.IntegrationTests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
@@ -18,20 +18,17 @@
                         @"signalx.ready(function (server) {
                                      
                                    }); ",
-                        () => { },
-                        () => { assert.Equal(10000, actual); },
-                        new TestEventHandler(
+                        onAppStarted: () => { },
+                        checks: () => { assert.AreEqual(10000, actual); },
+                        events: new TestEventHandler(
                             () =>
                             {
                                 signalx.RunJavaScriptOnAllClients(
                                     $"return 100*100",
                                     answer => { actual = (int)answer; });
-                            },
-                            e => { throw e; },
-                            () => { },
-                            e => { }),
-                        browserType: BrowserType.Default);
-                });
+                            })
+                        );
+                },1);
         }
     }
 }
