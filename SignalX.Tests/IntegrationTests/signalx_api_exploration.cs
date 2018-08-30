@@ -15,6 +15,14 @@
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
+                    signalx.SetUpClientErrorMessageHandler((error, request) =>
+                    {
+
+                    });
+                    signalx.SetUpClientDebugMessageHandler((error, request) =>
+                    {
+
+                    });
                     SignalX mySignalX = SignalX.Instance;
                     signalx.OnException((message, exception) => { });
                     signalx.OnWarning((message, exception) => { });
@@ -38,7 +46,7 @@
                     signalx.GetOutGoingMessageSpeedAsync(TimeSpan.FromSeconds(10));
                     signalx.SetGlobalDefaultMessageBufferSize(1000);
 
-                    return new SignalXTestDefinition
+                    return new SignalXTestDefinition()
                     {
                         OnAppStarted = () =>
                         {
@@ -47,7 +55,11 @@
                             signalx.ServerAuthorizedSingleAccess(Guid.NewGuid().ToString(), request => { });
                             signalx.ServerSingleAccess(Guid.NewGuid().ToString(), request => { });
                         },
-                        TestEvents = new TestEventHandler(() => { assert.AreEqual(1, (int)signalx.CurrentNumberOfConnections); })
+                        TestEvents = new TestEventHandler(
+                            () =>
+                            {
+                                assert.AreEqual(1, (int)signalx.ConnectionCount);
+                            })
                     };
                 });
         }

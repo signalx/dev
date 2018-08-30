@@ -17,11 +17,24 @@ namespace SignalXLib.Lib
         /// <param name="user"></param>
         /// <param name="replyTo"></param>
         /// <param name="message"></param>
-        public void Receive(string user, string replyTo, dynamic message)
+        public void Receive(string user, string replyTo, dynamic message
+            //, string groupName = null
+            )
         {
-            IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
+            //if (!string.IsNullOrEmpty(groupName))
+            //{
+            //    IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
 
-            hubContext.Clients.Client(user).broadcastMessage(replyTo, message);
+            //    hubContext.Clients.Group(groupName).broadcastMessage(replyTo, message);
+
+            //}
+            //else
+            {
+                IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
+
+                hubContext.Clients.Client(user).broadcastMessage(replyTo, message);
+
+            }
         }
 
         /// <summary>
@@ -75,6 +88,7 @@ namespace SignalXLib.Lib
         public void RequestScripts(SignalX SignalX,HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
         {
             SignalX.RespondToScriptRequest(context, clients, groups);
+           
         }
 
         /// <summary>

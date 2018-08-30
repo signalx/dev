@@ -72,7 +72,7 @@ namespace ConsoleApplicationCSharp
                         SignalX.RespondToAll(string.IsNullOrEmpty(request.ReplyTo) ? "Myclient" : request.ReplyTo, request.MessageId + ":" + request.Sender + " sent me this message : " + request.Message + " and asked me to reply to " + request.ReplyTo);
                     });
 
-                SignalX.Server("Sample3", (request) => request.RespondToAll(request.ReplyTo));
+                SignalX.Server("Sample3", (request) => request.RespondToSender(request.ReplyTo));
 
                 System.Diagnostics.Process.Start(url);
 

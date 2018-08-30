@@ -404,7 +404,7 @@
                                 request =>
                                 {
                                     VerifiedJoinedGroup = request.Message as string == groupName;
-                                    signalX.RespondToAll(clientGroupReceiver, request.Message, groupName);
+                                    signalX.RespondToAllInGroup(clientGroupReceiver, request.Message, groupName);
                                 });
                             signalX.Server(
                                 groupWatcher2,

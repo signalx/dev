@@ -9,10 +9,33 @@
     public class SignalX : IDisposable
     {
         internal static object padlock = new object();
-
         static readonly SignalXAgents SignalXAgents = new SignalXAgents();
-        internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT"; //+Guid.NewGuid().ToString().Replace("-","");
+        internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT"; 
+        internal static string SIGNALXCLIENTERRORHANDLER = "SIGNALXCLIENTERRORHANDLER"; 
+        internal static string SIGNALXCLIENTDEBUGHANDLER = "SIGNALXCLIENTDEBUGHANDLER";
+        public readonly string ClientDebugSnippet = @"                   
+                    signalx.debug(function(e){ signalx.ready(function(){ signalx.server." + SignalX.SIGNALXCLIENTDEBUGHANDLER + @"(JSON.stringify(e),function(MSG){  });  }); });
+                 ";
 
+        public readonly string ClientErrorSnippet = @"
+                    signalx.error(function(e){ signalx.ready(function(){ signalx.server." + SignalX.SIGNALXCLIENTERRORHANDLER + @"(JSON.stringify(e),function(MSG){  });  }); });
+                    
+                 ";
+
+        internal Action<string, SignalXRequest> OnErrorMessageReceivedFromClient { set; get; }
+
+        public void SetUpClientErrorMessageHandler(Action<string, SignalXRequest> handler)
+        {
+            OnErrorMessageReceivedFromClient = handler;
+        }
+
+
+        internal Action<string, SignalXRequest> OnDebugMessageReceivedFromClient { set; get; }
+
+        public void SetUpClientDebugMessageHandler(Action<string, SignalXRequest> handler)
+        {
+            OnDebugMessageReceivedFromClient = handler;
+        }
         public SignalXSettings Settings = new SignalXSettings();
 
         SignalX()
@@ -21,7 +44,7 @@
 
         static SignalX instance { set; get; }
 
-        public ulong CurrentNumberOfConnections { get; internal set; }
+        public ulong ConnectionCount { get; internal set; }
 
         public static SignalX Instance
         {
@@ -182,8 +205,13 @@
 
             return true;
         }
+        public void RespondToAll(string replyTo, dynamic responseData)
+        {
+            RespondToAllInGroup(replyTo, responseData, null);
+        }
 
-        public void RespondToAll(string replyTo, dynamic responseData, string groupName = null)
+
+        public void RespondToAllInGroup(string replyTo, dynamic responseData, string groupName )
         {
             if (!AllowToSend(replyTo, responseData))
                 return;

@@ -11,6 +11,9 @@ namespace SignalXLib.TestHelperLib
         public void DoSomething()
         {
             SignalX sx = SignalX.Instance;
+            sx.Settings.ReceiveErrorMessagesFromClient = true;
+            sx.Settings.ReceiveDebugMessagesFromClient = true;
+            sx.Settings.ManageUserConnections = true;
             sx.Settings.LogAgentMessagesOnClient = true;
             if (this.MethodBody != null )
             {

@@ -29,8 +29,18 @@
         public void GetMethods()
         {
             this.signalX.RespondToScriptRequest(this.Context, this.Clients, this.Groups);
+            
         }
 
+        public void SignalXClientReady()
+        {
+            signalX.Settings.HasOneOrMoreConnections = true;
+            this.signalX.ConnectionCount++;
+        }
+        public void SignalXClientReadyError(string message,string error)
+        {
+            
+        }
         public override Task OnConnected()
         {
             this.signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.OnConnected.ToString(), null));
@@ -38,9 +48,8 @@
 
             if (name != null)
                 this.signalX.Settings.Connections?.Add(this.signalX, name, this.Context?.ConnectionId);
-
-            this.signalX.Settings.HasOneOrMoreConnections = true;
-            this.signalX.CurrentNumberOfConnections++;
+            
+           
             return base.OnConnected();
         }
 
@@ -54,8 +63,8 @@
 
             try
             {
-                if (this.signalX.CurrentNumberOfConnections != 0)
-                    this.signalX.CurrentNumberOfConnections--;
+                if (this.signalX.ConnectionCount != 0)
+                    this.signalX.ConnectionCount--;
             }
             catch (Exception)
             {
@@ -73,7 +82,7 @@
             if (name != null)
                 if (this.signalX.Settings.Connections != null && !this.signalX.Settings.Connections.GetConnections(name).Contains(this.Context?.ConnectionId))
                     this.signalX.Settings.Connections?.Add(this.signalX, name, this.Context?.ConnectionId);
-            this.signalX.CurrentNumberOfConnections++;
+            this.signalX.ConnectionCount++;
             return base.OnReconnected();
         }
     }

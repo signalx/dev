@@ -54,9 +54,11 @@
     <Compile Include="IntegrationTests\signalx_api_exploration.cs" />
     <Compile Include="IntegrationTests\when_client_sends_message_to_server2.cs" />
     <Compile Include="IntegrationTests\when_client_sends_message_to_server.cs" />
+    <Compile Include="IntegrationTests\when_server_receives_message_from_multiple_clients.cs" />
     <Compile Include="IntegrationTests\when_server_receives_message_from_server.cs" />
     <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestLibTests\when_signalx_is_used_on_the_client_and_server.cs" />
     <Compile Include="TestModels\TestMessageModel.cs" />
     <Compile Include="Mocks\TestReceiver.cs" />
     <Compile Include="IntegrationTests\INTEGRATION_TEST_CLASS_TEMPLATE.cs" />
@@ -294,6 +296,7 @@
   <ItemGroup>
     <Content Include="todo.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3' Or $(TargetFrameworkVersion) == 'v4.7' Or $(TargetFrameworkVersion) == 'v4.7.1' Or $(TargetFrameworkVersion) == 'v4.7.2')">
       <ItemGroup>

@@ -56,7 +56,7 @@ namespace SignalXLib.TestHelperLib
             DateTime start = DateTime.Now;
             while ((DateTime.Now - start).TotalMilliseconds < fromSeconds.TotalMilliseconds)
             {
-               Task.Delay(TimeSpan.FromMilliseconds(50)).Wait();
+               Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();
             }
         }
     }

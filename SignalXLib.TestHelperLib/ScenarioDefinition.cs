@@ -14,7 +14,7 @@ namespace SignalXLib.TestHelperLib
             TestEventHandler events = null,
             BrowserType browserType = DefaultBrowserType)
         {
-            ConstructSignalXTestDefinition(
+            this.ConstructSignalXTestDefinition(
                 new List<string>() { script??"" },
                 onAppStarted,
                 checks,
@@ -49,7 +49,7 @@ namespace SignalXLib.TestHelperLib
             BrowserType browserType = DefaultBrowserType)
         {
             ConstructSignalXTestDefinition(
-                script,
+                script?? new List<string>(){""},
                 onAppStarted,
                 checks,
                 events,

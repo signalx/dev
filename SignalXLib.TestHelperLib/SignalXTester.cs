@@ -17,31 +17,31 @@ namespace SignalXLib.TestHelperLib
 
     public class SignalXTester
     {
-        public static TimeSpan MaxTestWaitTime = TimeSpan.FromMinutes(1);
+        public static TimeSpan MaxTestTimeSpan = TimeSpan.FromMinutes(1);
+        public static TimeSpan MaxTestWaitTimeBeforeChecks = TimeSpan.FromSeconds(5);
 
         public static void RunAndExpectFailure(Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun, int numberOfRetryOnTestFailure = 0, int numberOfMustRetryNoMatterWhat = 0)
         {
-            try
-            {
-                RunInternal(fun,true, numberOfRetryOnTestFailure, numberOfMustRetryNoMatterWhat );
-                throw new Exception("Expected run to fail , but it succeeded");
-            }
-            catch (Exception e)
-            {
-            }
+            RunInternal(fun, true, numberOfRetryOnTestFailure, numberOfMustRetryNoMatterWhat);
+
         }
 
         public static void Run(Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun, int numberOfRetryOnTestFailure = 0, int numberOfMustRetryNoMatterWhat = 0)
         {
             RunInternal(fun,false,  numberOfRetryOnTestFailure ,  numberOfMustRetryNoMatterWhat );
         }
-        static void RunInternal(Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun, bool expectFailure, int numberOfRetryOnTestFailure=0, int numberOfMustRetryNoMatterWhat=0)
+        static void RunInternal(
+            Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun, 
+            bool expectFailure, 
+            int numberOfRetryOnTestFailure=0,
+            int numberOfMustRetryNoMatterWhat=0)
         {
-            for (int i = 0; i < numberOfMustRetryNoMatterWhat+1; i++)
+            Exception ex=null;
+            for (int i = 0; i <= numberOfMustRetryNoMatterWhat; i++)
             {
                 var failures = 0;
                 var succeeded = false;
-                while (failures<=numberOfRetryOnTestFailure && !succeeded)
+                while (failures<=numberOfRetryOnTestFailure )
                 {
                     try
                     {
@@ -51,29 +51,52 @@ namespace SignalXLib.TestHelperLib
                             isolated.Value.DoSomething();
                         }
 
-                        succeeded = true;
+                        if (expectFailure)
+                        {
+                            failures++;
+                        }
+                        else
+                        {
+                            succeeded = true;
+                            break;
+                            
+                        }
                     }
                     catch (Exception e)
                     {
+                        ex = e;
                         if (!expectFailure)
                         {
                             failures++;
                         }
-                        break;
+                        else
+                        {
+                            succeeded = true;
+                            break;
+                        }
+                       
                     }
+                }
+
+                if (succeeded)
+                {
+
+                }
+                else
+                {
+                    throw expectFailure ? 
+                        new Exception("Expected tests to fail but it did not"):
+                        ex?? new Exception("Expected tests to pass but it did not");
                 }
             }
         }
 
-        private static SignalX SignalX;
+      //  private static SignalX SignalX;
 
         // internal static string FileName;
         //internal static string FilePath;
 
-        internal static void SetSignalXInstance(SignalX signalX)
-        {
-            SignalX = signalX;
-        }
+        
 
         internal static int FreeTcpPort()
         {
@@ -117,7 +140,7 @@ namespace SignalXLib.TestHelperLib
         internal static void Run(SignalX signalX, SignalXTestDefinition scenarioDefinition)
 
         {
-            SetSignalXInstance(signalX);
+           // SetSignalXInstance(signalX);
             //setup
             var testObjects = new List<TestObject>();
             // script
@@ -142,7 +165,8 @@ namespace SignalXLib.TestHelperLib
 							<script src='" + CDNSignalX + @"'></script>
                             ";
             }
-             
+
+            scriptTags += "<script>" + signalX.ClientDebugSnippet + @"</script>";
 
             for (int i = 0; i < scenarioDefinition.NumberOfClients; i++)
             {
@@ -166,27 +190,23 @@ namespace SignalXLib.TestHelperLib
 
             scenarioDefinition.TestEvents = scenarioDefinition.TestEvents ?? new TestEventHandler();
             scenarioDefinition.TestEvents.OnAppStarted = () => { scenarioDefinition?.OnAppStarted?.Invoke(); };
-            scenarioDefinition.TestEvents.OnFinally = (e) => { signalX.Dispose(); };
-            CheckExpectations(scenarioDefinition.NumberOfClients,
+           
+            CheckExpectations(signalX,scenarioDefinition.NumberOfClients,
                 () => { scenarioDefinition?.Checks?.Invoke(); },
                 "http://localhost:" + FreeTcpPort(),
                 testObjects,
                 scenarioDefinition.BrowserType,
                 scenarioDefinition.TestEvents);
         }
-
-       
-
-        internal static void CheckExpectations(int numberOfClients, Action operation, string url, List<TestObject> testObjects, BrowserType browserType = BrowserType.Default, TestEventHandler events = null)
+        internal static void CheckExpectations(SignalX signalX,  int numberOfClients, Action operation, string url, List<TestObject> testObjects, BrowserType browserType = BrowserType.Default, TestEventHandler events = null)
         {
             Thread thread;
             Process browserProcess = null;
-            SignalX.Settings.LogAgentMessagesOnClient = true;
-            SignalX.Settings.ManageUserConnections = true;
+           
             using (WebApp.Start<Startup>(url))
             {
                 events?.OnAppStarted?.Invoke();
-
+                
                 thread = new Thread(
                     () =>
                     {
@@ -211,25 +231,36 @@ namespace SignalXLib.TestHelperLib
                                     webClient.GetPage(url + testObject.FileName.Replace("\\", "/"));
                                 }
                             }
-
-                            AwaitAssert(
-                                () =>
-                                {
-                                    if (!SignalX.Settings.HasOneOrMoreConnections || SignalX.CurrentNumberOfConnections < (ulong)numberOfClients)
-                                        throw new Exception("No connection received from any client");
-                                },
-                                TimeSpan.FromSeconds(10));
-
-                            events?.OnClientLoaded?.Invoke();
                         }
                         catch (Exception e)
                         {
                             events?.OnClientError?.Invoke(e);
                         }
+                      
                     });
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.Start();
 
+               
+               // SpinWait.SpinUntil(() => (!SignalX.Settings.HasOneOrMoreConnections || SignalX.CurrentNumberOfConnections < (ulong)numberOfClients), MaxTestWaitTimeBeforeChecks);
+            
+                AwaitAssert(
+                () =>
+                {
+                    if (!signalX.Settings.HasOneOrMoreConnections )
+                        throw new Exception("No connection received from any client.This may also be caused by slow internet");
+
+                    if ( signalX.ConnectionCount < (ulong)numberOfClients)
+                        throw new Exception($"Wait timeout for expected number of clients {numberOfClients} to show up.This may also be caused by slow internet");
+
+                },
+                TimeSpan.FromSeconds(15));
+
+                new SignalXAssertionLib().WaitForSomeTime(MaxTestWaitTimeBeforeChecks);
+
+
+                events?.OnClientLoaded?.Invoke();
+                //wait for some time before checks to allow side effects to occur
                 AwaitAssert(
                     () =>
                     {
@@ -237,11 +268,21 @@ namespace SignalXLib.TestHelperLib
                         //if we got this far, then we made it
                         events?.OnCheckSucceeded?.Invoke();
                     },
-                    MaxTestWaitTime,
+                    MaxTestTimeSpan,
                     null,
                     ex =>
                     {
-                        events?.OnFinally?.Invoke(ex);
+                       
+                        try
+                        {
+ events?.OnFinally?.Invoke(ex);
+                            signalX.Dispose();
+                        }
+                        catch (Exception e)
+                        {
+                            signalX.Dispose();
+                            throw;
+                        }
                         try
                         {
                             browserProcess?.Kill();
@@ -298,7 +339,9 @@ namespace SignalXLib.TestHelperLib
                             "+bodyHtml+@"
 							"+concatScriptsTags+@"
 							<script>
+                              signalx.ready(function(){
                                " + script + @"
+                             });
 							</script>
 							</body>
 							</html>";
@@ -309,15 +352,18 @@ namespace SignalXLib.TestHelperLib
             AwaitAssert(operation, null, cleanUpOperation);
         }
 
+       
+
         internal static void AwaitAssert(Action operation, TimeSpan? maxDuration = null, Action cleanUpOperation = null, Action<Exception> onFinally = null, Action<Exception> onEveryFailure = null)
         {
             maxDuration = maxDuration ?? TimeSpan.FromSeconds(5);
             DateTime start = DateTime.Now;
-            bool done = false;
+            var done = false;
             Exception lastException = null;
+            
             while ((DateTime.Now - start).TotalMilliseconds < maxDuration.Value.TotalMilliseconds && !done)
             {
-                Task.Delay(TimeSpan.FromMilliseconds(500)).Wait();
+                
                 try
                 {
                     operation();
@@ -328,12 +374,14 @@ namespace SignalXLib.TestHelperLib
                     lastException = e;
                     onEveryFailure?.Invoke(e);
                 }
+               // Thread.Sleep(0);
+                Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();
             }
 
             cleanUpOperation?.Invoke();
             if (!done)
             {
-                var e = new Exception("Unable to pass withing specified miliseconds" + maxDuration.Value.TotalMilliseconds + "  " + lastException?.Message, lastException);
+                var e = new Exception("Unable to pass within specified miliseconds" + maxDuration.Value.TotalMilliseconds + "  " + lastException?.Message, lastException);
                 onFinally?.Invoke(e);
                 throw e;
             }

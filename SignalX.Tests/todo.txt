@@ -15,3 +15,5 @@ clearly state what each public api is and does
 investigate SetUpAgents with SIGNALXCLIENTAGENT
 
 test various types of server config such as single writer
+
+test EnableClient/disbale etc

@@ -36,16 +36,21 @@ namespace SignalXLib.Lib
 
         public string Handler { get; private set; }
 
-        public void RespondToAll(object response, string groupName = null)
-        {
-            if (!string.IsNullOrEmpty(ReplyTo))
-                SignalX.RespondToAll(ReplyTo, response, groupName);
-        }
+        //public void RespondToAll(object response, string groupName = null)
+        //{
+        //    if (!string.IsNullOrEmpty(ReplyTo))
+        //        SignalX.RespondToAll(ReplyTo, response, groupName);
+        //}
 
-        public void RespondToAll(string replyTo, object response, string groupName = null)
+        public void RespondToAllInGroup(string replyTo, object response, string groupName )
         {
             if (replyTo == null) throw new ArgumentNullException(nameof(replyTo));
-            SignalX.RespondToAll(replyTo, response, groupName);
+            SignalX.RespondToAllInGroup(replyTo, response, groupName);
+        }
+        public void RespondToAll(string replyTo, object response)
+        {
+            if (replyTo == null) throw new ArgumentNullException(nameof(replyTo));
+            SignalX.RespondToAll(replyTo, response);
         }
 
         public void RespondToUser(string userId, string replyTo, object response)
@@ -74,6 +79,7 @@ namespace SignalXLib.Lib
         {
             if (!string.IsNullOrEmpty(this.User))
                 SignalX.RespondToUser(this.User, ReplyTo, response);
+          
         }
 
         /// <summary>

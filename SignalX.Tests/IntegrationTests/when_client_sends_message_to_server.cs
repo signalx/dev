@@ -210,7 +210,7 @@
                                 request =>
                                 {
                                     assert.AreEqual(100, (int)request.Message, "server must get the correct message");
-                                    request.RespondToAll(100);
+                                    request.RespondToSender(100);
                                 });
                             signalx.Server(
                                 "sample2",
@@ -242,7 +242,7 @@
                                 request =>
                                 {
                                     assert.AreEqual(100, (int)request.Message, "server must get the correct message");
-                                    request.RespondToAll(100);
+                                    request.RespondToSender(100);
                                 });
                             signalx.Server(
                                 "sample2",
@@ -265,7 +265,7 @@
                                         signalx.server.sample(100,function(something) {
                                             signalx.server.sample2(10);
                                        });
-                                   }); ",
+                                   }); ", 
                         onAppStarted: () =>
                         {
                             signalx.Server(
@@ -273,7 +273,7 @@
                                 request =>
                                 {
                                     assert.AreEqual(100, (int)request.Message, "server must get the correct message");
-                                    request.RespondToAll(100);
+                                    request.RespondToSender(100);
                                 });
                             signalx.Server(
                                 "sample2",

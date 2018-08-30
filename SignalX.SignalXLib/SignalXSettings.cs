@@ -43,6 +43,10 @@
         /// </summary>
         public  ConnectionMapping<string> Connections { internal set; get; }
         public  bool ManageUserConnections { set; get; }
+
+        /// <summary>
+        /// Connections to signal X
+        /// </summary>
         public  bool HasOneOrMoreConnections { internal set; get; }
         public  bool RequireAuthorizationForAllHandlers { get; set; }
         public  bool RequireAuthorizationForPersistentConnections { get; set; }
@@ -59,7 +63,9 @@
         //todo make this allow for multiple instances
         internal  Action<dynamic, SignalXRequest, string> OnResponseAfterScriptRuns { set; get; }
 
-       
+        
+        public bool ReceiveErrorMessagesFromClient { get; set; }
+        public bool ReceiveDebugMessagesFromClient { get; set; }
 
         public void Dispose()
         {

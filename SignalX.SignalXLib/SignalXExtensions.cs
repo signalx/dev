@@ -383,17 +383,30 @@
             }
         }
 
-
-        public static void RunJavaScriptOnAllClients(this SignalX signalX, string script, Action<dynamic> onResponse = null, TimeSpan? delay = null)
+        public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script,string groupName, Action<dynamic> onResponse = null, TimeSpan? delay = null)
         {
-            signalX.RunJavaScriptOnAllClients( script,
+            signalX.RunJavaScriptOnAllClientsInGroup(script,
                 (a, b, c) =>
                 {
                     onResponse?.Invoke(a);
-                });
+                },delay,groupName);
         }
 
-        public static void RunJavaScriptOnAllClients(this SignalX signalX, string script, Action<dynamic, SignalXRequest, string> onResponse=null, TimeSpan? delay = null)
+        public static void RunJavaScriptOnAllClients(this SignalX signalX, string script, Action<dynamic> onResponse = null, TimeSpan? delay = null)
+        {
+            signalX.RunJavaScriptOnAllClients(script,
+                (a, b, c) =>
+                {
+                    onResponse?.Invoke(a);
+                },delay);
+        }
+
+        public static void RunJavaScriptOnAllClients(this SignalX signalX, string script, Action<dynamic, SignalXRequest, string> onResponse = null, TimeSpan? delay = null)
+        {
+            signalX.RunJavaScriptOnAllClientsInGroup(script, onResponse, delay,null);
+        }
+        
+        public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script, Action<dynamic, SignalXRequest, string> onResponse=null, TimeSpan? delay = null, string groupName=null)
         {
             if (signalX.Settings.OnResponseAfterScriptRuns != null)
             {
@@ -405,10 +418,11 @@
             signalX.Settings.OnResponseAfterScriptRuns = onResponse;
             Task.Delay(delay.Value).ContinueWith((c) =>
             {
-                signalX.RespondToAll(SignalX. SIGNALXCLIENTAGENT, script);
+                signalX.RespondToAllInGroup(SignalX. SIGNALXCLIENTAGENT, script,groupName);
             });
         }
 
+       
         public static void RespondToScriptRequest(this SignalX signalX,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
@@ -423,7 +437,11 @@
 
             var logRequestOnClient = signalX.Settings.LogAgentMessagesOnClient ? "console.log(message);" : "";
             var logResponseOnClient = signalX.Settings.LogAgentMessagesOnClient ? "console.log(response);" : "";
-            var clientAgent = @"
+            var receiveErrorsFromClient = (signalX.Settings.ReceiveErrorMessagesFromClient
+                ? signalX.ClientErrorSnippet : "")+(signalX.Settings.ReceiveDebugMessagesFromClient
+                ? signalX.ClientDebugSnippet : "");
+            var clientAgent = @"   
+                 "+ receiveErrorsFromClient + @"
                  signalx.client." + SignalX. SIGNALXCLIENTAGENT + @" = function (message) {
                    " + logRequestOnClient + @"
                    var response ={};
@@ -439,6 +457,7 @@
             signalX.Settings.Receiver.ReceiveScripts(context?.ConnectionId, methods, context, groups, clients);
 
             signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestForMethodsCompleted.ToString(), methods));
+           
         }
 
         internal static void JoinGroup(this SignalX signalX, HubCallerContext context,

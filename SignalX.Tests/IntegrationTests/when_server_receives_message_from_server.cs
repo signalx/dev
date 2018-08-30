@@ -6,63 +6,9 @@
     using SignalXLib.TestHelperLib;
 
     [TestClass]
-    public class when_server_receives_message_from_server
+    public class when_server_receives_message_from_client
     {
-
-      
-
-
-        [TestMethod]
-        public void all_clients_should_respond2()
-        {
-            SignalXTester.RunAndExpectFailure(
-                (signalx, assert) =>
-                {
-                    var numberOfClients = 4;
-                    int counter = 0;
-                    return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
-                                     signalx.server.sample(100);
-                                   });",
-                        numberOfClients: 2,
-                        onAppStarted: () =>
-                        {
-                            signalx.ServerSingleAccess(
-                                "sample",
-                                request => { counter++; });
-                        },
-                        checks: () =>
-                        {
-                            assert.AreEqual(numberOfClients, counter);
-                        });
-                });
-        }
-
-
-        [TestMethod]
-        public void all_clients_should_respond()
-        {
-            SignalXTester.Run(
-                (signalx, assert) =>
-                {
-                    var numberOfClients = 4;
-                    int counter = 0;
-                    return new SignalXTestDefinition(
-                        script: @"signalx.ready(function (server) {
-                                     signalx.server.sample(100);
-                                   }); ",
-                        numberOfClients: numberOfClients,
-                        onAppStarted: () =>
-                        {
-                            signalx.ServerSingleAccess(
-                                "sample",
-                                request => { counter++; });
-                        },
-                        checks: () => { assert.AreEqual(numberOfClients, counter); });
-
-                });
-        }
-
+        
 
 
         [TestMethod]
@@ -114,7 +60,7 @@
                         },
                         checks: () =>
                         {
-                            assert.WaitForSomeTime(SignalXTester.MaxTestWaitTime);
+                            assert.WaitForSomeTime(SignalXTester.MaxTestTimeSpan);
                             assert.IsFalse(failed);
                         });
                 });
@@ -141,7 +87,7 @@
                         },
                         checks: () =>
                         {
-                            assert.WaitForSomeTime(SignalXTester.MaxTestWaitTime);
+                            assert.WaitForSomeTime(SignalXTester.MaxTestTimeSpan);
                             assert.IsFalse(failed);
                         });
                 });
@@ -168,7 +114,7 @@
                         },
                         checks: () =>
                         {
-                            assert.WaitForSomeTime(SignalXTester.MaxTestWaitTime);
+                            assert.WaitForSomeTime(SignalXTester.MaxTestTimeSpan);
                             assert.IsFalse(failed);
                         });
                 });
@@ -227,7 +173,7 @@
                         },
                         checks: () =>
                         {
-                            assert.WaitForSomeTime(SignalXTester.MaxTestWaitTime);
+                            assert.WaitForSomeTime(SignalXTester.MaxTestTimeSpan);
                             assert.IsFalse(failed);
                         });
                 });
@@ -253,7 +199,7 @@
                         },
                         checks: () =>
                         {
-                            assert.WaitForSomeTime(SignalXTester.MaxTestWaitTime);
+                            assert.WaitForSomeTime(SignalXTester.MaxTestTimeSpan);
                             assert.IsFalse(failed);
                         });
                 });

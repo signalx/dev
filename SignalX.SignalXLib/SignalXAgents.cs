@@ -33,6 +33,36 @@
                     //removed coz of possibility of result aggregation from clients
                     // SignalX.OnResponseAfterScriptRuns = null;
                 }, requireAuthorization: false, isSingleWriter: false, allowDynamicServerForThisInstance: true);
+            
+            SignalX.Server(SignalX.SIGNALXCLIENTERRORHANDLER,
+                (request, state) =>
+                {
+                    try
+                    {
+                        var str = request.Message.ToString();
+                       
+                        SignalX.OnErrorMessageReceivedFromClient?.Invoke(str, request);
+                    }
+                    catch (Exception e)
+                    {
+                        SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
+                    }
+                }, requireAuthorization: false, isSingleWriter: false, allowDynamicServerForThisInstance: true);
+
+            SignalX.Server(SignalX.SIGNALXCLIENTDEBUGHANDLER,
+                (request, state) =>
+                {
+                    try
+                    {
+                        var str = request.Message.ToString();
+                        SignalX.OnDebugMessageReceivedFromClient?.Invoke(str, request);
+                    }
+                    catch (Exception e)
+                    {
+                        SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
+                    }
+                }, requireAuthorization: false, isSingleWriter: false, allowDynamicServerForThisInstance: true);
+            
         }
     }
 }
