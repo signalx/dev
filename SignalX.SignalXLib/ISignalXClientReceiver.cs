@@ -15,11 +15,14 @@
 
         void ReceiveInGroupManager(string userId, dynamic message, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups);
 
-        void RequestScripts(SignalX SignalX,HubCallerContext context,
+        void RequestScripts(
+            SignalX SignalX,
+            HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups);
 
-        void SendMessageToServer(SignalX SignalX,
+        void SendMessageToServer(
+            SignalX SignalX,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,

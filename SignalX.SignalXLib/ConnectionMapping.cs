@@ -6,29 +6,21 @@
 
     public class ConnectionMapping<T>
     {
-     
-        private readonly ConcurrentDictionary<T, HashSet<string>> _connections = new ConcurrentDictionary<T, HashSet<string>>();
+        readonly ConcurrentDictionary<T, HashSet<string>> _connections = new ConcurrentDictionary<T, HashSet<string>>();
 
-        public int Count
-        {
-            get
-            {
-                return this._connections.Count;
-            }
-        }
+        public int Count => this._connections.Count;
 
-        public void Add(SignalX SignalX,T key, string connectionId)
+        public void Add(SignalX SignalX, T key, string connectionId)
         {
             if (!SignalX.Settings.ManageUserConnections)
-            {
                 return;
-            }
             HashSet<string> connections;
             if (!this._connections.TryGetValue(key, out connections))
             {
                 connections = new HashSet<string>();
                 this._connections.GetOrAdd(key, connections);
             }
+
             connections.Add(connectionId);
         }
 
@@ -36,30 +28,22 @@
         {
             HashSet<string> connections;
             if (this._connections.TryGetValue(key, out connections))
-            {
                 return connections;
-            }
 
             return Enumerable.Empty<string>();
         }
 
-        public void Remove(SignalX SignalX,T key, string connectionId)
+        public void Remove(SignalX SignalX, T key, string connectionId)
         {
             if (!SignalX.Settings.ManageUserConnections)
-            {
                 return;
-            }
             HashSet<string> connections;
             if (!this._connections.TryGetValue(key, out connections))
-            {
                 return;
-            }
             connections.Remove(connectionId);
 
             if (connections.Count == 0)
-            {
                 this._connections.TryRemove(key, out connections);
-            }
         }
 
         public void RemoveAll(SignalX SignalX)

@@ -1,8 +1,8 @@
-﻿using System.Threading;
-
-namespace SignalXLib.Lib
+﻿namespace SignalXLib.Lib
 {
-    internal class ServerHandlerDetails
+    using System.Threading;
+
+    class ServerHandlerDetails
     {
         public ServerHandlerDetails(bool requiresAuthorization, bool isSingleWriter)
         {
@@ -11,11 +11,12 @@ namespace SignalXLib.Lib
             this.SingleWriter = new ReaderWriterLockSlim();
         }
 
-        internal bool RequiresAuthorization { private set; get; }
+        internal bool RequiresAuthorization { get; }
 
-        public bool IsSingleWriter { get; private set; }
+        public bool IsSingleWriter { get; }
 
-        public ReaderWriterLockSlim SingleWriter {set;get;}
+        public ReaderWriterLockSlim SingleWriter { set; get; }
+
         public SignalXServerState State { get; set; }
     }
 }

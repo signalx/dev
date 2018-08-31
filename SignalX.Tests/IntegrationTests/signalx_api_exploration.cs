@@ -15,14 +15,8 @@
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
-                    signalx.SetUpClientErrorMessageHandler((error, request) =>
-                    {
-
-                    });
-                    signalx.SetUpClientDebugMessageHandler((error, request) =>
-                    {
-
-                    });
+                    signalx.SetUpClientErrorMessageHandler((error, request) => { });
+                    signalx.SetUpClientDebugMessageHandler((error, request) => { });
                     SignalX mySignalX = SignalX.Instance;
                     signalx.OnException((message, exception) => { });
                     signalx.OnWarning((message, exception) => { });
@@ -45,21 +39,18 @@
                     signalx.GetInComingMessageSpeedAsync(TimeSpan.FromSeconds(10));
                     signalx.GetOutGoingMessageSpeedAsync(TimeSpan.FromSeconds(10));
                     signalx.SetGlobalDefaultMessageBufferSize(1000);
-
-                    return new SignalXTestDefinition()
+                    signalx.AuthenticationHandler(r => true);
+                    return new SignalXTestDefinition("")
                     {
                         OnAppStarted = () =>
                         {
-                            signalx.Server(Guid.NewGuid().ToString(), request => { });
-                            signalx.ServerAuthorized(Guid.NewGuid().ToString(), request => { });
-                            signalx.ServerAuthorizedSingleAccess(Guid.NewGuid().ToString(), request => { });
-                            signalx.ServerSingleAccess(Guid.NewGuid().ToString(), request => { });
+                            signalx.Server(SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
+                            signalx.ServerAuthorized(SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
+                            signalx.ServerAuthorizedSingleAccess(SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
+                            signalx.ServerSingleAccess(SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
                         },
                         TestEvents = new TestEventHandler(
-                            () =>
-                            {
-                                assert.AreEqual(1, (int)signalx.ConnectionCount);
-                            })
+                            () => { assert.AreEqual(1, (int)signalx.ConnectionCount); })
                     };
                 });
         }

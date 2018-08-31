@@ -20,7 +20,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -33,8 +33,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -51,7 +51,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -64,8 +64,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -82,7 +82,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -95,8 +95,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -114,7 +114,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -127,8 +127,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -146,7 +146,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -159,8 +159,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -178,7 +178,7 @@
                                        };
                                      signalx.server.sample(100,'getSomethingCompleted');
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -191,8 +191,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -210,7 +210,7 @@
                                        };
                                      signalx.server.sample(100,'getSomethingCompleted');
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -223,8 +223,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -241,7 +241,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -254,8 +254,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -273,7 +273,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -286,8 +286,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -305,7 +305,7 @@
                                        };
                                      signalx.server.sample(100,'getSomethingCompleted');
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -318,8 +318,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
     }

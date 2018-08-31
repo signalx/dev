@@ -6,41 +6,58 @@
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
 
+    public class DefaultInternalSignalXException : Exception
+    {
+        public DefaultInternalSignalXException(string error)
+            : base(error)
+        {
+        }
+    }
+
     public class SignalX : IDisposable
     {
         internal static object padlock = new object();
         static readonly SignalXAgents SignalXAgents = new SignalXAgents();
-        internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT"; 
-        internal static string SIGNALXCLIENTERRORHANDLER = "SIGNALXCLIENTERRORHANDLER"; 
+        internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT";
+        internal static string SIGNALXCLIENTERRORHANDLER = "SIGNALXCLIENTERRORHANDLER";
         internal static string SIGNALXCLIENTDEBUGHANDLER = "SIGNALXCLIENTDEBUGHANDLER";
-        public readonly string ClientDebugSnippet = @"                   
-                    signalx.debug(function(e){ signalx.ready(function(){ signalx.server." + SignalX.SIGNALXCLIENTDEBUGHANDLER + @"(JSON.stringify(e),function(MSG){  });  }); });
+
+        public readonly string ClientDebugSnippet = @"
+                    signalx.debug(function(e){ signalx.ready(function(){ signalx.server." + SIGNALXCLIENTDEBUGHANDLER + @"(JSON.stringify(e),function(MSG){  });  }); });
                  ";
 
         public readonly string ClientErrorSnippet = @"
-                    signalx.error(function(e){ signalx.ready(function(){ signalx.server." + SignalX.SIGNALXCLIENTERRORHANDLER + @"(JSON.stringify(e),function(MSG){  });  }); });
-                    
+                      //signalx error collector
+                        ;window.onerror = function (msg, url, lineNo, columnNo, error) {
+                            var string = msg.toLowerCase();
+                            var substring = 'script error';
+                            if (string.indexOf(substring) > -1){
+		                        signalx.ready(function(){ signalx.server." + SIGNALXCLIENTERRORHANDLER + @"('Script Error: See Browser Console for Detail',function(MSG){  });  });
+                            } else {
+                                var message = [
+                                    'Message: ' + msg,
+                                    'URL: ' + url,
+                                    'Line: ' + lineNo,
+                                    'Column: ' + columnNo,
+                                    'Error object: ' + JSON.stringify(error)
+                                ].join(' - ');
+                                signalx.ready(function(){ signalx.server." + SIGNALXCLIENTERRORHANDLER + @"(message,function(MSG){  });  });
+                            }
+                            return false;
+                        };
+                    signalx.error(function(e){ signalx.ready(function(){ signalx.server." + SIGNALXCLIENTERRORHANDLER + @"(JSON.stringify(e),function(MSG){  });  }); });
+
                  ";
 
-        internal Action<string, SignalXRequest> OnErrorMessageReceivedFromClient { set; get; }
-
-        public void SetUpClientErrorMessageHandler(Action<string, SignalXRequest> handler)
-        {
-            OnErrorMessageReceivedFromClient = handler;
-        }
-
-
-        internal Action<string, SignalXRequest> OnDebugMessageReceivedFromClient { set; get; }
-
-        public void SetUpClientDebugMessageHandler(Action<string, SignalXRequest> handler)
-        {
-            OnDebugMessageReceivedFromClient = handler;
-        }
         public SignalXSettings Settings = new SignalXSettings();
 
         SignalX()
         {
         }
+
+        internal Action<string, SignalXRequest> OnErrorMessageReceivedFromClient { set; get; }
+
+        internal Action<string, SignalXRequest> OnDebugMessageReceivedFromClient { set; get; }
 
         static SignalX instance { set; get; }
 
@@ -77,6 +94,16 @@
         {
             instance = null;
             this.Settings.Dispose();
+        }
+
+        public void SetUpClientErrorMessageHandler(Action<string, SignalXRequest> handler)
+        {
+            this.OnErrorMessageReceivedFromClient = handler;
+        }
+
+        public void SetUpClientDebugMessageHandler(Action<string, SignalXRequest> handler)
+        {
+            this.OnDebugMessageReceivedFromClient = handler;
         }
 
         [Obsolete("Not intended for client use")]
@@ -130,11 +157,15 @@
             catch (Exception e)
             {
                 error = "An error occured on the server while processing message " + message + " with id " +
-                    messageId + " received from  " + sender + " [ user = " + user.Identity.Name + "] for a response to " + replyTo + " - ERROR: " +
-                    e.Message;
-                this.RespondToUser(context.ConnectionId, "signalx_error", error);
-                if (!string.IsNullOrEmpty(replyTo))
-                    this.RespondToUser(context.ConnectionId, replyTo, error);
+                    messageId + " received from  " + sender + " [ user = " + user?.Identity?.Name + "] for a response to " + replyTo + " - ERROR: " +
+                    e?.Message;
+                if (!string.IsNullOrEmpty(context?.ConnectionId))
+                    this.RespondToUser(context?.ConnectionId, "signalx_error", error);
+
+                if (!string.IsNullOrEmpty(replyTo) && !string.IsNullOrEmpty(context?.ConnectionId))
+                    this.RespondToUser(context?.ConnectionId, replyTo, error);
+
+                //todo possible infinite loop here. Need to fix!!!
                 this.Settings.ExceptionHandler.ForEach(h => h?.Invoke(error, e));
             }
 
@@ -205,13 +236,13 @@
 
             return true;
         }
+
         public void RespondToAll(string replyTo, dynamic responseData)
         {
             RespondToAllInGroup(replyTo, responseData, null);
         }
 
-
-        public void RespondToAllInGroup(string replyTo, dynamic responseData, string groupName )
+        public void RespondToAllInGroup(string replyTo, dynamic responseData, string groupName)
         {
             if (!AllowToSend(replyTo, responseData))
                 return;

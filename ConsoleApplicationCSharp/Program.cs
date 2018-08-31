@@ -33,7 +33,7 @@ namespace ConsoleApplicationCSharp
                     });
                 SignalX.Server("Sample", request =>
                {
-                   var messageId = Guid.NewGuid().ToString();
+                   var messageId = SignalXExtensions.GenerateUniqueNameId();
                    SignalX.RespondToAll("Myclient", messageId + " - " + request.Message + ": Thank you for sending me the message ");
                    SignalX.RespondToAll("Myclient", messageId + " - " + request.Message + ": Hang on i'm not done yet");
                    Task.Delay(TimeSpan.FromMilliseconds(1000)).ContinueWith(x =>

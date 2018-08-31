@@ -49,6 +49,12 @@
     <None Include="App.config" />
     <None Include="paket.references" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SignalX.SignalXLib\SignalXLib.Lib.csproj">
+      <Project>{689aa72b-541c-48f8-bab9-df439b1c7108}</Project>
+      <Name>SignalXLib.Lib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETCoreApp' And ($(TargetFrameworkVersion) == 'v2.0' Or $(TargetFrameworkVersion) == 'v2.1')">

@@ -1,66 +1,66 @@
 ﻿namespace SignalXLib.Lib
 {
+    using Microsoft.AspNet.SignalR;
+    using Microsoft.AspNet.SignalR.Hubs;
     using System;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.AspNet.SignalR;
-    using Microsoft.AspNet.SignalR.Hubs;
 
     public static class SignalXExtensions
     {
-       
+      
+
         #region METHODS
-        internal static void UpdateClient(this SignalX signalX,   string clientMethodName, bool status)
+
+        internal static void UpdateClient(this SignalX signalX, string clientMethodName, bool status)
         {
             if (string.IsNullOrEmpty(clientMethodName))
                 throw new ArgumentNullException(nameof(clientMethodName));
             if (signalX.Settings.SignalXClientDetails.ContainsKey(clientMethodName))
-            {
                 signalX.Settings.SignalXClientDetails[clientMethodName].Disabled = status;
-            }
             else
-            {
-                signalX.Settings.SignalXClientDetails.GetOrAdd(clientMethodName, new ClientDetails() { Disabled = status });
-            }
+                signalX.Settings.SignalXClientDetails.GetOrAdd(clientMethodName, new ClientDetails { Disabled = status });
         }
 
         /// <summary>
-        /// Stops message sending to a given client
+        ///     Stops message sending to a given client
         /// </summary>
         public static void DisableClient(this SignalX signalX, string clientMethodName)
         {
-            UpdateClient(signalX,clientMethodName, true);
+            UpdateClient(signalX, clientMethodName, true);
         }
 
         public static void DisableAllClients(this SignalX signalX)
         {
             signalX.Settings.DisabledAllClients = true;
             foreach (string s in signalX.Settings.SignalXClientDetails.Select(x => x.Key).ToList())
-            {
                 signalX.UpdateClient(s, true);
-            }
         }
+
         /// <summary>
-        /// This just turns around to set the GlobalHost.Configuration.DefaultMessageBufferSize
-        /// Since messages are stored in the message bus in server memory, reducing the size of messages can also address server memory issues.
-        /// Since SignalR doesn't block when you call client methods, you can invoke client methods very quickly. 
-        /// Unfortunately, the client might not always be ready to receive messages immediately once you send them, so SignalR has to buffer messages
-        /// So by default SignalR will buffer up to 1000 messages per client. 
-        /// Once the client falls behind by over 1000 messages, it will start missing messages
-        /// By default, SignalR retains 1000 messages in memory per hub per connection. 
-        /// If large messages are being used, this may create memory issues which can be 
-        /// alleviated by reducing this value. This setting can be set in the 
-        /// Application_Start event handler in an ASP.NET application, or in the 
-        /// Configuration method of an OWIN startup class in a self-hosted application
-        /// see https://docs.microsoft.com/en-us/aspnet/signalr/overview/performance/signalr-performance#tuning
-        ///  </summary>
+        ///     This just turns around to set the GlobalHost.Configuration.DefaultMessageBufferSize
+        ///     Since messages are stored in the message bus in server memory, reducing the size of messages can also address
+        ///     server memory issues.
+        ///     Since SignalR doesn't block when you call client methods, you can invoke client methods very quickly.
+        ///     Unfortunately, the client might not always be ready to receive messages immediately once you send them, so SignalR
+        ///     has to buffer messages
+        ///     So by default SignalR will buffer up to 1000 messages per client.
+        ///     Once the client falls behind by over 1000 messages, it will start missing messages
+        ///     By default, SignalR retains 1000 messages in memory per hub per connection.
+        ///     If large messages are being used, this may create memory issues which can be
+        ///     alleviated by reducing this value. This setting can be set in the
+        ///     Application_Start event handler in an ASP.NET application, or in the
+        ///     Configuration method of an OWIN startup class in a self-hosted application
+        ///     see https://docs.microsoft.com/en-us/aspnet/signalr/overview/performance/signalr-performance#tuning
+        /// </summary>
         /// <param name="defaultMessageBufferSize">Default val is 1000 </param>
         public static void SetGlobalDefaultMessageBufferSize(this SignalX signalX, int defaultMessageBufferSize = 1000)
         {
             GlobalHost.Configuration.DefaultMessageBufferSize = defaultMessageBufferSize;
         }
+
         public static void EnableClient(this SignalX signalX, string clientMethodName)
         {
             signalX.UpdateClient(clientMethodName, false);
@@ -70,15 +70,13 @@
         {
             signalX.Settings.DisabledAllClients = false;
             foreach (string s in signalX.Settings.SignalXClientDetails.Select(x => x.Key).ToList())
-            {
                 signalX.UpdateClient(s, false);
-            }
         }
 
         internal static bool CanProcess(this SignalX signalX, HubCallerContext context, string serverHandlerName)
         {
             bool result = false;
-            if (signalX.Settings.RequireAuthorizationForAllHandlers || (signalX.Settings.SignalXServerExecutionDetails.ContainsKey(serverHandlerName) && signalX.Settings.SignalXServerExecutionDetails[serverHandlerName].RequiresAuthorization))
+            if (signalX.Settings.RequireAuthorizationForAllHandlers || signalX.Settings.SignalXServerExecutionDetails.ContainsKey(serverHandlerName) && signalX.Settings.SignalXServerExecutionDetails[serverHandlerName].RequiresAuthorization)
             {
                 if (signalX.Settings.AuthenticatedWhen != null)
                 {
@@ -96,6 +94,7 @@
                 signalX.Settings.WarningHandler.ForEach(h => h?.Invoke("AuthorizationNotSet", "Try setting an authorization handler to prevent anonymous access into your server"));
                 result = true;
             }
+
             return result;
         }
 
@@ -120,10 +119,8 @@
             return result;
         }
 
-
-
         /// <summary>
-        /// Cookie authentication supported
+        ///     Cookie authentication supported
         /// </summary>
         //public static void AuthenticationHandler(string cookieName, Func<Cookie,string, string, IRequest, bool> handler)
         //{
@@ -139,71 +136,107 @@
         }
 
         /// <summary>
-        /// Adds a warning handler
+        ///     Adds a warning handler
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="handler"></param>
         public static void OnWarning(this SignalX signalX, Action<string, object> handler)
         {
-            signalX.Settings.WarningHandler .Add(handler); 
+            signalX.Settings.WarningHandler.Add(
+                (s, o) =>
+                {
+                    try
+                    {
+                        handler(s, o);
+                    }
+                    catch (Exception e)
+                    {
+                        //todo swallow
+                    }
+                });
         }
 
         /// <summary>
-        /// Adds an exception handler
+        ///     Adds an exception handler
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="handler"></param>
         public static void OnException(this SignalX signalX, Action<Exception> handler)
         {
-            signalX.Settings.ExceptionHandler.Add((m, e) => handler.Invoke(e)); 
+            signalX.Settings.ExceptionHandler.Add(
+                (m, e) =>
+                {
+                    try
+                    {
+                        handler.Invoke(e);
+                    }
+                    catch (Exception exception)
+                    {
+                        //todo swallow
+                    }
+                });
         }
+
         /// <summary>
-        /// Adds an exception handler
+        ///     Adds an exception handler
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="handler"></param>
         public static void OnException(this SignalX signalX, Action<string, Exception> handler)
         {
-            signalX.Settings.ExceptionHandler .Add(handler); 
+            signalX.Settings.ExceptionHandler.Add(
+                (s, o) =>
+                {
+                    try
+                    {
+                        handler(s, o);
+                    }
+                    catch (Exception e)
+                    {
+                        //todo swallow
+                    }
+                });
         }
 
         /// <summary>
-        /// Adds a connection event handler
+        ///     Adds a connection event handler
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="handler"></param>
         public static void OnConnectionEvent(this SignalX signalX, Action<string, object> handler)
         {
-            signalX.Settings.ConnectionEventsHandler .Add(handler); 
+            signalX.Settings.ConnectionEventsHandler.Add(handler);
         }
 
-
-
-
         /// <summary>
-        /// Sets up a server
+        ///     Sets up a server
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
         /// <param name="server"></param>
-        /// <param name="requireAuthorization">Indicates if the set authorization should be checked before allowing access to the server</param>
+        /// <param name="requireAuthorization">
+        ///     Indicates if the set authorization should be checked before allowing access to the
+        ///     server
+        /// </param>
         /// <param name="isSingleWriter">Set whether or not requests should be queued and only one allowed in at a time</param>
-        /// <param name="allowDynamicServerForThisInstance">Sets if it is allowed for another server to be created with same name. In such a case, the existing server will be discarded</param>
-
-        public static void Server(this SignalX signalX, string name,
+        /// <param name="allowDynamicServerForThisInstance">
+        ///     Sets if it is allowed for another server to be created with same name.
+        ///     In such a case, the existing server will be discarded
+        /// </param>
+        public static void Server(
+            this SignalX signalX,
+            string name,
             Action<SignalXRequest, SignalXServerState> server,
             bool requireAuthorization = false,
             bool isSingleWriter = false,
             bool allowDynamicServerForThisInstance = false)
         {
             name = name.Trim();
-            var camelCased = Char.ToLowerInvariant(name[0]) + name.Substring(1);
-            var unCamelCased = Char.ToUpperInvariant(name[0]) + name.Substring(1);
+            string camelCased = char.ToLowerInvariant(name[0]) + name.Substring(1);
+            string unCamelCased = char.ToUpperInvariant(name[0]) + name.Substring(1);
 
             if ((signalX.Settings.SignalXServers.ContainsKey(camelCased) || signalX.Settings.SignalXServers.ContainsKey(unCamelCased)) && !signalX.Settings.AllowDynamicServerInternal && !allowDynamicServerForThisInstance)
-            {
                 throw new Exception("Server with name '" + name + "' has already been created");
-            }
 
             try
             {
@@ -235,8 +268,9 @@
                 signalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while creating server {name}", e));
             }
         }
+
         /// <summary>
-        /// Sets us a server that requires authorization to be checked before it is called
+        ///     Sets us a server that requires authorization to be checked before it is called
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
@@ -245,8 +279,10 @@
         {
             signalX.ServerAuthorized(name, (r, s) => server(r));
         }
+
         /// <summary>
-        /// Sets up a server where authorization is checked before access and requests should be queued with only one allowed in at a time
+        ///     Sets up a server where authorization is checked before access and requests should be queued with only one allowed
+        ///     in at a time
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
@@ -255,8 +291,9 @@
         {
             signalX.ServerAuthorizedSingleAccess(name, (r, s) => server(r));
         }
+
         /// <summary>
-        /// Sets up a server
+        ///     Sets up a server
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
@@ -266,8 +303,9 @@
         {
             signalX.Server(name, (r, s) => server(r), requireAuthorization);
         }
+
         /// <summary>
-        /// Sets up a server where requests should be queued with only one allowed in at a time
+        ///     Sets up a server where requests should be queued with only one allowed in at a time
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
@@ -277,8 +315,9 @@
         {
             signalX.Server(name, (r, s) => server(r), requireAuthorization, true);
         }
+
         /// <summary>
-        /// Sets up a server where authorization is checked before access 
+        ///     Sets up a server where authorization is checked before access
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
@@ -287,8 +326,10 @@
         {
             signalX.Server(name, server, true);
         }
+
         /// <summary>
-        /// Sets up a server where authorization is checked before access and requests should be queued with only one allowed in at a time
+        ///     Sets up a server where authorization is checked before access and requests should be queued with only one allowed
+        ///     in at a time
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
@@ -298,14 +339,13 @@
             signalX.Server(name, server, true, true);
         }
 
-       
         public static async Task<double> GetOutGoingMessageSpeedAsync(this SignalX signalX, TimeSpan duration)
         {
             signalX.Settings.OutGoingCounter = 0;
             var sw = new Stopwatch();
             signalX.Settings.StartCountingOutGoingMessages = true;
             sw.Start();
-            await Task.Delay(duration);// might not be 5 sec
+            await Task.Delay(duration); // might not be 5 sec
             signalX.Settings.StartCountingOutGoingMessages = false;
             sw.Stop();
             long currentCount = Interlocked.Read(ref signalX.Settings.OutGoingCounter);
@@ -318,17 +358,15 @@
             var sw = new Stopwatch();
             signalX.Settings.StartCountingInComingMessages = true;
             sw.Start();
-            await Task.Delay(duration);// might not be 5 sec
+            await Task.Delay(duration); // might not be 5 sec
             signalX.Settings.StartCountingInComingMessages = false;
             sw.Stop();
             long currentCount = Interlocked.Read(ref signalX.Settings.InComingCounter);
             return currentCount / sw.Elapsed.TotalSeconds;
         }
 
-
-
         /// <summary>
-        /// Reply to a specific client
+        ///     Reply to a specific client
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="user"></param>
@@ -337,9 +375,7 @@
         public static void RespondToUser(this SignalX signalX, string user, string name, object data)
         {
             if (!signalX.AllowToSend(name, data))
-            {
                 return;
-            }
             if (signalX.Settings.StartCountingOutGoingMessages)
                 Interlocked.Increment(ref signalX.Settings.OutGoingCounter);
 
@@ -347,7 +383,7 @@
         }
 
         /// <summary>
-        ///  Reply to every other clients but the sender
+        ///     Reply to every other clients but the sender
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="excludedUserId"></param>
@@ -357,72 +393,92 @@
         public static void RespondToOthers(this SignalX signalX, string excludedUserId, string name, object data, string groupName = null)
         {
             if (!signalX.AllowToSend(name, data))
-            {
                 return;
-            }
             if (signalX.Settings.StartCountingOutGoingMessages)
                 Interlocked.Increment(ref signalX.Settings.OutGoingCounter);
 
             signalX.Settings.Receiver.ReceiveAsOther(name, data, excludedUserId, groupName);
         }
 
-      
         internal static void CallServer(this SignalX signalX, SignalXRequest request)
         {
-            var executionDetails = signalX.Settings.SignalXServerExecutionDetails[request.Handler];
+            ServerHandlerDetails executionDetails = signalX.Settings.SignalXServerExecutionDetails[request.Handler];
             if (executionDetails.IsSingleWriter)
-            {
                 using (executionDetails.SingleWriter.Write())
                 {
-                    signalX.Settings.SignalXServers[request.Handler].Invoke(request, signalX. Settings.SignalXServerExecutionDetails[request.Handler].State);
+                    signalX.Settings.SignalXServers[request.Handler].Invoke(request, signalX.Settings.SignalXServerExecutionDetails[request.Handler].State);
                 }
-            }
             else
-            {
-                signalX.Settings.SignalXServers[request.Handler].Invoke(request, signalX. Settings.SignalXServerExecutionDetails[request.Handler].State);
-            }
+                signalX.Settings.SignalXServers[request.Handler].Invoke(request, signalX.Settings.SignalXServerExecutionDetails[request.Handler].State);
         }
 
-        public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script,string groupName, Action<dynamic> onResponse = null, TimeSpan? delay = null)
+        public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script, string groupName, Action<dynamic> onResponse = null, TimeSpan? delay = null)
         {
-            signalX.RunJavaScriptOnAllClientsInGroup(script,
-                (a, b, c) =>
-                {
-                    onResponse?.Invoke(a);
-                },delay,groupName);
+            signalX.RunJavaScriptOnAllClientsInGroup(
+                script,
+                (a, b, c) => { onResponse?.Invoke(a); },
+                delay,
+                groupName);
         }
 
         public static void RunJavaScriptOnAllClients(this SignalX signalX, string script, Action<dynamic> onResponse = null, TimeSpan? delay = null)
         {
-            signalX.RunJavaScriptOnAllClients(script,
-                (a, b, c) =>
-                {
-                    onResponse?.Invoke(a);
-                },delay);
+            signalX.RunJavaScriptOnAllClients(
+                script,
+                (a, b, c) => { onResponse?.Invoke(a); },
+                delay);
         }
 
         public static void RunJavaScriptOnAllClients(this SignalX signalX, string script, Action<dynamic, SignalXRequest, string> onResponse = null, TimeSpan? delay = null)
         {
-            signalX.RunJavaScriptOnAllClientsInGroup(script, onResponse, delay,null);
+            signalX.RunJavaScriptOnAllClientsInGroup(script, onResponse, delay, null);
         }
-        
-        public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script, Action<dynamic, SignalXRequest, string> onResponse=null, TimeSpan? delay = null, string groupName=null)
+
+        public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script, Action<dynamic, SignalXRequest, string> onResponse = null, TimeSpan? delay = null, string groupName = null)
         {
             if (signalX.Settings.OnResponseAfterScriptRuns != null)
             {
-                //todo do something here to maybe block multiple calls 
+                //todo do something here to maybe block multiple calls
                 //todo before a previous one finishes
                 //todo or throw a warning
             }
+
             delay = delay ?? TimeSpan.FromSeconds(0);
             signalX.Settings.OnResponseAfterScriptRuns = onResponse;
-            Task.Delay(delay.Value).ContinueWith((c) =>
-            {
-                signalX.RespondToAllInGroup(SignalX. SIGNALXCLIENTAGENT, script,groupName);
-            });
+            Task.Delay(delay.Value).ContinueWith(c => { signalX.RespondToAllInGroup(SignalX.SIGNALXCLIENTAGENT, script, groupName); });
         }
 
-       
+        internal static void JoinGroup(
+            this SignalX signalX,
+            HubCallerContext context,
+            IHubCallerConnectionContext<dynamic> clients,
+            IGroupManager groups,
+            string groupName)
+        {
+            groups.Add(context?.ConnectionId, groupName);
+            signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXGroupJoin.ToString(), groupName));
+
+            signalX.Settings.Receiver.ReceiveInGroupManager(context?.ConnectionId, groupName, context, clients, groups);
+        }
+
+        internal static void LeaveGroup(
+            this SignalX signalX,
+            HubCallerContext context,
+            IHubCallerConnectionContext<dynamic> clients,
+            IGroupManager groups,
+            string groupName)
+        {
+            groups.Remove(context?.ConnectionId, groupName);
+            signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXGroupLeave.ToString(), groupName));
+
+            signalX.Settings.Receiver.ReceiveInGroupManager(context?.ConnectionId, groupName, context, clients, groups);
+        }
+        public static string GenerateUniqueNameId()
+        {
+            return "S" + Guid.NewGuid().ToString().Replace("-", "");
+        }
+        #endregion METHODS
+
         public static void RespondToScriptRequest(this SignalX signalX,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
@@ -438,18 +494,20 @@
             var logRequestOnClient = signalX.Settings.LogAgentMessagesOnClient ? "console.log(message);" : "";
             var logResponseOnClient = signalX.Settings.LogAgentMessagesOnClient ? "console.log(response);" : "";
             var receiveErrorsFromClient = (signalX.Settings.ReceiveErrorMessagesFromClient
-                ? signalX.ClientErrorSnippet : "")+(signalX.Settings.ReceiveDebugMessagesFromClient
+                ? signalX.ClientErrorSnippet : "") + (signalX.Settings.ReceiveDebugMessagesFromClient
                 ? signalX.ClientDebugSnippet : "");
-            var clientAgent = @"   
-                 "+ receiveErrorsFromClient + @"
-                 signalx.client." + SignalX. SIGNALXCLIENTAGENT + @" = function (message) {
+            var clientAgent = @"
+                 " + receiveErrorsFromClient + @"
+                 signalx.client." + SignalX.SIGNALXCLIENTAGENT + @" = function (message) {
                    " + logRequestOnClient + @"
                    var response ={};
                    try{ response={ Error : '', Result : eval('(function(){ '+message+' })()') }; }catch(err){  response = {Error : err, Result :'' }   }
                    " + logResponseOnClient + @"
                     signalx.server." + SignalX.SIGNALXCLIENTAGENT + @"(response,function(messageResponse){  });
                  };";
-            var methods = signalX.Settings.SignalXServers.Aggregate(clientAgent + "window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})};var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")) + "}; $sx; ";
+            var methods = ";" +
+                signalX.Settings.SignalXServers.Aggregate(clientAgent + "window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})};var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")).Trim()
+                + "}; $sx; ";
 
             if (signalX.Settings.StartCountingInComingMessages)
                 Interlocked.Increment(ref signalX.Settings.InComingCounter);
@@ -457,29 +515,6 @@
             signalX.Settings.Receiver.ReceiveScripts(context?.ConnectionId, methods, context, groups, clients);
 
             signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestForMethodsCompleted.ToString(), methods));
-           
         }
-
-        internal static void JoinGroup(this SignalX signalX, HubCallerContext context,
-            IHubCallerConnectionContext<dynamic> clients,
-            IGroupManager groups, string groupName)
-        {
-            groups.Add(context?.ConnectionId, groupName);
-            signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXGroupJoin.ToString(), groupName));
-
-            signalX.Settings.Receiver.ReceiveInGroupManager(context?.ConnectionId, groupName, context, clients, groups);
-        }
-
-        internal static void LeaveGroup(this SignalX signalX, HubCallerContext context,
-            IHubCallerConnectionContext<dynamic> clients,
-            IGroupManager groups, string groupName)
-        {
-            groups.Remove(context?.ConnectionId, groupName);
-            signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXGroupLeave.ToString(), groupName));
-
-            signalX.Settings.Receiver.ReceiveInGroupManager(context?.ConnectionId, groupName, context, clients, groups);
-        }
-
-        #endregion
     }
 }

@@ -1,11 +1,11 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.TestHelperLib;
-    using System;
 
     [TestClass]
-    public class when_test_library_is_used
+    public class WHEN_TEST_LIBRARY_TEST_is_used_to_test
     {
         [TestMethod]
         public void it_can_pass()
@@ -15,17 +15,15 @@
                 {
                     return new SignalXTestDefinition(
                         @"",
-                        onAppStarted: () =>
+                        () => { },
+                        () => { },
+                        new TestEventHandler
                         {
-                        },
-                        checks: () => { },
-                        events: new TestEventHandler()
-                        {
-                            OnFinally = (e) => { },
+                            OnFinally = e => { },
                             OnCheckSucceeded = () => { },
-                            OnCheckFailures = (e) => { },
+                            OnCheckFailures = e => { },
                             OnClientLoaded = () => { },
-                            OnClientError = (e) => { }
+                            OnClientError = e => { }
                         });
                 });
         }
@@ -40,17 +38,15 @@
                     {
                         return new SignalXTestDefinition(
                             @"",
-                            onAppStarted: () =>
+                            () => { },
+                            () => { },
+                            new TestEventHandler
                             {
-                            },
-                            checks: () => { },
-                            events: new TestEventHandler()
-                            {
-                                OnFinally = (e) => { },
+                                OnFinally = e => { },
                                 OnCheckSucceeded = () => { },
-                                OnCheckFailures = (e) => { },
+                                OnCheckFailures = e => { },
                                 OnClientLoaded = () => { },
-                                OnClientError = (e) => { }
+                                OnClientError = e => { }
                             });
                     });
                 Assert.Fail();
@@ -69,17 +65,15 @@
                     throw new Exception("signal x test exception thrown");
                     return new SignalXTestDefinition(
                         @"",
-                        onAppStarted: () =>
+                        () => { },
+                        () => { },
+                        new TestEventHandler
                         {
-                        },
-                        checks: () => { },
-                        events: new TestEventHandler()
-                        {
-                            OnFinally = (e) => { },
+                            OnFinally = e => { },
                             OnCheckSucceeded = () => { },
-                            OnCheckFailures = (e) => { },
+                            OnCheckFailures = e => { },
                             OnClientLoaded = () => { },
-                            OnClientError = (e) => { }
+                            OnClientError = e => { }
                         });
                 });
         }
@@ -95,17 +89,15 @@
                         throw new Exception("signal x test exception thrown");
                         return new SignalXTestDefinition(
                             @"",
-                            onAppStarted: () =>
+                            () => { },
+                            () => { },
+                            new TestEventHandler
                             {
-                            },
-                            checks: () => { },
-                            events: new TestEventHandler()
-                            {
-                                OnFinally = (e) => { },
+                                OnFinally = e => { },
                                 OnCheckSucceeded = () => { },
-                                OnCheckFailures = (e) => { },
+                                OnCheckFailures = e => { },
                                 OnClientLoaded = () => { },
-                                OnClientError = (e) => { }
+                                OnClientError = e => { }
                             });
                     });
                 throw new AggregateException();
@@ -113,9 +105,7 @@
             catch (Exception e)
             {
                 if (e is AggregateException)
-                {
                     throw e;
-                }
             }
         }
 
@@ -125,32 +115,27 @@
             try
             {
                 SignalXTester.Run(
-                            (signalx, assert) =>
+                    (signalx, assert) =>
+                    {
+                        return new SignalXTestDefinition(
+                            @"",
+                            () => { throw new Exception("signal x test exception thrown"); },
+                            () => { },
+                            new TestEventHandler
                             {
-                                return new SignalXTestDefinition(
-                                    @"",
-                                    onAppStarted: () =>
-                                    {
-                                        throw new Exception("signal x test exception thrown");
-                                    },
-                                    checks: () => { },
-                                    events: new TestEventHandler()
-                                    {
-                                        OnFinally = (e) => { },
-                                        OnCheckSucceeded = () => { },
-                                        OnCheckFailures = (e) => { },
-                                        OnClientLoaded = () => { },
-                                        OnClientError = (e) => { }
-                                    });
+                                OnFinally = e => { },
+                                OnCheckSucceeded = () => { },
+                                OnCheckFailures = e => { },
+                                OnClientLoaded = () => { },
+                                OnClientError = e => { }
                             });
+                    });
                 throw new AggregateException();
             }
             catch (Exception e)
             {
                 if (e is AggregateException)
-                {
                     throw e;
-                }
             }
         }
 
@@ -160,32 +145,28 @@
             try
             {
                 SignalXTester.Run(
-                          (signalx, assert) =>
-                          {
-                              SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(20);
-                              return new SignalXTestDefinition(
-                                  @"",
-                                  onAppStarted: () =>
-                                  {
-                                  },
-                                  checks: () => { throw new Exception(); },
-                                  events: new TestEventHandler()
-                                  {
-                                      OnFinally = (e) => { },
-                                      OnCheckSucceeded = () => { },
-                                      OnCheckFailures = (e) => { },
-                                      OnClientLoaded = () => { },
-                                      OnClientError = (e) => { }
-                                  });
-                          });
+                    (signalx, assert) =>
+                    {
+                        SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(20);
+                        return new SignalXTestDefinition(
+                            @"",
+                            () => { },
+                            () => { throw new Exception(); },
+                            new TestEventHandler
+                            {
+                                OnFinally = e => { },
+                                OnCheckSucceeded = () => { },
+                                OnCheckFailures = e => { },
+                                OnClientLoaded = () => { },
+                                OnClientError = e => { }
+                            });
+                    });
                 throw new AggregateException();
             }
             catch (Exception e)
             {
                 if (e is AggregateException)
-                {
                     throw e;
-                }
             }
         }
 
@@ -195,31 +176,27 @@
             try
             {
                 SignalXTester.Run(
-               (signalx, assert) =>
-               {
-                   return new SignalXTestDefinition(
-                       @"",
-                       onAppStarted: () =>
-                       {
-                       },
-                       checks: () => { },
-                       events: new TestEventHandler()
-                       {
-                           OnFinally = (e) => { throw new Exception("signal x test exception thrown"); },
-                           OnCheckSucceeded = () => { },
-                           OnCheckFailures = (e) => { },
-                           OnClientLoaded = () => { },
-                           OnClientError = (e) => { }
-                       });
-               });
+                    (signalx, assert) =>
+                    {
+                        return new SignalXTestDefinition(
+                            @"",
+                            () => { },
+                            () => { },
+                            new TestEventHandler
+                            {
+                                OnFinally = e => { throw new Exception("signal x test exception thrown"); },
+                                OnCheckSucceeded = () => { },
+                                OnCheckFailures = e => { },
+                                OnClientLoaded = () => { },
+                                OnClientError = e => { }
+                            });
+                    });
                 throw new AggregateException();
             }
             catch (Exception e)
             {
                 if (e is AggregateException)
-                {
                     throw e;
-                }
             }
         }
 
@@ -234,17 +211,15 @@
                         SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(20);
                         return new SignalXTestDefinition(
                             @"",
-                            onAppStarted: () =>
+                            () => { },
+                            () => { },
+                            new TestEventHandler
                             {
-                            },
-                            checks: () => { },
-                            events: new TestEventHandler()
-                            {
-                                OnFinally = (e) => { },
+                                OnFinally = e => { },
                                 OnCheckSucceeded = () => { throw new Exception("signal x test exception thrown"); },
-                                OnCheckFailures = (e) => { },
+                                OnCheckFailures = e => { },
                                 OnClientLoaded = () => { },
-                                OnClientError = (e) => { }
+                                OnClientError = e => { }
                             });
                     });
                 throw new AggregateException();
@@ -252,9 +227,7 @@
             catch (Exception e)
             {
                 if (e is AggregateException)
-                {
                     throw e;
-                }
             }
         }
 
@@ -266,27 +239,23 @@
                 SignalXTester.Run(
                     (signalx, assert) =>
                     {
-                        var count = 0;
+                        int count = 0;
                         return new SignalXTestDefinition(
                             @"",
-                            onAppStarted: () =>
-                            {
-                            },
-                            checks: () =>
+                            () => { },
+                            () =>
                             {
                                 count++;
                                 if (count == 1)
-                                {
                                     throw new Exception("signal x test exception thrown");
-                                }
                             },
-                            events: new TestEventHandler()
+                            new TestEventHandler
                             {
-                                OnFinally = (e) => { },
+                                OnFinally = e => { },
                                 OnCheckSucceeded = () => { },
-                                OnCheckFailures = (e) => { throw new Exception("signal x test exception thrown"); },
+                                OnCheckFailures = e => { throw new Exception("signal x test exception thrown"); },
                                 OnClientLoaded = () => { },
-                                OnClientError = (e) => { }
+                                OnClientError = e => { }
                             });
                     });
                 throw new AggregateException();
@@ -294,9 +263,7 @@
             catch (Exception e)
             {
                 if (e is AggregateException)
-                {
                     throw e;
-                }
             }
         }
 
@@ -310,17 +277,15 @@
                     {
                         return new SignalXTestDefinition(
                             @"",
-                            onAppStarted: () =>
+                            () => { },
+                            () => { },
+                            new TestEventHandler
                             {
-                            },
-                            checks: () => { },
-                            events: new TestEventHandler()
-                            {
-                                OnFinally = (e) => { },
+                                OnFinally = e => { },
                                 OnCheckSucceeded = () => { },
-                                OnCheckFailures = (e) => { },
+                                OnCheckFailures = e => { },
                                 OnClientLoaded = () => { throw new Exception("signal x test exception thrown"); },
-                                OnClientError = (e) => { }
+                                OnClientError = e => { }
                             });
                     });
                 throw new AggregateException();
@@ -328,9 +293,7 @@
             catch (Exception e)
             {
                 if (e is AggregateException)
-                {
                     throw e;
-                }
             }
         }
 
@@ -342,18 +305,15 @@
                 {
                     return new SignalXTestDefinition(
                         @"",
-                        onAppStarted: () =>
+                        () => { throw new Exception("signal x test exception thrown"); },
+                        () => { },
+                        new TestEventHandler
                         {
-                            throw new Exception("signal x test exception thrown");
-                        },
-                        checks: () => { },
-                        events: new TestEventHandler()
-                        {
-                            OnFinally = (e) => { },
+                            OnFinally = e => { },
                             OnCheckSucceeded = () => { },
-                            OnCheckFailures = (e) => { },
+                            OnCheckFailures = e => { },
                             OnClientLoaded = () => { },
-                            OnClientError = (e) => { }
+                            OnClientError = e => { }
                         });
                 });
         }
@@ -368,20 +328,15 @@
 
                     return new SignalXTestDefinition(
                         @"",
-                        onAppStarted: () =>
+                        () => { },
+                        () => { throw new Exception("signal x test exception thrown"); },
+                        new TestEventHandler
                         {
-                        },
-                        checks: () =>
-                        {
-                            throw new Exception("signal x test exception thrown");
-                        },
-                        events: new TestEventHandler()
-                        {
-                            OnFinally = (e) => { },
+                            OnFinally = e => { },
                             OnCheckSucceeded = () => { },
-                            OnCheckFailures = (e) => { },
+                            OnCheckFailures = e => { },
                             OnClientLoaded = () => { },
-                            OnClientError = (e) => { }
+                            OnClientError = e => { }
                         });
                 });
         }
@@ -394,17 +349,15 @@
                 {
                     return new SignalXTestDefinition(
                         @"",
-                        onAppStarted: () =>
+                        () => { },
+                        () => { },
+                        new TestEventHandler
                         {
-                        },
-                        checks: () => { },
-                        events: new TestEventHandler()
-                        {
-                            OnFinally = (e) => { throw new Exception("signal x test exception thrown"); },
+                            OnFinally = e => { throw new Exception("signal x test exception thrown"); },
                             OnCheckSucceeded = () => { },
-                            OnCheckFailures = (e) => { },
+                            OnCheckFailures = e => { },
                             OnClientLoaded = () => { },
-                            OnClientError = (e) => { }
+                            OnClientError = e => { }
                         });
                 });
         }
@@ -418,17 +371,15 @@
                     SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(20);
                     return new SignalXTestDefinition(
                         @"",
-                        onAppStarted: () =>
+                        () => { },
+                        () => { },
+                        new TestEventHandler
                         {
-                        },
-                        checks: () => { },
-                        events: new TestEventHandler()
-                        {
-                            OnFinally = (e) => { },
+                            OnFinally = e => { },
                             OnCheckSucceeded = () => { throw new Exception("signal x test exception thrown"); },
-                            OnCheckFailures = (e) => { },
+                            OnCheckFailures = e => { },
                             OnClientLoaded = () => { },
-                            OnClientError = (e) => { }
+                            OnClientError = e => { }
                         });
                 });
         }
@@ -439,27 +390,23 @@
             SignalXTester.RunAndExpectFailure(
                 (signalx, assert) =>
                 {
-                    var count = 0;
+                    int count = 0;
                     return new SignalXTestDefinition(
                         @"",
-                        onAppStarted: () =>
-                        {
-                        },
-                        checks: () =>
+                        () => { },
+                        () =>
                         {
                             count++;
                             if (count == 1)
-                            {
                                 throw new Exception("signal x test exception thrown");
-                            }
                         },
-                        events: new TestEventHandler()
+                        new TestEventHandler
                         {
-                            OnFinally = (e) => { },
+                            OnFinally = e => { },
                             OnCheckSucceeded = () => { },
-                            OnCheckFailures = (e) => { throw new Exception("signal x test exception thrown"); },
+                            OnCheckFailures = e => { throw new Exception("signal x test exception thrown"); },
                             OnClientLoaded = () => { },
-                            OnClientError = (e) => { }
+                            OnClientError = e => { }
                         });
                 });
         }
@@ -472,17 +419,15 @@
                 {
                     return new SignalXTestDefinition(
                         @"",
-                        onAppStarted: () =>
+                        () => { },
+                        () => { },
+                        new TestEventHandler
                         {
-                        },
-                        checks: () => { },
-                        events: new TestEventHandler()
-                        {
-                            OnFinally = (e) => { },
+                            OnFinally = e => { },
                             OnCheckSucceeded = () => { },
-                            OnCheckFailures = (e) => { },
+                            OnCheckFailures = e => { },
                             OnClientLoaded = () => { throw new Exception("signal x test exception thrown"); },
-                            OnClientError = (e) => { }
+                            OnClientError = e => { }
                         });
                 });
         }

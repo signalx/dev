@@ -1,25 +1,25 @@
-﻿using Microsoft.AspNet.SignalR;
-using Microsoft.AspNet.SignalR.Infrastructure;
-
-namespace SignalXLib.Lib
+﻿namespace SignalXLib.Lib
 {
-    using System;
+    using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
+    using Microsoft.AspNet.SignalR.Infrastructure;
 
-    internal class DefaultSignalRClientReceiver : ISignalXClientReceiver
+    class DefaultSignalRClientReceiver : ISignalXClientReceiver
     {
-       // SignalX SignalX= Lib.SignalX.Instance;
+        // SignalX SignalX= Lib.SignalX.Instance;
 
-        
         /// <summary>
-        /// Called by framework
+        ///     Called by framework
         /// </summary>
         /// <param name="user"></param>
         /// <param name="replyTo"></param>
         /// <param name="message"></param>
-        public void Receive(string user, string replyTo, dynamic message
+        public void Receive(
+            string user,
+            string replyTo,
+            dynamic message
             //, string groupName = null
-            )
+        )
         {
             //if (!string.IsNullOrEmpty(groupName))
             //{
@@ -33,12 +33,11 @@ namespace SignalXLib.Lib
                 IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
 
                 hubContext.Clients.Client(user).broadcastMessage(replyTo, message);
-
             }
         }
 
         /// <summary>
-        /// Called by framework
+        ///     Called by framework
         /// </summary>
         /// <param name="clientName"></param>
         /// <param name="message"></param>
@@ -53,7 +52,7 @@ namespace SignalXLib.Lib
         }
 
         /// <summary>
-        /// Called by framework
+        ///     Called by framework
         /// </summary>
         /// <param name="clientName"></param>
         /// <param name="message"></param>
@@ -68,7 +67,7 @@ namespace SignalXLib.Lib
         }
 
         /// <summary>
-        /// Called by framework
+        ///     Called by framework
         /// </summary>
         /// <param name="contextConnectionId"></param>
         /// <param name="methods"></param>
@@ -85,14 +84,13 @@ namespace SignalXLib.Lib
             clients.Caller?.groupManager(message);
         }
 
-        public void RequestScripts(SignalX SignalX,HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
+        public void RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
         {
             SignalX.RespondToScriptRequest(context, clients, groups);
-           
         }
 
         /// <summary>
-        /// Call this to send message to server
+        ///     Call this to send message to server
         /// </summary>
         /// <param name="context"></param>
         /// <param name="clients"></param>
@@ -101,7 +99,7 @@ namespace SignalXLib.Lib
         /// <param name="replyTo"></param>
         /// <param name="sender"></param>
         /// <param name="messageId"></param>
-        public void SendMessageToServer(SignalX SignalX,HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId)
+        public void SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId)
         {
             SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId);
         }

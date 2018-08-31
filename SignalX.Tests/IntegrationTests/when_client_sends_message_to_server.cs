@@ -21,7 +21,7 @@
                                        };
                                      signalx.server.sample(100,'getSomethingCompleted');
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -34,8 +34,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -53,7 +53,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -66,8 +66,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -84,7 +84,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -97,8 +97,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -115,21 +115,21 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
                                 request =>
                                 {
-                                    assert.AreEqual<int>(100, request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.Message, "server must get the correct message");
                                     signalx.RespondToOthers(request.User, request.ReplyTo, 100);
                                 });
                             signalx.Server(
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -145,13 +145,13 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
                                 request =>
                                 {
-                                    assert.AreEqual<int>(100, request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.Message, "server must get the correct message");
                                     signalx.RespondToUser(request.User, request.ReplyTo, 100);
                                 });
                             signalx.Server(
@@ -173,7 +173,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -184,7 +184,7 @@
                                 });
                             signalx.Server(
                                 "sample2",
-                                request => { assert.AreEqual<int>(10, request.Message); });
+                                request => { assert.AreEqual(10, request.Message); });
                         });
                 });
         }
@@ -203,7 +203,7 @@
                                        };
                                      signalx.server.sample(100,'getSomethingCompleted');
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -216,8 +216,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -235,7 +235,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -248,8 +248,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -265,8 +265,8 @@
                                         signalx.server.sample(100,function(something) {
                                             signalx.server.sample2(10);
                                        });
-                                   }); ", 
-                        onAppStarted: () =>
+                                   }); ",
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -279,8 +279,8 @@
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -297,21 +297,21 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
                                 request =>
                                 {
-                                    assert.AreEqual<int>(100, request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.Message, "server must get the correct message");
                                     request.RespondToOthers(100);
                                 });
                             signalx.Server(
                                 "sample2",
                                 request => { result = (int)request.Message; });
                         },
-                        checks: () => { assert.AreEqual(result, 10); }
-                        );
+                        () => { assert.AreEqual(result, 10); }
+                    );
                 });
         }
 
@@ -327,7 +327,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -355,7 +355,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",
@@ -383,7 +383,7 @@
                                             signalx.server.sample2(10);
                                        });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.Server(
                                 "sample",

@@ -1,4 +1,8 @@
-﻿(function ($, window, undefined) {
+﻿/*!
+ * SignalX JavaScript Library v0.9.3-pre
+ * https://github.com/signalx
+ */
+(function ($, window, undefined) {
     var signalx = {};
     var context = {};
     signalx.logConnections = false;
@@ -129,7 +133,8 @@
         } catch (e) {
             signalx.error.f({
                 error: e,
-                description: "Error executing server client"
+                description: "Error executing server client",
+                context: request
             });
         }
 
@@ -180,6 +185,7 @@
                 } catch (e) {
                     signalx.error.f({
                         error: e,
+                        context: func,
                         description: "Error while executing method in signalx.ready"
                     });
                 }
@@ -253,7 +259,7 @@
                 dataType: "script",
                 success: function () {
                     $(function () {
-                        var chat = $.connection.signalXHub;
+                      var  chat = $.connection.signalXHub;
                         //debug
                         debuging("successfully loaded signalr script from /signalr/hubs ");
                         chat.client.groupManager = function (msg) {
@@ -267,15 +273,15 @@
                             join: function (grpName, f) {
                                 signalx.groupNotifications = [];
                                 signalx.groupNotifications.push(f);
-                                chat.server.joinGroup(grpName);
+                                 chat.server.joinGroup(grpName);
                             },
                             leave: function (grpName, f) {
                                 signalx.groupNotifications = [];
                                 signalx.groupNotifications.push(f);
-                                chat.server.leaveGroup(grpName);
+                                 chat.server.leaveGroup(grpName);
                             }
                         };
-                        chat.client.addMessage = function (message) {
+                         chat.client.addMessage = function (message) {
                             try {
                                 debuging("successfully loaded signalx script from server : " + message);
                                 var server = eval(message);
@@ -285,17 +291,20 @@
                                     }
                                 }
                                 isReady = true;
+                                (typeof  chat.server.signalXClientReady === "function") &&  chat.server.signalXClientReady();
                                 mailBox.run();
                             } catch (e) {
+                                (typeof  chat.server.signalXClientReadyError === "function") &&  chat.server.signalXClientReadyError("Error downloading script from server",e);
                                 signalx.error.f({
                                     error: e,
+                                    context: message,
                                     description: "Error downloading script from server"
                                 });
                                 throw e;
                             }
                         };
 
-                        chat.client.broadcastMessage = clientReceiver;
+                         chat.client.broadcastMessage = clientReceiver;
                         $.connection.hub.logging = signalx.error.logConnections;
                         $.connection.logging = signalx.error.logConnections;
 
@@ -309,7 +318,7 @@
                         promise.done(function () {
                             //debug
                             debuging("signalr hub started successfully. Now loading signalx script from hub");
-                            chat.server.getMethods();
+                             chat.server.getMethods();
                         }).fail(function (e) {
                             signalx.error.f({
                                 error: e,
@@ -347,4 +356,5 @@
     signalx.getConnectionId = function () {
         return $.connection.hub.id;
     };
+    signalx.ready(function() { });
 }(window.jQuery, window));

@@ -5,14 +5,26 @@
 
     public static class SingleWriterExtensions
     {
-        private sealed class ReadLockToken : IDisposable
+        public static IDisposable Read(this ReaderWriterLockSlim locker)
         {
-            private ReaderWriterLockSlim locker;
+            return new ReadLockToken(locker);
+        }
+
+        public static IDisposable Write(this ReaderWriterLockSlim locker)
+        {
+            return new WriteLockToken(locker);
+        }
+
+        sealed class ReadLockToken : IDisposable
+        {
+            ReaderWriterLockSlim locker;
+
             public ReadLockToken(ReaderWriterLockSlim sync)
             {
                 this.locker = sync;
                 sync.EnterReadLock();
             }
+
             public void Dispose()
             {
                 if (this.locker == null)
@@ -21,14 +33,17 @@
                 this.locker = null;
             }
         }
-        private sealed class WriteLockToken : IDisposable
+
+        sealed class WriteLockToken : IDisposable
         {
-            private ReaderWriterLockSlim locker;
+            ReaderWriterLockSlim locker;
+
             public WriteLockToken(ReaderWriterLockSlim sync)
             {
                 this.locker = sync;
                 sync.EnterWriteLock();
             }
+
             public void Dispose()
             {
                 if (this.locker == null)
@@ -36,15 +51,6 @@
                 this.locker.ExitWriteLock();
                 this.locker = null;
             }
-        }
-
-        public static IDisposable Read(this ReaderWriterLockSlim locker)
-        {
-            return new ReadLockToken(locker);
-        }
-        public static IDisposable Write(this ReaderWriterLockSlim locker)
-        {
-            return new WriteLockToken(locker);
         }
     }
 }

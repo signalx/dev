@@ -6,15 +6,15 @@ namespace SignalXLib.TestHelperLib
 
     public class SignalXAssertionLib
     {
-        public void AreNotEqual<T>(T item1, T item2, string message = "")
+        public void AreNotEqual<T>(T item1, object item2, string message = "")
         {
-            if (item1.Equals(item2))
+            if (item1.Equals(Convert.ChangeType(item2, typeof(T))))
                 throw new Exception($"Expected {item1} to be not equal to {item2} " + message);
         }
 
-        public void AreEqual<T>(T item1, T item2, string message = "")
+        public void AreEqual<T>(T item1, object item2, string message = "")
         {
-            if (!item1.Equals(item2))
+            if (!item1.Equals(Convert.ChangeType(item2, typeof(T))))
                 throw new Exception($"Expected {item1} to be equal to {item2} " + message);
         }
 

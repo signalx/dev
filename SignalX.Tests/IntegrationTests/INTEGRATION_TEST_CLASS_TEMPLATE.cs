@@ -16,19 +16,19 @@
                     int actual = 0;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
-                                     
                                    }); ",
-                        onAppStarted: () => { },
-                        checks: () => { assert.AreEqual(10000, actual); },
-                        events: new TestEventHandler(
+                        () => { },
+                        () => { assert.AreEqual(10000, actual); },
+                        new TestEventHandler(
                             () =>
                             {
                                 signalx.RunJavaScriptOnAllClients(
                                     $"return 100*100",
                                     answer => { actual = (int)answer; });
                             })
-                        );
-                },1);
+                    );
+                },
+                1);
         }
     }
 }
