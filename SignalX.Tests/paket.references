@@ -5,6 +5,7 @@ Microsoft.Owin.Hosting
 Microsoft.Owin.Security
 Newtonsoft.Json
 Owin
-NHtmlUnit
 MSTest.TestAdapter
 MSTest.TestFramework 
+Selenium.WebDriver
+Selenium.Firefox.WebDriver

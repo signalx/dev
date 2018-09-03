@@ -16,6 +16,7 @@
 
     public class SignalX : IDisposable
     {
+        
         internal static object padlock = new object();
         static readonly SignalXAgents SignalXAgents = new SignalXAgents();
         internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT";
@@ -23,7 +24,7 @@
         internal static string SIGNALXCLIENTDEBUGHANDLER = "SIGNALXCLIENTDEBUGHANDLER";
 
         public readonly string ClientDebugSnippet = @"
-                    signalx.debug(function(e){ signalx.ready(function(){ signalx.server." + SIGNALXCLIENTDEBUGHANDLER + @"(JSON.stringify(e),function(MSG){  });  }); });
+                    signalx.debug(function(ev,e){ signalx.ready(function(){ signalx.server." + SIGNALXCLIENTDEBUGHANDLER + @"(JSON.stringify(e),function(MSG){  });  }); });
                  ";
 
         public readonly string ClientErrorSnippet = @"
@@ -45,7 +46,7 @@
                             }
                             return false;
                         };
-                    signalx.error(function(e){ signalx.ready(function(){ signalx.server." + SIGNALXCLIENTERRORHANDLER + @"(JSON.stringify(e),function(MSG){  });  }); });
+                    signalx.error(function(ev,e){ signalx.ready(function(){ signalx.server." + SIGNALXCLIENTERRORHANDLER + @"(JSON.stringify(e),function(MSG){  });  }); });
 
                  ";
 

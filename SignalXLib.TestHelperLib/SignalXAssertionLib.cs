@@ -20,16 +20,16 @@ namespace SignalXLib.TestHelperLib
 
         public void AreTheSame(object item1, object item2, string message = "")
         {
-            var obj1 = JsonConvert.SerializeObject(item1);
-            var obj2 = JsonConvert.SerializeObject(item2);
+            string obj1 = JsonConvert.SerializeObject(item1);
+            string obj2 = JsonConvert.SerializeObject(item2);
             if (obj1 != obj2)
                 throw new Exception($"Expected {obj1} to be equal to {obj2} " + message);
         }
 
         public void AreDifferent(object item1, object item2, string message = "")
         {
-            var obj1 = JsonConvert.SerializeObject(item1);
-            var obj2 = JsonConvert.SerializeObject(item2);
+            string obj1 = JsonConvert.SerializeObject(item1);
+            string obj2 = JsonConvert.SerializeObject(item2);
             if (obj1 == obj2)
                 throw new Exception($"Expected {obj1} to be equal to {obj2} " + message);
         }
@@ -48,16 +48,14 @@ namespace SignalXLib.TestHelperLib
 
         public void Fail()
         {
-            throw  new Exception("This line was not expected to be reached");
+            throw new Exception("This line was not expected to be reached");
         }
 
         public void WaitForSomeTime(TimeSpan fromSeconds)
         {
             DateTime start = DateTime.Now;
             while ((DateTime.Now - start).TotalMilliseconds < fromSeconds.TotalMilliseconds)
-            {
-               Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();
-            }
+                Task.Delay(TimeSpan.FromMilliseconds(100)).Wait();
         }
     }
 }

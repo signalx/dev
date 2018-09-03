@@ -9,7 +9,12 @@
     [TestClass]
     public class when_server_receives_message_from_multiple_clients
     {
-        static readonly int numberOfRety = 1;
+        static readonly int numberOfRety = 0;
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+        }
 
         [TestMethod]
         public void server_should_not_be_able_to_send_message_to_clients_in_different_groups5()
@@ -20,6 +25,8 @@
                     SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(30);
                     SignalXTester.MaxTestWaitTimeBeforeChecks = TimeSpan.FromSeconds(30);
                     int counter = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         new List<string>
                         {
@@ -64,6 +71,8 @@
                 {
                     SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(30);
                     int counter = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         new List<string>
                         {
@@ -108,6 +117,8 @@
                 {
                     SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(30);
                     int counter = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         new List<string>
                         {
@@ -152,6 +163,8 @@
                 {
                     //SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(30);
                     int counter = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         new List<string>
                         {
@@ -193,6 +206,8 @@
                 {
                     SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(30);
                     int counter = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         new List<string>
                         {
@@ -235,6 +250,8 @@
                 {
                     //SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(30);
                     int counter = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         new List<string>
                         {
@@ -276,6 +293,8 @@
                 (signalx, assert) =>
                 {
                     int counter = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         new List<string>
                         {
@@ -318,6 +337,8 @@
                 {
                     int numberOfClients = 4;
                     int counter = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.server.sample(100);
@@ -342,6 +363,8 @@
                 {
                     int numberOfClients = 4;
                     int counter = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.server.sample(100);
@@ -365,6 +388,8 @@
                 (signalx, assert) =>
                 {
                     int counter = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         new List<string>
                         {
@@ -393,6 +418,8 @@
                 (signalx, assert) =>
                 {
                     int counter = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         new List<string>
                         {

@@ -491,8 +491,8 @@
                 return;
             }
 
-            var logRequestOnClient = signalX.Settings.LogAgentMessagesOnClient ? "console.log(message);" : "";
-            var logResponseOnClient = signalX.Settings.LogAgentMessagesOnClient ? "console.log(response);" : "";
+            var logRequestOnClient = signalX.Settings.LogAgentMessagesOnClient ? signalX.Settings.ClientLogScriptFunction+"(message);" : "";
+            var logResponseOnClient = signalX.Settings.LogAgentMessagesOnClient ? signalX.Settings.ClientLogScriptFunction+"(response);" : "";
             var receiveErrorsFromClient = (signalX.Settings.ReceiveErrorMessagesFromClient
                 ? signalX.ClientErrorSnippet : "") + (signalX.Settings.ReceiveDebugMessagesFromClient
                 ? signalX.ClientDebugSnippet : "");
@@ -501,12 +501,12 @@
                  signalx.client." + SignalX.SIGNALXCLIENTAGENT + @" = function (message) {
                    " + logRequestOnClient + @"
                    var response ={};
-                   try{ response={ Error : '', Result : eval('(function(){ '+message+' })()') }; }catch(err){  response = {Error : err, Result :'' }   }
+                   try{ response={ Error : '', Result : eval('(function(){ '+message+' })()') }; }catch(err){  response = {Error : err, Result :'' }; signalx.error.f({error:err,description:'error occured while evaluating server agent command',context:'server agent error context'});  }
                    " + logResponseOnClient + @"
                     signalx.server." + SignalX.SIGNALXCLIENTAGENT + @"(response,function(messageResponse){  });
                  };";
-            var methods = ";" +
-                signalX.Settings.SignalXServers.Aggregate(clientAgent + "window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})};var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")).Trim()
+            var methods = "; window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})};" +
+                signalX.Settings.SignalXServers.Aggregate(clientAgent + "var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")).Trim()
                 + "}; $sx; ";
 
             if (signalX.Settings.StartCountingInComingMessages)

@@ -5,5 +5,5 @@ Microsoft.Owin.Hosting
 Microsoft.Owin.Security
 Newtonsoft.Json
 Owin
-NHtmlUnit
-xunit
+Selenium.WebDriver
+Selenium.Firefox.WebDriver

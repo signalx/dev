@@ -14,6 +14,8 @@
                 (signalx, assert) =>
                 {
                     int actual = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                    }); ",

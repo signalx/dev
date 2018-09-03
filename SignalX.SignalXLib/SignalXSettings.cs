@@ -8,6 +8,8 @@
     public class SignalXSettings : IDisposable
     {
         internal string AuthenticationCookieName = "";
+
+        public string ClientLogScriptFunction = "console.log";
         internal long InComingCounter;
         internal long OutGoingCounter;
 

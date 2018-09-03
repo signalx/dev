@@ -15,6 +15,8 @@
                 {
                     bool failed = false;
                     signalx.AuthenticationHandler(request => false);
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.server.sample(100);
@@ -37,6 +39,8 @@
                 {
                     bool failed = false;
                     signalx.AuthenticationHandler(request => false);
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.server.sample(100);
@@ -63,6 +67,8 @@
                 {
                     bool failed = false;
                     signalx.AuthenticationHandler(request => false);
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.server.sample(100);
@@ -89,6 +95,8 @@
                 {
                     bool failed = false;
                     signalx.AuthenticationHandler(request => false);
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.server.sample(100);
@@ -115,6 +123,8 @@
                 {
                     bool failed = false;
                     signalx.AuthenticationHandler(request => false);
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.server.sample(100);
@@ -137,6 +147,8 @@
                 {
                     bool failed = false;
                     signalx.AuthenticationHandler(request => false);
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.server.sample(100);
@@ -162,6 +174,8 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.server.sample(100);

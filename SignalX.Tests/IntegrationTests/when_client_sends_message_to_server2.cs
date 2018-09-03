@@ -14,6 +14,8 @@
                 (signalx, assert) =>
                 {
                     int result = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function(something) {
@@ -45,6 +47,8 @@
                 (signalx, assert) =>
                 {
                     int result = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function(something) {
@@ -76,6 +80,8 @@
                 (signalx, assert) =>
                 {
                     int result = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function(something) {
@@ -107,6 +113,8 @@
                 (signalx, assert) =>
                 {
                     int result = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      var getSomethingCompletedPromise = signalx.server.sample(100);
@@ -139,6 +147,8 @@
                 (signalx, assert) =>
                 {
                     int result = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      var getSomethingCompletedPromise = signalx.server.sample(100);
@@ -171,6 +181,8 @@
                 (signalx, assert) =>
                 {
                     int result = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.client.getSomethingCompleted=function (something) {
@@ -203,6 +215,8 @@
                 (signalx, assert) =>
                 {
                     int result = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.client.getSomethingCompleted=function (something) {
@@ -235,6 +249,8 @@
                 (signalx, assert) =>
                 {
                     int result = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                         signalx.server.sample(100,function(something) {
@@ -266,6 +282,8 @@
                 (signalx, assert) =>
                 {
                     int result = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      var getSomethingCompletedPromise = signalx.server.sample(100);
@@ -298,6 +316,8 @@
                 (signalx, assert) =>
                 {
                     int result = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                                      signalx.client.getSomethingCompleted=function (something) {

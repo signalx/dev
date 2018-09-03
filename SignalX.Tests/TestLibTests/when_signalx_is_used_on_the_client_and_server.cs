@@ -13,6 +13,8 @@
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"",
                         () => { },
@@ -36,6 +38,9 @@
                 SignalXTester.RunAndExpectFailure(
                     (signalx, assert) =>
                     {
+                        SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                        SignalXTester.EmbedeLibraryScripts = true;
+
                         return new SignalXTestDefinition(
                             @"",
                             () => { },
@@ -63,6 +68,8 @@
                 (signalx, assert) =>
                 {
                     throw new Exception("signal x test exception thrown");
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"",
                         () => { },
@@ -87,6 +94,8 @@
                     (signalx, assert) =>
                     {
                         throw new Exception("signal x test exception thrown");
+                        SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                        SignalXTester.EmbedeLibraryScripts = true;
                         return new SignalXTestDefinition(
                             @"",
                             () => { },
@@ -117,6 +126,8 @@
                 SignalXTester.Run(
                     (signalx, assert) =>
                     {
+                        SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                        SignalXTester.EmbedeLibraryScripts = true;
                         return new SignalXTestDefinition(
                             @"",
                             () => { throw new Exception("signal x test exception thrown"); },
@@ -148,6 +159,8 @@
                     (signalx, assert) =>
                     {
                         SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(20);
+                        SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                        SignalXTester.EmbedeLibraryScripts = true;
                         return new SignalXTestDefinition(
                             @"",
                             () => { },
@@ -178,6 +191,8 @@
                 SignalXTester.Run(
                     (signalx, assert) =>
                     {
+                        SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                        SignalXTester.EmbedeLibraryScripts = true;
                         return new SignalXTestDefinition(
                             @"",
                             () => { },
@@ -209,6 +224,8 @@
                     (signalx, assert) =>
                     {
                         SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(20);
+                        SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                        SignalXTester.EmbedeLibraryScripts = true;
                         return new SignalXTestDefinition(
                             @"",
                             () => { },
@@ -240,6 +257,8 @@
                     (signalx, assert) =>
                     {
                         int count = 0;
+                        SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                        SignalXTester.EmbedeLibraryScripts = true;
                         return new SignalXTestDefinition(
                             @"",
                             () => { },
@@ -275,6 +294,8 @@
                 SignalXTester.Run(
                     (signalx, assert) =>
                     {
+                        SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                        SignalXTester.EmbedeLibraryScripts = true;
                         return new SignalXTestDefinition(
                             @"",
                             () => { },
@@ -303,6 +324,8 @@
             SignalXTester.RunAndExpectFailure(
                 (signalx, assert) =>
                 {
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"",
                         () => { throw new Exception("signal x test exception thrown"); },
@@ -326,6 +349,8 @@
                 {
                     SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(20);
 
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"",
                         () => { },
@@ -347,6 +372,8 @@
             SignalXTester.RunAndExpectFailure(
                 (signalx, assert) =>
                 {
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"",
                         () => { },
@@ -369,6 +396,8 @@
                 (signalx, assert) =>
                 {
                     SignalXTester.MaxTestTimeSpan = TimeSpan.FromSeconds(20);
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"",
                         () => { },
@@ -391,6 +420,8 @@
                 (signalx, assert) =>
                 {
                     int count = 0;
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"",
                         () => { },
@@ -417,6 +448,8 @@
             SignalXTester.RunAndExpectFailure(
                 (signalx, assert) =>
                 {
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
+                    SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"",
                         () => { },
