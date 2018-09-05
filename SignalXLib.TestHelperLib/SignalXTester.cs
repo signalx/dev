@@ -9,6 +9,7 @@ namespace SignalXLib.TestHelperLib
     using System.Diagnostics;
     using System.IO;
     using System.Net;
+    using System.Net.NetworkInformation;
     using System.Net.Sockets;
     using System.Runtime.CompilerServices;
     using System.Security.Permissions;
@@ -22,7 +23,10 @@ namespace SignalXLib.TestHelperLib
         public static TimeSpan MaxTestWaitTimeBeforeChecks = TimeSpan.FromSeconds(3);
         public static bool EmbedeLibraryScripts = true;
         public static TimeSpan MaxWaitTimeForAllExpectedConnectionsToArrive = TimeSpan.FromSeconds(30);
-
+        /// <summary>
+        /// Specify the method that generates the file name of each web page used in test
+        /// </summary>
+        public static Func<string> TestFileNameGenerator = () => Guid.NewGuid().ToString();
         /// <summary>
         ///     Sets this only when none is specified in each test
         /// </summary>
@@ -147,19 +151,32 @@ namespace SignalXLib.TestHelperLib
                 }
             }
         }
+        
 
-        //  private static SignalX SignalX;
-
-        // internal static string FileName;
-        //internal static string FilePath;
-
-        internal static int FreeTcpPort()
+        /// <summary>
+        /// Dynamically specify what port to use to run test
+        /// </summary>
+        public static Func<int> TcpPortNumberGenerator = () =>
         {
             var l = new TcpListener(IPAddress.Loopback, 0);
             l.Start();
             int port = ((IPEndPoint)l.LocalEndpoint).Port;
             l.Stop();
             return port;
+        };
+
+        internal static bool IsPortIsAvailable(int port)
+        {
+            IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+            TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
+            foreach (TcpConnectionInformation t in tcpConnInfoArray)
+            {
+                if (t.LocalEndPoint.Port == port)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         internal static void Run(ExceptionTracker exceptionTracker, SignalX signalX, SignalXTestDefinition scenarioDefinition)
@@ -203,7 +220,7 @@ namespace SignalXLib.TestHelperLib
 
                 var testObject = new TestObject();
                 testObject.BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                testObject.FileName = "\\index" + Guid.NewGuid() + ".html";
+                testObject.FileName = "\\index" + TestFileNameGenerator()+ ".html";
                 testObject.PageHtml = WrapScriptInHtml(scriptTags, script, "<h1>Signalx tests running ....</h1>");
 
                 testObject = scenarioDefinition.OnClientPrepared == null ? testObject : scenarioDefinition.OnClientPrepared.Invoke(testObject);
@@ -216,12 +233,18 @@ namespace SignalXLib.TestHelperLib
             scenarioDefinition.TestEvents = scenarioDefinition.TestEvents ?? new TestEventHandler();
             scenarioDefinition.TestEvents.OnAppStarted = () => { scenarioDefinition?.OnAppStarted?.Invoke(); };
 
+            var port = TcpPortNumberGenerator();
+            if (!IsPortIsAvailable(port))
+            {
+                throw new Exception($"The specified tcp port {port} is already in use");
+            }
+
             CheckExpectations(
                 exceptionTracker,
                 signalX,
                 scenarioDefinition.NumberOfClients,
                 () => { scenarioDefinition?.Checks?.Invoke(); },
-                "http://localhost:" + FreeTcpPort(),
+                "http://localhost:" +port ,
                 testObjects,
                 scenarioDefinition.BrowserType,
                 scenarioDefinition.TestEvents);

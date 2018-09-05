@@ -5,7 +5,7 @@ namespace SignalXLib.ConsoleTests
     using Microsoft.Owin.Hosting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using Xunit;
+   
     using TestObject = SignalXLib.TestHelperLib.TestObject;
 
     internal class Program

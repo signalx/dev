@@ -37,7 +37,7 @@
 
         internal IDisposable MyApp { get; set; }
 
-        internal Func<IRequest, bool> AuthenticatedWhen { set; get; }
+        internal Func<SignalXRequest, bool> AuthenticatedWhen { set; get; }
 
         internal List<Action<string, object>> WarningHandler { set; get; }
 

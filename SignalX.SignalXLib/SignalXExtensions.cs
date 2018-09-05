@@ -3,6 +3,7 @@
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
@@ -10,7 +11,7 @@
 
     public static class SignalXExtensions
     {
-      
+
 
         #region METHODS
 
@@ -73,14 +74,36 @@
                 signalX.UpdateClient(s, false);
         }
 
-        internal static bool CanProcess(this SignalX signalX, HubCallerContext context, string serverHandlerName)
+        internal static bool CanProcess(this SignalX signalX, HubCallerContext context, string serverHandlerName, SignalXRequest request,bool isScriptRequest)
         {
             bool result = false;
-            if (signalX.Settings.RequireAuthorizationForAllHandlers || signalX.Settings.SignalXServerExecutionDetails.ContainsKey(serverHandlerName) && signalX.Settings.SignalXServerExecutionDetails[serverHandlerName].RequiresAuthorization)
+
+            if (isScriptRequest)
+            {
+                return true;
+            }
+
+            if (signalX.Settings.SignalXServerExecutionDetails.ContainsKey(serverHandlerName))
+            {
+               var allowedGroups = signalX.Settings.SignalXServerExecutionDetails[serverHandlerName].AllowedGroups;
+                
+               foreach (var allowedGroup in allowedGroups)
+                {
+                    if (!request.Groups.Contains(allowedGroup))
+                    {
+                        signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestAuthorizationFailed.ToString(), $"Authorization failed : The request does not contain group {allowedGroup} and is therefore denied access to {serverHandlerName}"));
+                        return false;
+                    }
+                }
+            }
+
+            if (signalX.Settings.RequireAuthorizationForAllHandlers ||
+                signalX.Settings.SignalXServerExecutionDetails.ContainsKey(serverHandlerName) &&
+                signalX.Settings.SignalXServerExecutionDetails[serverHandlerName].RequiresAuthorization)
             {
                 if (signalX.Settings.AuthenticatedWhen != null)
                 {
-                    result = signalX.IsAuthenticated(context.Request);
+                    result = signalX.IsAuthenticated(context.Request, request);
                 }
                 else
                 {
@@ -98,14 +121,14 @@
             return result;
         }
 
-        internal static bool IsAuthenticated(this SignalX signalX, IRequest request)
+        internal static bool IsAuthenticated(this SignalX signalX, IRequest request, SignalXRequest sRequest)
         {
             bool result;
             try
             {
                 //var cookie = request?.Cookies[AuthenticationCookieName];
                 //var ip = request?.Environment["server.RemoteIpAddress"]?.ToString();
-                result = signalX.Settings.AuthenticatedWhen(request);
+                result = signalX.Settings.AuthenticatedWhen(sRequest);
                 if (!result)
                     signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestAuthorizationFailed.ToString(), "Authorization failed after checking with Custom Authorization provided"));
             }
@@ -127,7 +150,7 @@
         //    AuthenticationCookieName = cookieName ?? throw new ArgumentNullException(nameof(cookieName));
         //    AuthenticatedWhen = handler ?? throw new ArgumentNullException(nameof(handler));
         //}
-        public static void AuthenticationHandler(this SignalX signalX, Func<IRequest, bool> handler)
+        public static void AuthenticationHandler(this SignalX signalX, Func<SignalXRequest, bool> handler)
         {
             if (handler == null)
                 throw new ArgumentNullException(nameof(handler));
@@ -214,6 +237,7 @@
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
         /// <param name="server"></param>
+        /// <param name="groupName"></param>
         /// <param name="requireAuthorization">
         ///     Indicates if the set authorization should be checked before allowing access to the
         ///     server
@@ -227,10 +251,12 @@
             this SignalX signalX,
             string name,
             Action<SignalXRequest, SignalXServerState> server,
+            List<string> groupName = null,
             bool requireAuthorization = false,
             bool isSingleWriter = false,
             bool allowDynamicServerForThisInstance = false)
         {
+            groupName = groupName ?? new List<string>();
             name = name.Trim();
             string camelCased = char.ToLowerInvariant(name[0]) + name.Substring(1);
             string unCamelCased = char.ToUpperInvariant(name[0]) + name.Substring(1);
@@ -243,23 +269,23 @@
                 if (signalX.Settings.SignalXServers.ContainsKey(camelCased))
                 {
                     signalX.Settings.SignalXServers[camelCased] = server;
-                    signalX.Settings.SignalXServerExecutionDetails[camelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter);
+                    signalX.Settings.SignalXServerExecutionDetails[camelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupName);
 
                     if (camelCased != unCamelCased)
                     {
                         signalX.Settings.SignalXServers[unCamelCased] = server;
-                        signalX.Settings.SignalXServerExecutionDetails[unCamelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter);
+                        signalX.Settings.SignalXServerExecutionDetails[unCamelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupName);
                     }
                 }
                 else
                 {
                     signalX.Settings.SignalXServers.GetOrAdd(camelCased, server);
-                    signalX.Settings.SignalXServerExecutionDetails.GetOrAdd(camelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter));
+                    signalX.Settings.SignalXServerExecutionDetails.GetOrAdd(camelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupName));
 
                     if (camelCased != unCamelCased)
                     {
                         signalX.Settings.SignalXServers.GetOrAdd(unCamelCased, server);
-                        signalX.Settings.SignalXServerExecutionDetails.GetOrAdd(unCamelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter));
+                        signalX.Settings.SignalXServerExecutionDetails.GetOrAdd(unCamelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupName));
                     }
                 }
             }
@@ -270,14 +296,14 @@
         }
 
         /// <summary>
-        ///     Sets us a server that requires authorization to be checked before it is called
+        ///     Sets up a server that requires authorization to be checked before it is called
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
         /// <param name="server"></param>
-        public static void ServerAuthorized(this SignalX signalX, string name, Action<SignalXRequest> server)
+        public static void ServerAuthorized(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames=null)
         {
-            signalX.ServerAuthorized(name, (r, s) => server(r));
+            signalX.ServerAuthorized(name, (r, s) => server(r), groupNames);
         }
 
         /// <summary>
@@ -287,9 +313,9 @@
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
         /// <param name="server"></param>
-        public static void ServerAuthorizedSingleAccess(this SignalX signalX, string name, Action<SignalXRequest> server)
+        public static void ServerAuthorizedSingleAccess(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames = null)
         {
-            signalX.ServerAuthorizedSingleAccess(name, (r, s) => server(r));
+            signalX.ServerAuthorizedSingleAccess(name, (r, s) => server(r),groupNames);
         }
 
         /// <summary>
@@ -298,10 +324,11 @@
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
         /// <param name="server"></param>
+        /// <param name="groupName"></param>
         /// <param name="requireAuthorization"></param>
-        public static void Server(this SignalX signalX, string name, Action<SignalXRequest> server, bool requireAuthorization = false)
+        public static void Server(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames = null, bool requireAuthorization = false)
         {
-            signalX.Server(name, (r, s) => server(r), requireAuthorization);
+            signalX.Server(name, (r, s) => server(r), groupName: groupNames, requireAuthorization: requireAuthorization);
         }
 
         /// <summary>
@@ -310,10 +337,11 @@
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
         /// <param name="server"></param>
+        /// <param name="groupName"></param>
         /// <param name="requireAuthorization"></param>
-        public static void ServerSingleAccess(this SignalX signalX, string name, Action<SignalXRequest> server, bool requireAuthorization = false)
+        public static void ServerSingleAccess(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames = null, bool requireAuthorization = false)
         {
-            signalX.Server(name, (r, s) => server(r), requireAuthorization, true);
+            signalX.Server(name, (r, s) => server(r), requireAuthorization: requireAuthorization, groupName: groupNames, isSingleWriter: true);
         }
 
         /// <summary>
@@ -322,9 +350,10 @@
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
         /// <param name="server"></param>
-        public static void ServerAuthorized(this SignalX signalX, string name, Action<SignalXRequest, SignalXServerState> server)
+        /// <param name="groupName"></param>
+        public static void ServerAuthorized(this SignalX signalX, string name, Action<SignalXRequest, SignalXServerState> server, List<string> groupNames = null)
         {
-            signalX.Server(name, server, true);
+            signalX.Server(name, server, requireAuthorization: true, groupName: groupNames);
         }
 
         /// <summary>
@@ -334,9 +363,10 @@
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
         /// <param name="server"></param>
-        public static void ServerAuthorizedSingleAccess(this SignalX signalX, string name, Action<SignalXRequest, SignalXServerState> server)
+        /// <param name="groupName"></param>
+        public static void ServerAuthorizedSingleAccess(this SignalX signalX, string name, Action<SignalXRequest, SignalXServerState> server, List<string> groupNames = null)
         {
-            signalX.Server(name, server, true, true);
+            signalX.Server(name, server, groupName: groupNames, requireAuthorization: true, isSingleWriter: true);
         }
 
         public static async Task<double> GetOutGoingMessageSpeedAsync(this SignalX signalX, TimeSpan duration)
@@ -458,7 +488,7 @@
             groups.Add(context?.ConnectionId, groupName);
             signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXGroupJoin.ToString(), groupName));
 
-            signalX.Settings.Receiver.ReceiveInGroupManager(context?.ConnectionId, groupName, context, clients, groups);
+            signalX.Settings.Receiver.ReceiveInGroupManager("join", context?.ConnectionId, groupName, context, clients, groups);
         }
 
         internal static void LeaveGroup(
@@ -471,7 +501,7 @@
             groups.Remove(context?.ConnectionId, groupName);
             signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXGroupLeave.ToString(), groupName));
 
-            signalX.Settings.Receiver.ReceiveInGroupManager(context?.ConnectionId, groupName, context, clients, groups);
+            signalX.Settings.Receiver.ReceiveInGroupManager("leave", context?.ConnectionId, groupName, context, clients, groups);
         }
         public static string GenerateUniqueNameId()
         {
@@ -485,14 +515,14 @@
             IGroupManager groups)
         {
             signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestForMethods.ToString(), context?.User?.Identity?.Name));
-            if (!signalX.CanProcess(context, ""))
+            if (!signalX.CanProcess(context, "", null, true))
             {
                 signalX.Settings.WarningHandler.ForEach(h => h?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required"));
                 return;
             }
 
-            var logRequestOnClient = signalX.Settings.LogAgentMessagesOnClient ? signalX.Settings.ClientLogScriptFunction+"(message);" : "";
-            var logResponseOnClient = signalX.Settings.LogAgentMessagesOnClient ? signalX.Settings.ClientLogScriptFunction+"(response);" : "";
+            var logRequestOnClient = signalX.Settings.LogAgentMessagesOnClient ? signalX.Settings.ClientLogScriptFunction + "(message);" : "";
+            var logResponseOnClient = signalX.Settings.LogAgentMessagesOnClient ? signalX.Settings.ClientLogScriptFunction + "(response);" : "";
             var receiveErrorsFromClient = (signalX.Settings.ReceiveErrorMessagesFromClient
                 ? signalX.ClientErrorSnippet : "") + (signalX.Settings.ReceiveDebugMessagesFromClient
                 ? signalX.ClientDebugSnippet : "");
@@ -506,7 +536,7 @@
                     signalx.server." + SignalX.SIGNALXCLIENTAGENT + @"(response,function(messageResponse){  });
                  };";
             var methods = "; window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})};" +
-                signalX.Settings.SignalXServers.Aggregate(clientAgent + "var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId); if(repTo){return messageId}else{ return deferred.promise();}   },")).Trim()
+                signalX.Settings.SignalXServers.Aggregate(clientAgent + "var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  var messageToSend={handler:'" + signalXServer.Key + "',message:m, replyTo:rt,sender:sen, groupList:signalx.groupList}; console.log(JSON.stringify(signalx.groupList));  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId,signalx.groupList||[]); if(repTo){return messageId}else{ return deferred.promise();}   },")).Trim()
                 + "}; $sx; ";
 
             if (signalX.Settings.StartCountingInComingMessages)

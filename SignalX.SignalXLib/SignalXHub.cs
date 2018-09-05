@@ -1,6 +1,7 @@
 ﻿namespace SignalXLib.Lib
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNet.SignalR;
@@ -11,16 +12,17 @@
     {
         readonly SignalX signalX = SignalX.Instance;
 
-        public void Send(string handler, dynamic message, string replyTo, dynamic sender, string messageId)
+        //not async because it already behaves as async from client clide
+        public void Send(string handler, dynamic message, string replyTo, dynamic sender, string messageId, List<string> groups)
         {
-            this.signalX.SendMessageToServer(this.Context, this.Clients, this.Groups, handler, message, replyTo, sender, messageId);
+            this.signalX.SendMessageToServer(this.Context, this.Clients, this.Groups, handler, message, replyTo, sender, messageId, groups);
         }
-
+        //not async because it already behaves as async from client clide
         public void JoinGroup(string groupName)
         {
             this.signalX.JoinGroup(this.Context, this.Clients, this.Groups, groupName);
         }
-
+        //not async because it already behaves as async from client clide
         public void LeaveGroup(string groupName)
         {
             this.signalX.LeaveGroup(this.Context, this.Clients, this.Groups, groupName);

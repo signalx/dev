@@ -31,7 +31,7 @@
                     ISignalXClientReceiver Receiver = signalx.Settings.Receiver;
                     bool RequireAuthorizationForAllHandlers = signalx.Settings.RequireAuthorizationForAllHandlers;
 
-                    signalx.AuthenticationHandler(request => true);
+                    signalx.AuthenticationHandler((request) => true);
                     signalx.DisableAllClients();
                     signalx.DisableClient("test");
                     signalx.EnableAllClients();
@@ -39,7 +39,7 @@
                     signalx.GetInComingMessageSpeedAsync(TimeSpan.FromSeconds(10));
                     signalx.GetOutGoingMessageSpeedAsync(TimeSpan.FromSeconds(10));
                     signalx.SetGlobalDefaultMessageBufferSize(1000);
-                    signalx.AuthenticationHandler(r => true);
+                    signalx.AuthenticationHandler((r)=> true);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition("")

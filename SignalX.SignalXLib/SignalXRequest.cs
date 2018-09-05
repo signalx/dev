@@ -1,13 +1,15 @@
 ﻿namespace SignalXLib.Lib
 {
     using System;
+    using System.Collections.Generic;
     using System.Security.Principal;
+    using Microsoft.AspNet.SignalR;
 
     public class SignalXRequest
     {
         readonly SignalX SignalX;
 
-        public SignalXRequest(SignalX signalX, string replyTo, object sender, string messageId, dynamic message, string user, string handler, IPrincipal principalUser)
+        internal SignalXRequest(SignalX signalX, string replyTo, object sender, string messageId, dynamic message, string user, string handler, IPrincipal principalUser,List<string> groups, IRequest request)
         {
             this.SignalX = signalX ?? throw new ArgumentNullException(nameof(signalX));
             this.ReplyTo = replyTo;
@@ -18,11 +20,14 @@
             this.User = user;
             this.Handler = handler;
             this.PrincipalUser = principalUser;
+            this.Groups = groups?? new List<string>();
+            Request = request;
         }
 
         // public string UserId { get; set; }
 
         public string ReplyTo { get; }
+        public List<string> Groups { get; }
 
         public object Sender { get; }
 
@@ -38,7 +43,7 @@
         public string User { get; }
 
         public IPrincipal PrincipalUser { get; }
-
+        public IRequest Request { get; }
         public string Handler { get; }
 
         //public void RespondToAll(object response, string groupName = null)
@@ -59,11 +64,11 @@
             this.SignalX.RespondToAll(replyTo, response);
         }
 
-        public void RespondToUser(string userId, string replyTo, object response)
-        {
-            if (replyTo == null) throw new ArgumentNullException(nameof(replyTo));
-            this.SignalX.RespondToUser(userId, replyTo, response);
-        }
+        //public void RespondToUser(string userId, string replyTo, object response)
+        //{
+        //    if (replyTo == null) throw new ArgumentNullException(nameof(replyTo));
+        //    this.SignalX.RespondToUser(userId, replyTo, response);
+        //}
 
         /// <summary>
         ///     Reply to a specific client

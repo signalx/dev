@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExceptionTracker.cs" />
     <Compile Include="ScriptLibraries.cs" />
     <Compile Include="SignalXAssertionLib.cs" />
     <Compile Include="BrowserType.cs" />

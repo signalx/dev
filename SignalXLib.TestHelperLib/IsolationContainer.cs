@@ -29,22 +29,25 @@ var appendHtml= function (el, str) {
 }
  appendHtml(document.body,html);
 })";
-            sx.SetUpClientErrorMessageHandler((error, request) => { throw new Exception($"Failed because an error has occurred on the client side script during a test '{this.TestName.Replace("_", " ")}'  {error}"); });
+            sx.SetUpClientErrorMessageHandler(
+                (error, request) =>
+                {
+                    throw new Exception($"Failed because an error has occurred on the client side script during a test '{this.TestName.Replace("_", " ")}'  {error}");
+                });
             var exceptionTracker = new ExceptionTracker
             {
                 Exception = null
             };
             sx.OnException(
-                e => { exceptionTracker.Exception = e; });
+               (m, e) =>
+                {
+                    exceptionTracker.Exception = new Exception(m,e);
+                    exceptionTracker.Context = m;
+                });
             if (this.MethodBody != null)
                 SignalXTester.Run(exceptionTracker, sx, this.MethodBody?.Invoke(sx, new SignalXAssertionLib()));
             if (this.MethodBody2 != null)
                 SignalXTester.Run(exceptionTracker, sx, this.MethodBody2?.Invoke(sx));
         }
-    }
-
-    public class ExceptionTracker
-    {
-        public Exception Exception { get; set; }
     }
 }

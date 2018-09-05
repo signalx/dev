@@ -1,48 +1,58 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
 
     [TestClass]
-    public class when_server_receives_message_from_client
+    public class when_authorized_server_receives_message_from_client_in_a_group
     {
         [TestMethod]
-        public void server_should_not_block_request_that_fails_authorization_when_ServerSingleAccess_is_used_when_Authentication_fails()
+        public void group_authorized_server_should_not_block_request_that_fails_authorization_when_ServerSingleAccess_is_used_when_Authentication_fails()
         {
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
+                 
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => false);
+                    signalx.AuthenticationHandler((request) => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
+                             signalx.groups.join('groupA');
                                      signalx.server.sample(100);
                                    }); ",
                         () =>
                         {
                             signalx.ServerSingleAccess(
                                 "sample",
-                                request => { failed = true; });
+                                request =>
+                                {
+                                    failed = true;
+                                });
                         },
-                        () => { assert.IsTrue(failed); });
+                        () =>
+                        {
+                            assert.IsTrue(failed);
+                        });
                 });
         }
 
         [TestMethod]
-        public void server_should_not_block_request_that_fails_authorization_when_ServerSingleAccess_is_used()
+        public void group_authorized_server_should_not_block_request_that_fails_authorization_when_ServerSingleAccess_is_used()
         {
             SignalXTester.RunAndExpectFailure(
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => false);
+                    signalx.AuthenticationHandler((request) => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
+                             signalx.groups.join('groupA');
                                      signalx.server.sample(100);
                                    }); ",
                         () =>
@@ -60,17 +70,18 @@
         }
 
         [TestMethod]
-        public void server_should_block_request_that_fails_authorization_when_ServerAuthorizedSingleAccess_is_used()
+        public void group_authorized_server_should_block_request_that_fails_authorization_when_ServerAuthorizedSingleAccess_is_used()
         {
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => false);
+                    signalx.AuthenticationHandler((request) => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
+                             signalx.groups.join('groupA');
                                      signalx.server.sample(100);
                                    }); ",
                         () =>
@@ -88,17 +99,18 @@
         }
 
         [TestMethod]
-        public void server_should_block_request_that_fails_authorization_when_serverAuthorized_is_used()
+        public void group_authorized_server_should_block_request_that_fails_authorization_when_serverAuthorized_is_used()
         {
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => false);
+                    signalx.AuthenticationHandler((request) => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
+                             signalx.groups.join('groupA');
                                      signalx.server.sample(100);
                                    }); ",
                         () =>
@@ -116,17 +128,18 @@
         }
 
         [TestMethod]
-        public void server_should_not_block_request_that_fails_authorization_when_serverAuthorized_is_not_used2()
+        public void group_authorized_server_should_not_block_request_that_fails_authorization_when_serverAuthorized_is_not_used2()
         {
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => false);
+                    signalx.AuthenticationHandler((request) => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
+                             signalx.groups.join('groupA');
                                      signalx.server.sample(100);
                                    }); ",
                         () =>
@@ -140,17 +153,18 @@
         }
 
         [TestMethod]
-        public void server_should_not_block_request_that_fails_authorization_when_serverAuthorized_is_not_used()
+        public void group_authorized_server_should_not_block_request_that_fails_authorization_when_serverAuthorized_is_not_used()
         {
             SignalXTester.RunAndExpectFailure(
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => false);
+                    signalx.AuthenticationHandler((request) => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
+                             signalx.groups.join('groupA');
                                      signalx.server.sample(100);
                                    }); ",
                         () =>
@@ -168,16 +182,18 @@
         }
 
         [TestMethod]
-        public void server_cannot_block_request_that_fails_when_no_authorization_is_set()
+        public void group_authorized_server_cannot_block_request_that_fails_when_no_authorization_is_set()
         {
             SignalXTester.RunAndExpectFailure(
                 (signalx, assert) =>
                 {
                     bool failed = false;
+
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
+                             signalx.groups.join('groupA');
                                      signalx.server.sample(100);
                                    }); ",
                         () =>

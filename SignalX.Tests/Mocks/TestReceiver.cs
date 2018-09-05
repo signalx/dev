@@ -1,6 +1,7 @@
 ﻿namespace SignalXLib.Tests
 {
     using System;
+    using System.Collections.Generic;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using SignalXLib.Lib;
@@ -49,7 +50,7 @@
             this.LastMessageReceived.Script = script;
         }
 
-        public void ReceiveInGroupManager(string userId, dynamic message, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
+        public void ReceiveInGroupManager(string operation, string userId, dynamic message, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
         {
             this.LastMessageReceived = new TestMessageModel();
             this.LastMessageReceived.UserId = userId;
@@ -61,9 +62,9 @@
             SignalX.RespondToScriptRequest(context, clients, groups);
         }
 
-        public void SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId)
+        public void SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId, List<string> groupList)
         {
-            SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId);
+            SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList);
         }
     }
 }

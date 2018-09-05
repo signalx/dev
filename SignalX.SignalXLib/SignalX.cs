@@ -1,6 +1,7 @@
 ﻿namespace SignalXLib.Lib
 {
     using System;
+    using System.Collections.Generic;
     using System.Security.Principal;
     using System.Threading;
     using Microsoft.AspNet.SignalR;
@@ -116,7 +117,8 @@
             dynamic message,
             string replyTo,
             object sender,
-            string messageId)
+            string messageId,
+            List<string> groupList)
         {
             IPrincipal user = context?.User;
             string error = "";
@@ -144,15 +146,15 @@
                     this.RespondToUser(context?.ConnectionId, replyTo, e);
                     return;
                 }
+               var request = new SignalXRequest(this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User, groupList, context?.Request);
 
-                if (!this.CanProcess(context, handler))
+                if (!this.CanProcess(context: context, serverHandlerName: handler, request: request, isScriptRequest: false))
                 {
                     this.Settings.WarningHandler.ForEach(h => h?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required"));
                     return;
                 }
 
-                var request = new SignalXRequest(this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User);
-
+               
                 this.CallServer(request);
             }
             catch (Exception e)

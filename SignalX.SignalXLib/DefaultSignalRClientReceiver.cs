@@ -1,5 +1,6 @@
 ﻿namespace SignalXLib.Lib
 {
+    using System.Collections.Generic;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using Microsoft.AspNet.SignalR.Infrastructure;
@@ -79,9 +80,19 @@
             clients.Caller?.addMessage(methods);
         }
 
-        public void ReceiveInGroupManager(string userId, dynamic message, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
+        /// <summary>
+        /// Notifies client using its callback that the group has been added successfully
+        /// signalx.groups.join(name, callback : function(groupName){ })
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="userId"></param>
+        /// <param name="groupName"></param>
+        /// <param name="context"></param>
+        /// <param name="clients"></param>
+        /// <param name="groups"></param>
+        public void ReceiveInGroupManager(string operation,string userId, dynamic groupName, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
         {
-            clients.Caller?.groupManager(message);
+            clients.Caller?.groupManager(groupName, operation);
         }
 
         public void RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
@@ -92,16 +103,19 @@
         /// <summary>
         ///     Call this to send message to server
         /// </summary>
+        /// <param name="SignalX"></param>
         /// <param name="context"></param>
         /// <param name="clients"></param>
+        /// <param name="groups"></param>
         /// <param name="handler"></param>
         /// <param name="message"></param>
         /// <param name="replyTo"></param>
         /// <param name="sender"></param>
         /// <param name="messageId"></param>
-        public void SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId)
+        /// <param name="groupList"></param>
+        public void SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId, List<string> groupList)
         {
-            SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId);
+            SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList);
         }
     }
 }

@@ -9,7 +9,7 @@
         protected override bool AuthorizeRequest(IRequest request)
         {
             if (this.SignalX.Settings.RequireAuthorizationForPersistentConnections)
-                return this.SignalX.IsAuthenticated(request);
+                return this.SignalX.IsAuthenticated(request, null);
             return base.AuthorizeRequest(request);
         }
     }

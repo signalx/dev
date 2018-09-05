@@ -33,9 +33,9 @@
                     //removed coz of possibility of result aggregation from clients
                     // SignalX.OnResponseAfterScriptRuns = null;
                 },
-                false,
-                false,
-                true);
+                requireAuthorization: false,
+                isSingleWriter: false,
+                allowDynamicServerForThisInstance: true);
 
             SignalX.Server(
                 SignalX.SIGNALXCLIENTERRORHANDLER,
@@ -52,9 +52,9 @@
                         SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
                     }
                 },
-                false,
-                false,
-                true);
+                requireAuthorization: false,
+                isSingleWriter: false,
+                allowDynamicServerForThisInstance: true);
 
             SignalX.Server(
                 SignalX.SIGNALXCLIENTDEBUGHANDLER,
@@ -70,9 +70,9 @@
                         SignalX.Settings.WarningHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
                     }
                 },
-                false,
-                false,
-                true);
+                requireAuthorization: false,
+                isSingleWriter: false,
+                allowDynamicServerForThisInstance: true);
         }
     }
 }

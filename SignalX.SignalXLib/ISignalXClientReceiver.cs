@@ -1,5 +1,6 @@
 ﻿namespace SignalXLib.Lib
 {
+    using System.Collections.Generic;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
 
@@ -13,7 +14,7 @@
 
         void ReceiveScripts(string contextConnectionId, string script, HubCallerContext context, IGroupManager groups, IHubCallerConnectionContext<dynamic> clients);
 
-        void ReceiveInGroupManager(string userId, dynamic message, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups);
+        void ReceiveInGroupManager(string operation, string userId, dynamic groupName, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups);
 
         void RequestScripts(
             SignalX SignalX,
@@ -30,6 +31,7 @@
             dynamic message,
             string replyTo,
             object sender,
-            string messageId);
+            string messageId,
+            List<string> groupList);
     }
 }

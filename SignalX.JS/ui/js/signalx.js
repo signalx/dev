@@ -30,6 +30,7 @@
             signalx.waitingList.w[n] = f;
         }
     };
+    signalx.groupList = signalx.groupList || [];
     signalx.waitingList.w = signalx.waitingList.w || {};
     //debug
     signalx.debug.f ("starting lib");
@@ -86,7 +87,7 @@
         window.signalxidgen = window.signalxidgen || function () {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 var r = Math.random() * 16 | 0,
-                    v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    v = c === 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
         };
@@ -262,10 +263,17 @@
                       var  chat = $.connection.signalXHub;
                         //debug
                         signalx.debug.f ("successfully loaded signalr script from /signalr/hubs ");
-                        chat.client.groupManager = function (msg) {
+                        chat.client.groupManager = function (groupName, operation) {
+                            
+                            if (operation === "join") {
+                                signalx.groupList.push(groupName);
+                            }
+                            if (operation === "leave") {
+                                signalx.groupList = signalx.groupList.filter(e => e !== groupName); 
+                            }
                             signalx.groupNotifications = signalx.groupNotifications || [];
                             for (var gi = 0; gi < signalx.groupNotifications.length; gi++) {
-                              typeof  signalx.groupNotifications[gi] ==="function" && signalx.groupNotifications[gi](msg);
+                                typeof signalx.groupNotifications[gi] === "function" && signalx.groupNotifications[gi](groupName, operation);
                             }
                             signalx.groupNotifications = [];
                         };
