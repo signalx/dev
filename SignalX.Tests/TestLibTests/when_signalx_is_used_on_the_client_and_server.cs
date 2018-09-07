@@ -256,6 +256,7 @@
                 SignalXTester.Run(
                     (signalx, assert) =>
                     {
+
                         int count = 0;
                         SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                         SignalXTester.EmbedeLibraryScripts = true;
