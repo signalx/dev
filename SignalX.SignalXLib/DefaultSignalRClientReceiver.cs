@@ -81,8 +81,8 @@
         }
 
         /// <summary>
-        /// Notifies client using its callback that the group has been added successfully
-        /// signalx.groups.join(name, callback : function(groupName){ })
+        ///     Notifies client using its callback that the group has been added successfully
+        ///     signalx.groups.join(name, callback : function(groupName){ })
         /// </summary>
         /// <param name="operation"></param>
         /// <param name="userId"></param>
@@ -90,7 +90,7 @@
         /// <param name="context"></param>
         /// <param name="clients"></param>
         /// <param name="groups"></param>
-        public void ReceiveInGroupManager(string operation,string userId, dynamic groupName, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
+        public void ReceiveInGroupManager(string operation, string userId, dynamic groupName, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
         {
             clients.Caller?.groupManager(groupName, operation);
         }

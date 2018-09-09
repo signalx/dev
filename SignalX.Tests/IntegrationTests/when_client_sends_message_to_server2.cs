@@ -226,7 +226,6 @@
                                    }); ",
                         () =>
                         {
-                           
                             signalx.Server(
                                 "sample",
                                 request =>

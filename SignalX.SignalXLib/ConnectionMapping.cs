@@ -24,13 +24,18 @@
             connections.Add(connectionId);
         }
 
-        public IEnumerable<string> GetConnections(T key)
+        public IEnumerable<string> GetByKey(T key)
         {
             HashSet<string> connections;
             if (this._connections.TryGetValue(key, out connections))
                 return connections;
 
             return Enumerable.Empty<string>();
+        }
+
+        public IEnumerable<string> GetAll()
+        {
+            return this._connections.Keys.SelectMany(x => this.GetByKey(x));
         }
 
         public void Remove(SignalX SignalX, T key, string connectionId)

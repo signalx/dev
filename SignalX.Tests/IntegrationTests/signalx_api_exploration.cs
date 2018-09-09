@@ -1,10 +1,10 @@
 ﻿namespace SignalXLib.Tests.IntegrationTests
 {
-    using System;
     using Microsoft.AspNet.SignalR;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
+    using System;
 
     [TestClass]
     public class signalx_api_exploration
@@ -24,7 +24,7 @@
                     signalx.AllowDynamicServer = false;
                     signalx.Settings.RequireAuthorizationForPersistentConnections = false;
                     signalx.Settings.ManageUserConnections = true;
-                    ConnectionMapping<string> Connections = signalx.Settings.Connections;
+                    ConnectionMapping<string> Connections = signalx.Connections;
                     bool HasOneOrMoreConnections = signalx.Settings.HasOneOrMoreConnections;
                     HubConfiguration HubConfiguration = signalx.Settings.HubConfiguration;
                     bool LogAgentMessagesOnClient = signalx.Settings.LogAgentMessagesOnClient;
@@ -39,7 +39,7 @@
                     signalx.GetInComingMessageSpeedAsync(TimeSpan.FromSeconds(10));
                     signalx.GetOutGoingMessageSpeedAsync(TimeSpan.FromSeconds(10));
                     signalx.SetGlobalDefaultMessageBufferSize(1000);
-                    signalx.AuthenticationHandler((r)=> true);
+                    signalx.AuthenticationHandler((r) => true);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition("")

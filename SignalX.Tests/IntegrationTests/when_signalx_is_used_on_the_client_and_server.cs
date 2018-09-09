@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Tests
 {
-    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
+    using System;
 
     [TestClass]
     public class when_signalx_is_used_on_the_client_and_server
@@ -440,31 +440,6 @@
         }
 
         [TestMethod]
-        public void server_should_be_able_to_run_simple_javascript_on_client()
-        {
-            SignalXTester.Run(
-                (signalX, assert) =>
-                {
-                    int result = 0;
-
-                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
-                    SignalXTester.EmbedeLibraryScripts = true;
-                    return new SignalXTestDefinition(
-                        "",
-                        () => { },
-                        () => { assert.AreEqual(50, result); },
-                        new TestEventHandler(
-                            () =>
-                            {
-                                signalX.RunJavaScriptOnAllClients(
-                                    $"return 5*10",
-                                    (response, request, error) => { result = Convert.ToInt32(response); },
-                                    TimeSpan.FromSeconds(15));
-                            }));
-                });
-        }
-
-        [TestMethod]
         public void DIRTY_SANITY_TEST_COMPLICATED_SETUP_SCENARIO()
 
         {
@@ -570,40 +545,6 @@
                         new TestEventHandler(() => { })
                     );
                 });
-        }
-
-        [TestMethod]
-        public void server_should_be_able_to_run_complex_javascript_on_client()
-        {
-            SignalXTester.Run(
-                (signalX, assert) =>
-                {
-                    int result = 0;
-                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
-                    SignalXTester.EmbedeLibraryScripts = true;
-                    return new SignalXTestDefinition(
-                        "",
-                        () => { },
-                        () => { assert.AreEqual(result, 3); },
-                        new TestEventHandler(
-                            () =>
-                            {
-                                signalX.RunJavaScriptOnAllClients(
-                                    @"
-                                    var grades = [1,2,3,4,5];
-                                    var total = 0;
-                                    for(var i = 0; i < grades.length; i++) {
-                                        total += grades[i];
-                                    }
-                                    var avg = total / grades.length;
-                                    return avg;
-                            ",
-                                    (response, request, error) => { result = Convert.ToInt32(response); },
-                                    TimeSpan.FromSeconds(10));
-                            })
-                    );
-                },
-                1);
         }
     }
 }

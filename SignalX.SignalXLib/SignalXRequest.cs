@@ -9,7 +9,7 @@
     {
         readonly SignalX SignalX;
 
-        internal SignalXRequest(SignalX signalX, string replyTo, object sender, string messageId, dynamic message, string user, string handler, IPrincipal principalUser,List<string> groups, IRequest request)
+        internal SignalXRequest(SignalX signalX, string replyTo, object sender, string messageId, dynamic message, string user, string handler, IPrincipal principalUser, List<string> groups, IRequest request)
         {
             this.SignalX = signalX ?? throw new ArgumentNullException(nameof(signalX));
             this.ReplyTo = replyTo;
@@ -20,13 +20,14 @@
             this.User = user;
             this.Handler = handler;
             this.PrincipalUser = principalUser;
-            this.Groups = groups?? new List<string>();
-            Request = request;
+            this.Groups = groups ?? new List<string>();
+            this.Request = request;
         }
 
         // public string UserId { get; set; }
 
         public string ReplyTo { get; }
+
         public List<string> Groups { get; }
 
         public object Sender { get; }
@@ -43,7 +44,9 @@
         public string User { get; }
 
         public IPrincipal PrincipalUser { get; }
+
         public IRequest Request { get; }
+
         public string Handler { get; }
 
         //public void RespondToAll(object response, string groupName = null)

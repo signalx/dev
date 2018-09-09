@@ -23,7 +23,6 @@
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupA',function(){ signalx.server.sample(100); });
-                                     
                                    }); ",
                         () =>
                         {
@@ -58,7 +57,6 @@
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupA',function(){  signalx.server.sample(100); });
-                                    
                                    }); ",
                         () =>
                         {
@@ -90,7 +88,6 @@
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupB',function(){ signalx.server.sample(100); });
-                                     
                                    }); ",
                         () =>
                         {
@@ -125,7 +122,6 @@
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupB',function(){ signalx.server.sample(100); });
-                                     
                                    }); ",
                         () =>
                         {
@@ -143,6 +139,5 @@
                         });
                 });
         }
-
     }
 }

@@ -1,5 +1,5 @@
 ﻿/*!
- * SignalX JavaScript Library v0.9.3-pre
+ * SignalX JavaScript Library v2.0.1-pre
  * https://github.com/signalx
  */
 (function ($, window, undefined) {

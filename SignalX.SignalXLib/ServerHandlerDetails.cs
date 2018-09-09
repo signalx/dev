@@ -20,6 +20,7 @@
         public ReaderWriterLockSlim SingleWriter { set; get; }
 
         public SignalXServerState State { get; set; }
+
         public List<string> AllowedGroups { get; set; }
     }
 }

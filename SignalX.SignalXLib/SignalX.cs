@@ -17,10 +17,10 @@
 
     public class SignalX : IDisposable
     {
-        
         internal static object padlock = new object();
         static readonly SignalXAgents SignalXAgents = new SignalXAgents();
         internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT";
+        internal static string SIGNALXCLIENTREADY = "SIGNALXCLIENTREADY";
         internal static string SIGNALXCLIENTERRORHANDLER = "SIGNALXCLIENTERRORHANDLER";
         internal static string SIGNALXCLIENTDEBUGHANDLER = "SIGNALXCLIENTDEBUGHANDLER";
 
@@ -55,7 +55,14 @@
 
         SignalX()
         {
+            this.Connections = new ConnectionMapping<string>();
         }
+
+        /// <summary>
+        ///     Is used only if SignalX.ManageUserConnections has been set to true, otherwise
+        ///     Connections remains empty, even if there has been connections
+        /// </summary>
+        public ConnectionMapping<string> Connections { internal set; get; }
 
         internal Action<string, SignalXRequest> OnErrorMessageReceivedFromClient { set; get; }
 
@@ -146,15 +153,15 @@
                     this.RespondToUser(context?.ConnectionId, replyTo, e);
                     return;
                 }
-               var request = new SignalXRequest(this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User, groupList, context?.Request);
 
-                if (!this.CanProcess(context: context, serverHandlerName: handler, request: request, isScriptRequest: false))
+                var request = new SignalXRequest(this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User, groupList, context?.Request);
+
+                if (!this.CanProcess(context, handler, request, false))
                 {
                     this.Settings.WarningHandler.ForEach(h => h?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required"));
                     return;
                 }
 
-               
                 this.CallServer(request);
             }
             catch (Exception e)

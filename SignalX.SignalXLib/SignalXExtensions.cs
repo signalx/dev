@@ -11,8 +11,6 @@
 
     public static class SignalXExtensions
     {
-
-
         #region METHODS
 
         internal static void UpdateClient(this SignalX signalX, string clientMethodName, bool status)
@@ -74,7 +72,7 @@
                 signalX.UpdateClient(s, false);
         }
 
-        internal static bool CanProcess(this SignalX signalX, HubCallerContext context, string serverHandlerName, SignalXRequest request,bool isScriptRequest)
+        internal static bool CanProcess(this SignalX signalX, HubCallerContext context, string serverHandlerName, SignalXRequest request, bool isScriptRequest)
         {
             bool result = false;
 
@@ -85,9 +83,9 @@
 
             if (signalX.Settings.SignalXServerExecutionDetails.ContainsKey(serverHandlerName))
             {
-               var allowedGroups = signalX.Settings.SignalXServerExecutionDetails[serverHandlerName].AllowedGroups;
-                
-               foreach (var allowedGroup in allowedGroups)
+                var allowedGroups = signalX.Settings.SignalXServerExecutionDetails[serverHandlerName].AllowedGroups;
+
+                foreach (var allowedGroup in allowedGroups)
                 {
                     if (!request.Groups.Contains(allowedGroup))
                     {
@@ -301,7 +299,7 @@
         /// <param name="signalX"></param>
         /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
         /// <param name="server"></param>
-        public static void ServerAuthorized(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames=null)
+        public static void ServerAuthorized(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames = null)
         {
             signalX.ServerAuthorized(name, (r, s) => server(r), groupNames);
         }
@@ -315,7 +313,7 @@
         /// <param name="server"></param>
         public static void ServerAuthorizedSingleAccess(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames = null)
         {
-            signalX.ServerAuthorizedSingleAccess(name, (r, s) => server(r),groupNames);
+            signalX.ServerAuthorizedSingleAccess(name, (r, s) => server(r), groupNames);
         }
 
         /// <summary>
@@ -446,9 +444,9 @@
         {
             signalX.RunJavaScriptOnAllClientsInGroup(
                 script,
+                groupName,
                 (a, b, c) => { onResponse?.Invoke(a); },
-                delay,
-                groupName);
+                delay);
         }
 
         public static void RunJavaScriptOnAllClients(this SignalX signalX, string script, Action<dynamic> onResponse = null, TimeSpan? delay = null)
@@ -461,10 +459,10 @@
 
         public static void RunJavaScriptOnAllClients(this SignalX signalX, string script, Action<dynamic, SignalXRequest, string> onResponse = null, TimeSpan? delay = null)
         {
-            signalX.RunJavaScriptOnAllClientsInGroup(script, onResponse, delay, null);
+            signalX.RunJavaScriptOnAllClientsInGroup(script, null, onResponse, delay);
         }
 
-        public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script, Action<dynamic, SignalXRequest, string> onResponse = null, TimeSpan? delay = null, string groupName = null)
+        public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script, string groupName, Action<dynamic, SignalXRequest, string> onResponse = null, TimeSpan? delay = null)
         {
             if (signalX.Settings.OnResponseAfterScriptRuns != null)
             {
@@ -476,6 +474,42 @@
             delay = delay ?? TimeSpan.FromSeconds(0);
             signalX.Settings.OnResponseAfterScriptRuns = onResponse;
             Task.Delay(delay.Value).ContinueWith(c => { signalX.RespondToAllInGroup(SignalX.SIGNALXCLIENTAGENT, script, groupName); });
+        }
+
+        public static void OnClientReady(this SignalX signalX, Action<SignalXRequest> onResponse)
+        {
+            signalX.Settings.OnClientReady = onResponse;
+        }
+
+        public static void OnClientReady(this SignalX signalX, Action onResponse)
+        {
+            if (onResponse != null)
+            {
+                signalX.Settings.OnClientReady = (r) => { onResponse?.Invoke(); };
+            }
+        }
+
+        public static void RunJavaScriptOnUser(this SignalX signalX, string userId, string script, Action<dynamic, SignalXRequest, string> onResponse = null, TimeSpan? delay = null)
+        {
+            if (signalX.Settings.OnResponseAfterScriptRuns != null)
+            {
+                //todo do something here to maybe block multiple calls
+                //todo before a previous one finishes
+                //todo or throw a warning
+            }
+
+            delay = delay ?? TimeSpan.FromSeconds(0);
+            signalX.Settings.OnResponseAfterScriptRuns = onResponse;
+            Task.Delay(delay.Value).ContinueWith(c => { signalX.RespondToUser(userId, SignalX.SIGNALXCLIENTAGENT, script); });
+        }
+
+        public static void RunJavaScriptOnUser(this SignalX signalX, string userId, string script, Action<dynamic> onResponse = null, TimeSpan? delay = null)
+        {
+            signalX.RunJavaScriptOnUser(
+                userId,
+                script,
+                (a, b, c) => { onResponse?.Invoke(a); },
+                delay);
         }
 
         internal static void JoinGroup(
@@ -503,10 +537,12 @@
 
             signalX.Settings.Receiver.ReceiveInGroupManager("leave", context?.ConnectionId, groupName, context, clients, groups);
         }
+
         public static string GenerateUniqueNameId()
         {
             return "S" + Guid.NewGuid().ToString().Replace("-", "");
         }
+
         #endregion METHODS
 
         public static void RespondToScriptRequest(this SignalX signalX,
@@ -535,8 +571,18 @@
                    " + logResponseOnClient + @"
                     signalx.server." + SignalX.SIGNALXCLIENTAGENT + @"(response,function(messageResponse){  });
                  };";
+
+            var clientReady = signalX.Settings.OnClientReady == null ? "" : @"
+                    signalx.beforeOthersReady=function(f){
+                        signalx.debug.f('Checking with server before executing ready functions...')
+                        signalx.server." + SignalX.SIGNALXCLIENTREADY + @"('',function(){
+                             signalx.debug.f('Server indicates readiness. Now running client ready functions ... ');
+                             typeof f ==='function' && f();
+                          });
+                 }";
+
             var methods = "; window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})};" +
-                signalX.Settings.SignalXServers.Aggregate(clientAgent + "var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  var messageToSend={handler:'" + signalXServer.Key + "',message:m, replyTo:rt,sender:sen, groupList:signalx.groupList}; console.log(JSON.stringify(signalx.groupList));  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId,signalx.groupList||[]); if(repTo){return messageId}else{ return deferred.promise();}   },")).Trim()
+                signalX.Settings.SignalXServers.Aggregate(clientReady + clientAgent + "var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  var messageToSend={handler:'" + signalXServer.Key + "',message:m, replyTo:rt,sender:sen, groupList:signalx.groupList}; console.log(JSON.stringify(signalx.groupList));  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId,signalx.groupList||[]); if(repTo){return messageId}else{ return deferred.promise();}   },")).Trim()
                 + "}; $sx; ";
 
             if (signalX.Settings.StartCountingInComingMessages)

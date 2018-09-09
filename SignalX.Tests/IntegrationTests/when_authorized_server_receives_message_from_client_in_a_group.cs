@@ -1,6 +1,5 @@
 ﻿namespace SignalXLib.Tests
 {
-    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
@@ -14,7 +13,6 @@
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
-                 
                     bool failed = false;
                     signalx.AuthenticationHandler((request) => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;

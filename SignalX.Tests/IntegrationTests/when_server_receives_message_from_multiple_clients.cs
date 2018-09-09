@@ -1,15 +1,15 @@
 ﻿namespace SignalXLib.Tests
 {
-    using System;
-    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
+    using System;
+    using System.Collections.Generic;
 
     [TestClass]
     public class when_server_receives_message_from_multiple_clients
     {
-        static readonly int numberOfRety = 0;
+        private static readonly int numberOfRety = 0;
 
         [TestCleanup]
         public void Cleanup()

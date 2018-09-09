@@ -52,15 +52,17 @@
   </Choose>
   <ItemGroup>
     <Compile Include="IntegrationTests\signalx_api_exploration.cs" />
-    <Compile Include="IntegrationTests\when_authorized_by_group_server_receives_message_from_client_in_a_group.cs" />
     <Compile Include="IntegrationTests\when_authorized_server_receives_message_from_client_in_a_group.cs" />
     <Compile Include="IntegrationTests\when_authorized_server_receives_message_from_client_in_a_group_it_should_fail_if_authorization_handler_fails.cs" />
     <Compile Include="IntegrationTests\when_authorized_server_receives_message_from_client_in_a_group_that_fails_authorization.cs" />
     <Compile Include="IntegrationTests\when_authorized_server_receives_message_from_client_in_a_group_that_fails_authorization2.cs" />
     <Compile Include="IntegrationTests\when_client_sends_message_to_server2.cs" />
     <Compile Include="IntegrationTests\when_client_sends_message_to_server.cs" />
+    <Compile Include="IntegrationTests\when_server_executes_javascript_on_client.cs" />
+    <Compile Include="IntegrationTests\when_server_executes_javascript_on_user.cs" />
+    <Compile Include="IntegrationTests\when_server_executes_javascript_on_user_from_onclient_ready.cs" />
     <Compile Include="IntegrationTests\when_server_receives_message_from_multiple_clients.cs" />
-    <Compile Include="IntegrationTests\when_server_receives_message_from_server.cs" />
+    <Compile Include="IntegrationTests\when_server_receives_message_from_client.cs" />
     <Compile Include="IntegrationTests\when_signalx_is_used_on_the_client_and_server.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestLibTests\when_signalx_is_used_on_the_client_and_server.cs" />

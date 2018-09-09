@@ -1,8 +1,8 @@
 ﻿namespace SignalXLib.Tests
 {
-    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.TestHelperLib;
+    using System;
 
     [TestClass]
     public class WHEN_TEST_LIBRARY_TEST_is_used_to_test
@@ -256,7 +256,6 @@
                 SignalXTester.Run(
                     (signalx, assert) =>
                     {
-
                         int count = 0;
                         SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                         SignalXTester.EmbedeLibraryScripts = true;

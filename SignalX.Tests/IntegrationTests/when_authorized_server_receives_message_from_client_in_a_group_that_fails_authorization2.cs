@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Tests
 {
-    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
+    using System.Collections.Generic;
 
     [TestClass]
     public class when_authorized_server_receives_message_from_client_in_a_group_that_fails_authorization2
@@ -21,7 +21,6 @@
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupA',function(){ signalx.server.sample(100); });
-                                     
                                    }); ",
                         () =>
                         {
@@ -30,7 +29,7 @@
                                 request =>
                                 {
                                     failed = true;
-                                }, new List<string>(){ "groupB" });
+                                }, new List<string>() { "groupB" });
                         },
                         () =>
                         {
@@ -53,7 +52,6 @@
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupA',function(){  signalx.server.sample(100); });
-                                    
                                    }); ",
                         () =>
                         {
@@ -76,13 +74,12 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                   signalx.AuthenticationHandler((request)=>true);
+                    signalx.AuthenticationHandler((request) => true);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupB',function(){ signalx.server.sample(100); });
-                                     
                                    }); ",
                         () =>
                         {
@@ -114,7 +111,6 @@
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupB',function(){ signalx.server.sample(100); });
-                                     
                                    }); ",
                         () =>
                         {
@@ -132,6 +128,5 @@
                         });
                 });
         }
-
     }
 }

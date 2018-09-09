@@ -17,11 +17,13 @@
         {
             this.signalX.SendMessageToServer(this.Context, this.Clients, this.Groups, handler, message, replyTo, sender, messageId, groups);
         }
+
         //not async because it already behaves as async from client clide
         public void JoinGroup(string groupName)
         {
             this.signalX.JoinGroup(this.Context, this.Clients, this.Groups, groupName);
         }
+
         //not async because it already behaves as async from client clide
         public void LeaveGroup(string groupName)
         {
@@ -46,10 +48,10 @@
         public override Task OnConnected()
         {
             this.signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.OnConnected.ToString(), null));
-            string name = this.Context?.User?.Identity?.Name;
+            string name = this.Context?.User?.Identity?.Name ?? this.Context?.ConnectionId;
 
             if (name != null)
-                this.signalX.Settings.Connections?.Add(this.signalX, name, this.Context?.ConnectionId);
+                this.signalX.Connections?.Add(this.signalX, name, this.Context?.ConnectionId);
 
             return base.OnConnected();
         }
@@ -57,10 +59,10 @@
         public override Task OnDisconnected(bool stopCalled)
         {
             this.signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.OnDisconnected.ToString(), null));
-            string name = this.Context?.User?.Identity?.Name;
+            string name = this.Context?.User?.Identity?.Name ?? this.Context?.ConnectionId;
 
             if (name != null)
-                this.signalX.Settings.Connections?.Remove(this.signalX, name, this.Context?.ConnectionId);
+                this.signalX.Connections?.Remove(this.signalX, name, this.Context?.ConnectionId);
 
             try
             {
@@ -77,11 +79,11 @@
         public override Task OnReconnected()
         {
             this.signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.OnReconnected.ToString(), null));
-            string name = this.Context?.User?.Identity?.Name;
+            string name = this.Context?.User?.Identity?.Name ?? this.Context?.ConnectionId;
 
             if (name != null)
-                if (this.signalX.Settings.Connections != null && !this.signalX.Settings.Connections.GetConnections(name).Contains(this.Context?.ConnectionId))
-                    this.signalX.Settings.Connections?.Add(this.signalX, name, this.Context?.ConnectionId);
+                if (this.signalX.Connections != null && !this.signalX.Connections.GetByKey(name).Contains(this.Context?.ConnectionId))
+                    this.signalX.Connections?.Add(this.signalX, name, this.Context?.ConnectionId);
             this.signalX.ConnectionCount++;
             return base.OnReconnected();
         }

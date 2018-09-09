@@ -10,6 +10,23 @@
             if (SignalX == null)
                 throw new ArgumentNullException(nameof(SignalX));
             SignalX.Server(
+                SignalX.SIGNALXCLIENTREADY,
+                (request, state) =>
+                {
+                    try
+                    {
+                        SignalX.Settings.OnClientReady?.Invoke(request);
+                    }
+                    catch (Exception e)
+                    {
+                        SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
+                    }
+                },
+                requireAuthorization: false,
+                isSingleWriter: false,
+                allowDynamicServerForThisInstance: true);
+
+            SignalX.Server(
                 SignalX.SIGNALXCLIENTAGENT,
                 (request, state) =>
                 {

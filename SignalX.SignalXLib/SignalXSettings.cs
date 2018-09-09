@@ -16,7 +16,6 @@
         public SignalXSettings()
         {
             this.HubConfiguration = new HubConfiguration { EnableDetailedErrors = true };
-            this.Connections = new ConnectionMapping<string>();
             this.Receiver = new DefaultSignalRClientReceiver();
             this.SignalXServers = new ConcurrentDictionary<string, Action<SignalXRequest, SignalXServerState>>();
             this.SignalXClientDetails = new ConcurrentDictionary<string, ClientDetails>();
@@ -45,12 +44,6 @@
 
         internal List<Action<string, Exception>> ExceptionHandler { set; get; }
 
-        /// <summary>
-        ///     Is used only if SignalX.ManageUserConnections has been set to true, otherwise
-        ///     Connections remains empty, even if there has been connections
-        /// </summary>
-        public ConnectionMapping<string> Connections { internal set; get; }
-
         public bool ManageUserConnections { set; get; }
 
         /// <summary>
@@ -76,6 +69,8 @@
 
         //todo make this allow for multiple instances
         internal Action<dynamic, SignalXRequest, string> OnResponseAfterScriptRuns { set; get; }
+
+        internal Action<SignalXRequest> OnClientReady { set; get; }
 
         public bool ReceiveErrorMessagesFromClient { get; set; }
 
