@@ -464,7 +464,7 @@
 
         public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script, string groupName, Action<dynamic, SignalXRequest, string> onResponse = null, TimeSpan? delay = null)
         {
-            if (signalX.Settings.OnResponseAfterScriptRuns != null)
+            if (signalX.OnResponseAfterScriptRuns != null)
             {
                 //todo do something here to maybe block multiple calls
                 //todo before a previous one finishes
@@ -472,26 +472,26 @@
             }
 
             delay = delay ?? TimeSpan.FromSeconds(0);
-            signalX.Settings.OnResponseAfterScriptRuns = onResponse;
+            signalX.OnResponseAfterScriptRuns = onResponse;
             Task.Delay(delay.Value).ContinueWith(c => { signalX.RespondToAllInGroup(SignalX.SIGNALXCLIENTAGENT, script, groupName); });
         }
 
         public static void OnClientReady(this SignalX signalX, Action<SignalXRequest> onResponse)
         {
-            signalX.Settings.OnClientReady = onResponse;
+            signalX.OnClientReady.Add(onResponse);
         }
 
         public static void OnClientReady(this SignalX signalX, Action onResponse)
         {
             if (onResponse != null)
             {
-                signalX.Settings.OnClientReady = (r) => { onResponse?.Invoke(); };
+                signalX.OnClientReady.Add((r) => { onResponse?.Invoke(); });
             }
         }
 
         public static void RunJavaScriptOnUser(this SignalX signalX, string userId, string script, Action<dynamic, SignalXRequest, string> onResponse = null, TimeSpan? delay = null)
         {
-            if (signalX.Settings.OnResponseAfterScriptRuns != null)
+            if (signalX.OnResponseAfterScriptRuns != null)
             {
                 //todo do something here to maybe block multiple calls
                 //todo before a previous one finishes
@@ -499,7 +499,7 @@
             }
 
             delay = delay ?? TimeSpan.FromSeconds(0);
-            signalX.Settings.OnResponseAfterScriptRuns = onResponse;
+            signalX.OnResponseAfterScriptRuns = onResponse;
             Task.Delay(delay.Value).ContinueWith(c => { signalX.RespondToUser(userId, SignalX.SIGNALXCLIENTAGENT, script); });
         }
 
@@ -572,7 +572,7 @@
                     signalx.server." + SignalX.SIGNALXCLIENTAGENT + @"(response,function(messageResponse){  });
                  };";
 
-            var clientReady = signalX.Settings.OnClientReady == null ? "" : @"
+            var clientReady = signalX.OnClientReady.Count == 0 ? "" : @"
                     signalx.beforeOthersReady=function(f){
                         signalx.debug.f('Checking with server before executing ready functions...')
                         signalx.server." + SignalX.SIGNALXCLIENTREADY + @"('',function(){

@@ -13,14 +13,20 @@
                 SignalX.SIGNALXCLIENTREADY,
                 (request, state) =>
                 {
-                    try
+                    foreach (Action<SignalXRequest> action in SignalX.OnClientReady)
                     {
-                        SignalX.Settings.OnClientReady?.Invoke(request);
+                        try
+                        {
+                            action.Invoke(request);
+                            request.RespondToSender("");
+                        }
+                        catch (Exception e)
+                        {
+                            SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
+                        }
                     }
-                    catch (Exception e)
-                    {
-                        SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
-                    }
+
+                
                 },
                 requireAuthorization: false,
                 isSingleWriter: false,
@@ -34,7 +40,7 @@
                     {
                         dynamic str = request.Message.ToString();
                         dynamic response = JsonConvert.DeserializeObject<ResponseAfterScriptRuns>(str);
-                        SignalX.Settings.OnResponseAfterScriptRuns?.Invoke(response.Result, request, response.Error);
+                        SignalX.OnResponseAfterScriptRuns?.Invoke(response.Result, request, response.Error);
                         /*
                           todo check why this is not working as dynamic
                           todo maybe needs to specify/check serialization for hub
@@ -58,16 +64,21 @@
                 SignalX.SIGNALXCLIENTERRORHANDLER,
                 (request, state) =>
                 {
-                    try
+                    foreach (Action<string, SignalXRequest> action in SignalX.OnErrorMessageReceivedFromClient)
+                    {
+                          try
                     {
                         dynamic str = request.Message.ToString();
 
-                        SignalX.OnErrorMessageReceivedFromClient?.Invoke(str, request);
+                        action?.Invoke(str, request);
                     }
                     catch (Exception e)
                     {
                         SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
                     }
+                    }
+
+                  
                 },
                 requireAuthorization: false,
                 isSingleWriter: false,
@@ -77,15 +88,20 @@
                 SignalX.SIGNALXCLIENTDEBUGHANDLER,
                 (request, state) =>
                 {
-                    try
+                    foreach (Action<string, SignalXRequest> action in SignalX.OnDebugMessageReceivedFromClient)
+                    {
+                              try
                     {
                         dynamic str = request.Message.ToString();
-                        SignalX.OnDebugMessageReceivedFromClient?.Invoke(str, request);
+                        action?.Invoke(str, request);
                     }
                     catch (Exception e)
                     {
                         SignalX.Settings.WarningHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
                     }
+                    }
+
+              
                 },
                 requireAuthorization: false,
                 isSingleWriter: false,

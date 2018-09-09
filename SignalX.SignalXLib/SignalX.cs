@@ -7,16 +7,23 @@
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
 
-    public class DefaultInternalSignalXException : Exception
+    public enum SignalXAdvancedLogType
     {
-        public DefaultInternalSignalXException(string error)
-            : base(error)
-        {
-        }
+        Default,
+        Debug,
+        Error,
+        Warning,
+        Fatal
+    }
+
+    public class SignalXAdvanced
+    {
+        public Action<SignalXAdvancedLogType,string, Exception,List<object>> Catch { set; get; }
     }
 
     public class SignalX : IDisposable
     {
+        public static SignalXAdvanced Advanced =new SignalXAdvanced();
         internal static object padlock = new object();
         static readonly SignalXAgents SignalXAgents = new SignalXAgents();
         internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT";
@@ -56,6 +63,10 @@
         SignalX()
         {
             this.Connections = new ConnectionMapping<string>();
+            this.OnErrorMessageReceivedFromClient=new List<Action<string, SignalXRequest>>();
+            this.OnDebugMessageReceivedFromClient=new List<Action<string, SignalXRequest>>();
+            this.OnClientReady=new List<Action<SignalXRequest>>();
+           
         }
 
         /// <summary>
@@ -64,10 +75,13 @@
         /// </summary>
         public ConnectionMapping<string> Connections { internal set; get; }
 
-        internal Action<string, SignalXRequest> OnErrorMessageReceivedFromClient { set; get; }
+        internal List<Action<string, SignalXRequest>> OnErrorMessageReceivedFromClient { set; get; }
 
-        internal Action<string, SignalXRequest> OnDebugMessageReceivedFromClient { set; get; }
+        internal List<Action<string, SignalXRequest>> OnDebugMessageReceivedFromClient { set; get; }
+        //needs more care to refactor
+        internal Action<dynamic, SignalXRequest, string> OnResponseAfterScriptRuns { set; get; }
 
+        internal List<Action<SignalXRequest>> OnClientReady { set; get; }
         static SignalX instance { set; get; }
 
         public ulong ConnectionCount { get; internal set; }
@@ -107,12 +121,13 @@
 
         public void SetUpClientErrorMessageHandler(Action<string, SignalXRequest> handler)
         {
-            this.OnErrorMessageReceivedFromClient = handler;
+
+            this.OnErrorMessageReceivedFromClient.Add(handler);
         }
 
         public void SetUpClientDebugMessageHandler(Action<string, SignalXRequest> handler)
         {
-            this.OnDebugMessageReceivedFromClient = handler;
+            this.OnDebugMessageReceivedFromClient.Add(handler);
         }
 
         [Obsolete("Not intended for client use")]

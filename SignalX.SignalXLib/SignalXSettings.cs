@@ -67,11 +67,6 @@
 
         public bool LogAgentMessagesOnClient { set; get; }
 
-        //todo make this allow for multiple instances
-        internal Action<dynamic, SignalXRequest, string> OnResponseAfterScriptRuns { set; get; }
-
-        internal Action<SignalXRequest> OnClientReady { set; get; }
-
         public bool ReceiveErrorMessagesFromClient { get; set; }
 
         public bool ReceiveDebugMessagesFromClient { get; set; }
