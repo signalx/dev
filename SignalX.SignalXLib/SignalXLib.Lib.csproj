@@ -52,6 +52,8 @@
     <Compile Include="ResponseAfterScriptRuns.cs" />
     <Compile Include="ServerHandlerDetails.cs" />
     <Compile Include="SignalrErrorHandler.cs" />
+    <Compile Include="SignalXAdvanced.cs" />
+    <Compile Include="SignalXAdvancedLogType.cs" />
     <Compile Include="SignalXAgents.cs" />
     <Compile Include="SignalXExtensions.cs" />
     <Compile Include="SignalXHub.cs" />

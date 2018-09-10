@@ -7,23 +7,9 @@
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
 
-    public enum SignalXAdvancedLogType
-    {
-        Default,
-        Debug,
-        Error,
-        Warning,
-        Fatal
-    }
-
-    public class SignalXAdvanced
-    {
-        public Action<SignalXAdvancedLogType,string, Exception,List<object>> Catch { set; get; }
-    }
-
     public class SignalX : IDisposable
     {
-        public static SignalXAdvanced Advanced =new SignalXAdvanced();
+        public  SignalXAdvanced Advanced =new SignalXAdvanced();
         internal static object padlock = new object();
         static readonly SignalXAgents SignalXAgents = new SignalXAgents();
         internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT";
@@ -66,7 +52,7 @@
             this.OnErrorMessageReceivedFromClient=new List<Action<string, SignalXRequest>>();
             this.OnDebugMessageReceivedFromClient=new List<Action<string, SignalXRequest>>();
             this.OnClientReady=new List<Action<SignalXRequest>>();
-           
+            this.Advanced.Trace($"SIgnalX framework initialized");
         }
 
         /// <summary>

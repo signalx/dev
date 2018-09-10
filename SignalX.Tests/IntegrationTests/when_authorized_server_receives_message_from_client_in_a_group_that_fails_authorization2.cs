@@ -81,7 +81,7 @@
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupB',function(){ signalx.server.sample(100); });
                                    }); ",
-                        () =>
+                        onAppStarted: () =>
                         {
                             signalx.ServerAuthorizedSingleAccess(
                                 "sample",
@@ -90,7 +90,7 @@
                                     failed = true;
                                 }, new List<string>() { "groupB" });
                         },
-                        () =>
+                        checks: () =>
                         {
                             assert.WaitForSomeTime(SignalXTester.MaxTestTimeSpan);
                             assert.IsTrue(failed);

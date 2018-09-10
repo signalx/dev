@@ -7,8 +7,14 @@
     {
         public void SetUpAgents(SignalX SignalX)
         {
+            SignalX?.Advanced.Trace($"Setting up agents ...");
             if (SignalX == null)
+            {
                 throw new ArgumentNullException(nameof(SignalX));
+            }
+
+
+            SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTREADY} ...");
             SignalX.Server(
                 SignalX.SIGNALXCLIENTREADY,
                 (request, state) =>
@@ -32,6 +38,7 @@
                 isSingleWriter: false,
                 allowDynamicServerForThisInstance: true);
 
+            SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTAGENT} ...");
             SignalX.Server(
                 SignalX.SIGNALXCLIENTAGENT,
                 (request, state) =>
@@ -60,6 +67,8 @@
                 isSingleWriter: false,
                 allowDynamicServerForThisInstance: true);
 
+
+            SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTERRORHANDLER} ...");
             SignalX.Server(
                 SignalX.SIGNALXCLIENTERRORHANDLER,
                 (request, state) =>
@@ -84,6 +93,7 @@
                 isSingleWriter: false,
                 allowDynamicServerForThisInstance: true);
 
+            SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTDEBUGHANDLER} ...");
             SignalX.Server(
                 SignalX.SIGNALXCLIENTDEBUGHANDLER,
                 (request, state) =>

@@ -5,6 +5,7 @@
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
     using System;
+    using System.Collections.Generic;
 
     [TestClass]
     public class signalx_api_exploration
@@ -54,6 +55,66 @@
                         TestEvents = new TestEventHandler(
                             () => { assert.AreEqual(1, (int)signalx.ConnectionCount); })
                     };
+                });
+        }
+
+
+        [TestMethod]
+        public void can_register_to_receive_internal_trace_messages()
+        {
+
+            SignalXTester.Run(
+                (signalx, assert) =>
+                {
+                    var tarceCount = 0;
+                    signalx.Advanced.OnTrace(
+                        (s, m, e, l) =>
+                        {
+                            if(tarceCount==0)
+                            {
+                                tarceCount++;
+                            }
+                          
+                        });
+                    signalx.Advanced.OnTrace(
+                        (s, m, e) =>
+                        {
+                            if (tarceCount == 1)
+                            {
+                                tarceCount++;
+                            }
+
+                        });
+                    signalx.Advanced.OnTrace(
+                        (m, e) =>
+                        {
+                            if (tarceCount == 2)
+                            {
+                                tarceCount++;
+                            }
+
+                        });
+                    
+                    signalx.Advanced.OnTrace(
+                        (m) =>
+                        {
+                            if (tarceCount == 3)
+                            {
+                                tarceCount++;
+                            }
+
+                        });
+  
+                    return new SignalXTestDefinition(
+                        @"",
+                        onAppStarted: () =>
+                        {
+
+                        },
+                        checks: () =>
+                        {
+                            assert.AreEqual(4, tarceCount);
+                        });
                 });
         }
     }
