@@ -80,7 +80,7 @@ namespace SignalXLib.TestHelperLib
         /// </summary>
         public int NumberOfClients { get; internal set; }
 
-        private void ConstructSignalXTestDefinition(
+        void ConstructSignalXTestDefinition(
             List<string> script,
             Action onAppStarted,
             Action checks,

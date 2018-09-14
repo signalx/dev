@@ -1,11 +1,10 @@
 ﻿namespace SignalXLib.Tests.IntegrationTests
 {
+    using System;
     using Microsoft.AspNet.SignalR;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System;
-    using System.Collections.Generic;
 
     [TestClass]
     public class signalx_api_exploration
@@ -32,7 +31,7 @@
                     ISignalXClientReceiver Receiver = signalx.Settings.Receiver;
                     bool RequireAuthorizationForAllHandlers = signalx.Settings.RequireAuthorizationForAllHandlers;
 
-                    signalx.AuthenticationHandler((request) => true);
+                    signalx.AuthenticationHandler(request => true);
                     signalx.DisableAllClients();
                     signalx.DisableClient("test");
                     signalx.EnableAllClients();
@@ -40,7 +39,7 @@
                     signalx.GetInComingMessageSpeedAsync(TimeSpan.FromSeconds(10));
                     signalx.GetOutGoingMessageSpeedAsync(TimeSpan.FromSeconds(10));
                     signalx.SetGlobalDefaultMessageBufferSize(1000);
-                    signalx.AuthenticationHandler((r) => true);
+                    signalx.AuthenticationHandler(r => true);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition("")
@@ -58,63 +57,43 @@
                 });
         }
 
-
         [TestMethod]
         public void can_register_to_receive_internal_trace_messages()
         {
-
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
-                    var tarceCount = 0;
+                    int traceCount = 0;
                     signalx.Advanced.OnTrace(
                         (s, m, e, l) =>
                         {
-                            if(tarceCount==0)
-                            {
-                                tarceCount++;
-                            }
-                          
+                            if (traceCount == 0)
+                                traceCount++;
                         });
                     signalx.Advanced.OnTrace(
                         (s, m, e) =>
                         {
-                            if (tarceCount == 1)
-                            {
-                                tarceCount++;
-                            }
-
+                            if (traceCount == 1)
+                                traceCount++;
                         });
                     signalx.Advanced.OnTrace(
                         (m, e) =>
                         {
-                            if (tarceCount == 2)
-                            {
-                                tarceCount++;
-                            }
-
+                            if (traceCount == 2)
+                                traceCount++;
                         });
-                    
+
                     signalx.Advanced.OnTrace(
-                        (m) =>
+                        m =>
                         {
-                            if (tarceCount == 3)
-                            {
-                                tarceCount++;
-                            }
-
+                            if (traceCount == 3)
+                                traceCount++;
                         });
-  
+
                     return new SignalXTestDefinition(
                         @"",
-                        onAppStarted: () =>
-                        {
-
-                        },
-                        checks: () =>
-                        {
-                            assert.AreEqual(4, tarceCount);
-                        });
+                        () => { },
+                        () => { assert.AreEqual(4, traceCount); });
                 });
         }
     }

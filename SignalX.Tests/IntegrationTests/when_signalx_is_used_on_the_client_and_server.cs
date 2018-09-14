@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System;
 
     [TestClass]
     public class when_signalx_is_used_on_the_client_and_server

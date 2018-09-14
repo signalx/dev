@@ -71,6 +71,8 @@
 
         public bool ReceiveDebugMessagesFromClient { get; set; }
 
+        public bool ContinueClientExecutionWhenAnyServerOnClientReadyFails { get; set; }
+
         public void Dispose()
         {
             this.MyApp?.Dispose();

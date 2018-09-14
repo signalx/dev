@@ -1,14 +1,14 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
+    using System.Collections.Generic;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using SignalXLib.Lib;
-    using System;
-    using System.Collections.Generic;
 
     public class TestReceiver : ISignalXClientReceiver
     {
-        private SignalX SignalX;
+        SignalX SignalX;
 
         public TestReceiver(SignalX signalX)
         {

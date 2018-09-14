@@ -1,10 +1,9 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System;
-    using System.Linq;
 
     [TestClass]
     public class when_server_executes_javascript_on_user
@@ -21,16 +20,13 @@
 
                     return new SignalXTestDefinition(
                         "",
-                        () =>
-                        {
-                            signalX.Settings.ManageUserConnections = true;
-                        },
+                        () => { signalX.Settings.ManageUserConnections = true; },
                         () => { assert.AreEqual(result, 3); },
                         new TestEventHandler(
                             () =>
                             {
                                 signalX.RunJavaScriptOnUser(
-                                    signalX.Connections.GetAll().First(),
+                                    signalX.Connections.FirstOrDefault(),
                                     @"
                                     var grades = [1,2,3,4,5];
                                     var total = 0;
@@ -66,8 +62,8 @@
                             () =>
                             {
                                 signalX.RunJavaScriptOnUser(
-                                    signalX.Connections.GetAll().First(),
-                                    $"return 5*10",
+                                    signalX.Connections.FirstOrDefault(),
+                                    "return 5*10",
                                     response => { result = Convert.ToInt32(response); },
                                     TimeSpan.FromSeconds(15));
                             }));
@@ -91,7 +87,7 @@
                             () =>
                             {
                                 signalX.RunJavaScriptOnUser(
-                                    signalX.Connections.GetAll().First(),
+                                    signalX.Connections.FirstOrDefault(),
                                     @"
                                     var grades = [1,2,3,4,5];
                                     var total = 0;
@@ -127,8 +123,8 @@
                             () =>
                             {
                                 signalX.RunJavaScriptOnUser(
-                                    signalX.Connections.GetAll().First(),
-                                    $"return 5*10",
+                                    signalX.Connections.FirstOrDefault(),
+                                    "return 5*10",
                                     (response, request, error) => { result = Convert.ToInt32(response); },
                                     TimeSpan.FromSeconds(15));
                             }));
@@ -152,7 +148,7 @@
                             () =>
                             {
                                 signalX.RunJavaScriptOnUser(
-                                    signalX.Connections.GetAll().First(),
+                                    signalX.Connections.FirstOrDefault(),
                                     @"
                                     var grades = [1,2,3,4,5,6];
                                     var total = 0;
@@ -188,8 +184,8 @@
                             () =>
                             {
                                 signalX.RunJavaScriptOnUser(
-                                    signalX.Connections.GetAll().First(),
-                                    $"return 5*10*20",
+                                    signalX.Connections.FirstOrDefault(),
+                                    "return 5*10*20",
                                     response => { result = Convert.ToInt32(response); },
                                     TimeSpan.FromSeconds(15));
                             }));
@@ -213,7 +209,7 @@
                             () =>
                             {
                                 signalX.RunJavaScriptOnUser(
-                                    signalX.Connections.GetAll().First(),
+                                    signalX.Connections.FirstOrDefault(),
                                     @"
                                     var grades = [1,2,3,4,5,6];
                                     var total = 0;
@@ -249,8 +245,8 @@
                             () =>
                             {
                                 signalX.RunJavaScriptOnUser(
-                                    signalX.Connections.GetAll().First(),
-                                    $"return 5*10*20",
+                                    signalX.Connections.FirstOrDefault(),
+                                    "return 5*10*20",
                                     (response, request, error) => { result = Convert.ToInt32(response); },
                                     TimeSpan.FromSeconds(15));
                             }));

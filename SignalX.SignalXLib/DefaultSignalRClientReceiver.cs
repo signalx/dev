@@ -19,22 +19,11 @@
             string user,
             string replyTo,
             dynamic message
-            //, string groupName = null
         )
         {
-            //if (!string.IsNullOrEmpty(groupName))
-            //{
-            //    IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
+            IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
 
-            //    hubContext.Clients.Group(groupName).broadcastMessage(replyTo, message);
-
-            //}
-            //else
-            {
-                IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
-
-                hubContext.Clients.Client(user).broadcastMessage(replyTo, message);
-            }
+            hubContext.Clients.Client(user).broadcastMessage(replyTo, message);
         }
 
         /// <summary>
@@ -115,6 +104,7 @@
         /// <param name="groupList"></param>
         public void SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId, List<string> groupList)
         {
+            SignalX.Advanced.Trace($"Sending message {message} to server from {messageId} having groups {string.Join(",", groupList ?? new List<string>())} with reply to {replyTo}");
             SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList);
         }
     }

@@ -6,9 +6,16 @@
 
     public class SignalXAdvanced
     {
-        internal void Trace(Exception error,
-            SignalXAdvancedLogType signalXAdvancedLogType,
+        public SignalXAdvanced()
+        {
+            this.TraceHandlers = new List<Action<SignalXAdvancedLogType, string, Exception, List<object>>>();
+        }
 
+        internal List<Action<SignalXAdvancedLogType, string, Exception, List<object>>> TraceHandlers { set; get; }
+
+        internal void Trace(
+            Exception error,
+            SignalXAdvancedLogType signalXAdvancedLogType,
             params object[] context)
         {
             this.Trace(signalXAdvancedLogType, error?.Message, error);
@@ -23,15 +30,14 @@
 
         internal void Trace(
             string message,
-
             params object[] context)
         {
             this.Trace(SignalXAdvancedLogType.Trace, message, null);
         }
 
-        internal void Trace(Exception error,
+        internal void Trace(
+            Exception error,
             string message,
-
             params object[] context)
         {
             this.Trace(SignalXAdvancedLogType.Trace, message, error);
@@ -46,7 +52,6 @@
             try
             {
                 foreach (Action<SignalXAdvancedLogType, string, Exception, List<object>> traceHandler in this.TraceHandlers)
-                {
                     try
                     {
                         traceHandler?.Invoke(signalXAdvancedLogType, message, error, context.ToList());
@@ -54,7 +59,6 @@
                     catch (Exception e)
                     {
                     }
-                }
             }
             catch (Exception e)
             {
@@ -65,29 +69,22 @@
 
         public void OnTrace(Action<SignalXAdvancedLogType, string, Exception, List<object>> logHandler)
         {
-            TraceHandlers.Add(logHandler);
+            this.TraceHandlers.Add(logHandler);
         }
 
         public void OnTrace(Action<SignalXAdvancedLogType, string, Exception> logHandler)
         {
-            TraceHandlers.Add((s, m, e, l) => { logHandler?.Invoke(s, m, e); });
+            this.TraceHandlers.Add((s, m, e, l) => { logHandler?.Invoke(s, m, e); });
         }
 
         public void OnTrace(Action<string, Exception> logHandler)
         {
-            TraceHandlers.Add((s, m, e, l) => { logHandler?.Invoke(m, e); });
+            this.TraceHandlers.Add((s, m, e, l) => { logHandler?.Invoke(m, e); });
         }
-        
+
         public void OnTrace(Action<string> logHandler)
         {
-            TraceHandlers.Add((s, m, e, l) => { logHandler?.Invoke(m); });
+            this.TraceHandlers.Add((s, m, e, l) => { logHandler?.Invoke(m); });
         }
-
-        public SignalXAdvanced()
-        {
-            TraceHandlers = new List<Action<SignalXAdvancedLogType, string, Exception, List<object>>>();
-        }
-
-        internal List<Action<SignalXAdvancedLogType, string, Exception, List<object>>> TraceHandlers { set; get; }
     }
 }

@@ -15,7 +15,7 @@
         //not async because it already behaves as async from client clide
         public void Send(string handler, dynamic message, string replyTo, dynamic sender, string messageId, List<string> groups)
         {
-            signalX.Advanced.Trace($"Received message from client {handler}...");
+            this.signalX.Advanced.Trace($"Received message from client {handler}...");
             this.signalX.SendMessageToServer(this.Context, this.Clients, this.Groups, handler, message, replyTo, sender, messageId, groups);
         }
 
@@ -33,14 +33,14 @@
 
         public void GetMethods()
         {
-            signalX.Advanced.Trace($"Sending methods to client...");
+            this.signalX.Advanced.Trace("Sending methods to client...");
 
             this.signalX.RespondToScriptRequest(this.Context, this.Clients, this.Groups);
         }
 
         public void SignalXClientReady()
         {
-            signalX.Advanced.Trace($"Client is ready...");
+            this.signalX.Advanced.Trace("Client is ready...");
             this.signalX.Settings.HasOneOrMoreConnections = true;
             this.signalX.ConnectionCount++;
         }
@@ -62,7 +62,7 @@
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            signalX.Advanced.Trace($"Client is disconnected");
+            this.signalX.Advanced.Trace("Client is disconnected");
             this.signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.OnDisconnected.ToString(), null));
             string name = this.Context?.User?.Identity?.Name ?? this.Context?.ConnectionId;
 

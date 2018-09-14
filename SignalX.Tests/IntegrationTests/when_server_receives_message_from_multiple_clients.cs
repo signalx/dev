@@ -1,15 +1,15 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System;
-    using System.Collections.Generic;
 
     [TestClass]
     public class when_server_receives_message_from_multiple_clients
     {
-        private static readonly int numberOfRety = 0;
+        static readonly int numberOfRety = 0;
 
         [TestCleanup]
         public void Cleanup()
@@ -295,6 +295,7 @@
                     int counter = 0;
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
+                    SignalXTester.MaxTestTimeSpan = TimeSpan.FromMinutes(1);
                     return new SignalXTestDefinition(
                         new List<string>
                         {

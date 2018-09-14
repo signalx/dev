@@ -27,8 +27,7 @@
             }
 
             app.MapSignalR(hubConfig);
-
-            // if (signalXOptions.UiFolder == null) return;
+            
         }
     }
 }

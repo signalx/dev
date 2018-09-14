@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System.Collections.Generic;
 
     [TestClass]
     public class when_authorized_server_receives_message_from_client_in_a_group_it_should_fail_if_authorization_handler_fails
@@ -15,7 +15,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => false);
+                    signalx.AuthenticationHandler(request => false);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -26,10 +26,9 @@
                         {
                             signalx.ServerAuthorizedSingleAccess(
                                 "sample",
-                                request =>
-                                {
-                                    failed = true;
-                                }, new List<string>() { "groupB" });
+                                request => { failed = true; },
+                                new List<string>
+                                    { "groupB" });
                         },
                         () =>
                         {
@@ -46,7 +45,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => false);
+                    signalx.AuthenticationHandler(request => false);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -57,10 +56,9 @@
                         {
                             signalx.ServerAuthorized(
                                 "sample",
-                                request =>
-                                {
-                                    failed = true;
-                                }, new List<string>() { "groupB" });
+                                request => { failed = true; },
+                                new List<string>
+                                    { "groupB" });
                         },
                         () =>
                         {

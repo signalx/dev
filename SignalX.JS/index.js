@@ -1,5 +1,5 @@
 ﻿/*!
- * SignalX JavaScript Library v2.0.2-pre
+ * SignalX JavaScript Library v3.0.0-pre
  * https://github.com/signalx
  */
 (function ($, window, undefined) {
@@ -298,13 +298,16 @@
                                         signalx.server[nnn] = server[nnn];
                                     }
                                 }
-                                isReady = true;
+                                
                                 (typeof  chat.server.signalXClientReady === "function") &&  chat.server.signalXClientReady();
                                 if (typeof signalx.beforeOthersReady === "function") {
-                                    signalx.beforeOthersReady(function () {
+                                    signalx.beforeOthersReady(function (msgResp) {
+                                        msgResp && signalx.debug.f("After serve's on ready executes : "+msgResp);
+                                       isReady = true;
                                        mailBox.run();
                                     });
                                 } else {
+                                    isReady = true;
                                     mailBox.run();
                                 }
                                 

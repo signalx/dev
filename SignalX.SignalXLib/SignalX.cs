@@ -9,7 +9,6 @@
 
     public class SignalX : IDisposable
     {
-        public  SignalXAdvanced Advanced =new SignalXAdvanced();
         internal static object padlock = new object();
         static readonly SignalXAgents SignalXAgents = new SignalXAgents();
         internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT";
@@ -44,15 +43,17 @@
 
                  ";
 
+        public SignalXAdvanced Advanced = new SignalXAdvanced();
+
         public SignalXSettings Settings = new SignalXSettings();
 
         SignalX()
         {
             this.Connections = new ConnectionMapping<string>();
-            this.OnErrorMessageReceivedFromClient=new List<Action<string, SignalXRequest>>();
-            this.OnDebugMessageReceivedFromClient=new List<Action<string, SignalXRequest>>();
-            this.OnClientReady=new List<Action<SignalXRequest>>();
-            this.Advanced.Trace($"SIgnalX framework initialized");
+            this.OnErrorMessageReceivedFromClient = new List<Action<string, SignalXRequest>>();
+            this.OnDebugMessageReceivedFromClient = new List<Action<string, SignalXRequest>>();
+            this.OnClientReady = new List<Action<SignalXRequest>>();
+            this.Advanced.Trace("SIgnalX framework initialized");
         }
 
         /// <summary>
@@ -64,10 +65,12 @@
         internal List<Action<string, SignalXRequest>> OnErrorMessageReceivedFromClient { set; get; }
 
         internal List<Action<string, SignalXRequest>> OnDebugMessageReceivedFromClient { set; get; }
+
         //needs more care to refactor
         internal Action<dynamic, SignalXRequest, string> OnResponseAfterScriptRuns { set; get; }
 
         internal List<Action<SignalXRequest>> OnClientReady { set; get; }
+
         static SignalX instance { set; get; }
 
         public ulong ConnectionCount { get; internal set; }
@@ -107,12 +110,13 @@
 
         public void SetUpClientErrorMessageHandler(Action<string, SignalXRequest> handler)
         {
-
+            this.Advanced.Trace($"Registering {nameof(this.SetUpClientErrorMessageHandler)}...");
             this.OnErrorMessageReceivedFromClient.Add(handler);
         }
 
         public void SetUpClientDebugMessageHandler(Action<string, SignalXRequest> handler)
         {
+            this.Advanced.Trace($"Registering {nameof(this.SetUpClientDebugMessageHandler)}...");
             this.OnDebugMessageReceivedFromClient.Add(handler);
         }
 
@@ -128,6 +132,7 @@
             string messageId,
             List<string> groupList)
         {
+            this.Advanced.Trace($"Sending message from {messageId} to server {handler} ...");
             IPrincipal user = context?.User;
             string error = "";
             try
@@ -150,6 +155,7 @@
                 if (string.IsNullOrEmpty(handler) || !this.Settings.SignalXServers.ContainsKey(handler))
                 {
                     string e = "Error request for unknown server name " + handler;
+                    this.Advanced.Trace(e);
                     this.Settings.ExceptionHandler.ForEach(h => h?.Invoke(e, new Exception(e)));
                     this.RespondToUser(context?.ConnectionId, replyTo, e);
                     return;
@@ -170,6 +176,7 @@
                 error = "An error occured on the server while processing message " + message + " with id " +
                     messageId + " received from  " + sender + " [ user = " + user?.Identity?.Name + "] for a response to " + replyTo + " - ERROR: " +
                     e?.Message;
+                this.Advanced.Trace(error, e);
                 if (!string.IsNullOrEmpty(context?.ConnectionId))
                     this.RespondToUser(context?.ConnectionId, "signalx_error", error);
 
@@ -196,6 +203,7 @@
 
         internal bool AllowToSend(string name, dynamic data)
         {
+            this.Advanced.Trace($"Checking if {name} can be sent a message", data);
             if (this.Settings.DisabledAllClients)
             {
                 if (!this.Settings.SignalXClientDetails.ContainsKey(name) ||
@@ -250,11 +258,13 @@
 
         public void RespondToAll(string replyTo, dynamic responseData)
         {
+            this.Advanced.Trace($"Responding to all {replyTo}...", responseData);
             RespondToAllInGroup(replyTo, responseData, null);
         }
 
         public void RespondToAllInGroup(string replyTo, dynamic responseData, string groupName)
         {
+            this.Advanced.Trace($"Responding to all {replyTo} in group {groupName}...", responseData);
             if (!AllowToSend(replyTo, responseData))
                 return;
             if (this.Settings.StartCountingOutGoingMessages)

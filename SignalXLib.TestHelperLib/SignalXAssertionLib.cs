@@ -1,8 +1,8 @@
 namespace SignalXLib.TestHelperLib
 {
-    using Newtonsoft.Json;
     using System;
     using System.Threading.Tasks;
+    using Newtonsoft.Json;
 
     public class SignalXAssertionLib
     {
@@ -37,13 +37,13 @@ namespace SignalXLib.TestHelperLib
         public void IsTrue(bool expectation, string message = "")
         {
             if (!expectation)
-                throw new Exception($"Expected result to be true " + message);
+                throw new Exception("Expected result to be true " + message);
         }
 
         public void IsFalse(bool expectation, string message = "")
         {
             if (expectation)
-                throw new Exception($"Expected result to be not true " + message);
+                throw new Exception("Expected result to be not true " + message);
         }
 
         public void Fail()

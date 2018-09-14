@@ -5,7 +5,7 @@ namespace SignalXLib.TestHelperLib
     public sealed class Isolated<T> : IDisposable
         where T : MarshalByRefObject
     {
-        private AppDomain _domain;
+        AppDomain _domain;
 
         public Isolated()
         {

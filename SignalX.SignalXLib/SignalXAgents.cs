@@ -7,12 +7,9 @@
     {
         public void SetUpAgents(SignalX SignalX)
         {
-            SignalX?.Advanced.Trace($"Setting up agents ...");
+            SignalX?.Advanced.Trace("Setting up agents ...");
             if (SignalX == null)
-            {
                 throw new ArgumentNullException(nameof(SignalX));
-            }
-
 
             SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTREADY} ...");
             SignalX.Server(
@@ -20,7 +17,6 @@
                 (request, state) =>
                 {
                     foreach (Action<SignalXRequest> action in SignalX.OnClientReady)
-                    {
                         try
                         {
                             action.Invoke(request);
@@ -28,11 +24,13 @@
                         }
                         catch (Exception e)
                         {
-                            SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
+                            string error = $"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}";
+                            SignalX.Advanced.Trace(e, error);
+                            if (SignalX.Settings.ContinueClientExecutionWhenAnyServerOnClientReadyFails)
+                                request.RespondToSender("Error while executing server ready, but server has allowed client to continue execution regardless");
+                            else
+                                SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke(error, e));
                         }
-                    }
-
-                
                 },
                 requireAuthorization: false,
                 isSingleWriter: false,
@@ -67,27 +65,22 @@
                 isSingleWriter: false,
                 allowDynamicServerForThisInstance: true);
 
-
             SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTERRORHANDLER} ...");
             SignalX.Server(
                 SignalX.SIGNALXCLIENTERRORHANDLER,
                 (request, state) =>
                 {
                     foreach (Action<string, SignalXRequest> action in SignalX.OnErrorMessageReceivedFromClient)
-                    {
-                          try
-                    {
-                        dynamic str = request.Message.ToString();
+                        try
+                        {
+                            dynamic str = request.Message.ToString();
 
-                        action?.Invoke(str, request);
-                    }
-                    catch (Exception e)
-                    {
-                        SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
-                    }
-                    }
-
-                  
+                            action?.Invoke(str, request);
+                        }
+                        catch (Exception e)
+                        {
+                            SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
+                        }
                 },
                 requireAuthorization: false,
                 isSingleWriter: false,
@@ -99,19 +92,15 @@
                 (request, state) =>
                 {
                     foreach (Action<string, SignalXRequest> action in SignalX.OnDebugMessageReceivedFromClient)
-                    {
-                              try
-                    {
-                        dynamic str = request.Message.ToString();
-                        action?.Invoke(str, request);
-                    }
-                    catch (Exception e)
-                    {
-                        SignalX.Settings.WarningHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
-                    }
-                    }
-
-              
+                        try
+                        {
+                            dynamic str = request.Message.ToString();
+                            action?.Invoke(str, request);
+                        }
+                        catch (Exception e)
+                        {
+                            SignalX.Settings.WarningHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
+                        }
                 },
                 requireAuthorization: false,
                 isSingleWriter: false,

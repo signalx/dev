@@ -1,5 +1,5 @@
 ﻿/*!
- * SignalX JavaScript Library v2.0.1-pre
+ * SignalX JavaScript Library v2.0.2-pre
  * https://github.com/signalx
  */
 (function ($, window, undefined) {
@@ -300,7 +300,14 @@
                                 }
                                 isReady = true;
                                 (typeof  chat.server.signalXClientReady === "function") &&  chat.server.signalXClientReady();
-                                mailBox.run();
+                                if (typeof signalx.beforeOthersReady === "function") {
+                                    signalx.beforeOthersReady(function () {
+                                       mailBox.run();
+                                    });
+                                } else {
+                                    mailBox.run();
+                                }
+                                
                             } catch (e) {
                                 (typeof  chat.server.signalXClientReadyError === "function") &&  chat.server.signalXClientReadyError("Error downloading script from server",e);
                                 signalx.error.f({

@@ -1,7 +1,7 @@
 namespace SignalXLib.TestHelperLib
 {
-    using SignalXLib.Lib;
     using System;
+    using SignalXLib.Lib;
 
     public class IsolationContainer : MarshalByRefObject
     {
@@ -30,18 +30,15 @@ var appendHtml= function (el, str) {
  appendHtml(document.body,html);
 })";
             sx.SetUpClientErrorMessageHandler(
-                (error, request) =>
-                {
-                    throw new Exception($"Failed because an error has occurred on the client side script during a test '{this.TestName.Replace("_", " ")}'  {error}");
-                });
+                (error, request) => { throw new Exception($"Failed because an error has occurred on the client side script during a test '{this.TestName.Replace("_", " ")}'  {error}"); });
             var exceptionTracker = new ExceptionTracker
             {
                 Exception = null
             };
             sx.OnException(
-               (m, e) =>
+                (m, e) =>
                 {
-                    exceptionTracker.Exception = new Exception(m,e);
+                    exceptionTracker.Exception = new Exception(m, e);
                     exceptionTracker.Context = m;
                 });
             if (this.MethodBody != null)

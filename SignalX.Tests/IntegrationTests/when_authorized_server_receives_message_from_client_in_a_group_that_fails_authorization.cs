@@ -14,10 +14,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) =>
-                    {
-                        return request.Groups.Contains("groupB");
-                    });
+                    signalx.AuthenticationHandler(request => { return request.Groups.Contains("groupB"); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -28,10 +25,7 @@
                         {
                             signalx.ServerAuthorizedSingleAccess(
                                 "sample",
-                                request =>
-                                {
-                                    failed = true;
-                                });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -48,10 +42,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) =>
-                    {
-                        return request.Groups.Contains("groupB");
-                    });
+                    signalx.AuthenticationHandler(request => { return request.Groups.Contains("groupB"); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -79,10 +70,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) =>
-                    {
-                        return request.Groups.Contains("groupB");
-                    });
+                    signalx.AuthenticationHandler(request => { return request.Groups.Contains("groupB"); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -93,10 +81,7 @@
                         {
                             signalx.ServerAuthorizedSingleAccess(
                                 "sample",
-                                request =>
-                                {
-                                    failed = true;
-                                });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -113,10 +98,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) =>
-                    {
-                        return request.Groups.Contains("groupB");
-                    });
+                    signalx.AuthenticationHandler(request => { return request.Groups.Contains("groupB"); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -127,10 +109,7 @@
                         {
                             signalx.ServerAuthorized(
                                 "sample",
-                                request =>
-                                {
-                                    failed = true;
-                                });
+                                request => { failed = true; });
                         },
                         () =>
                         {

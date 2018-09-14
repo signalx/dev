@@ -1,9 +1,5 @@
 namespace SignalXLib.TestHelperLib
 {
-    using Microsoft.Owin.Hosting;
-    using OpenQA.Selenium;
-    using OpenQA.Selenium.Firefox;
-    using SignalXLib.Lib;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -15,6 +11,10 @@ namespace SignalXLib.TestHelperLib
     using System.Security.Permissions;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.Owin.Hosting;
+    using OpenQA.Selenium;
+    using OpenQA.Selenium.Firefox;
+    using SignalXLib.Lib;
 
     public class SignalXTester
     {
@@ -23,10 +23,12 @@ namespace SignalXLib.TestHelperLib
         public static TimeSpan MaxTestWaitTimeBeforeChecks = TimeSpan.FromSeconds(3);
         public static bool EmbedeLibraryScripts = true;
         public static TimeSpan MaxWaitTimeForAllExpectedConnectionsToArrive = TimeSpan.FromSeconds(30);
+
         /// <summary>
-        /// Specify the method that generates the file name of each web page used in test
+        ///     Specify the method that generates the file name of each web page used in test
         /// </summary>
         public static Func<string> TestFileNameGenerator = () => Guid.NewGuid().ToString();
+
         /// <summary>
         ///     Sets this only when none is specified in each test
         /// </summary>
@@ -63,6 +65,18 @@ namespace SignalXLib.TestHelperLib
             }
         };
 
+        /// <summary>
+        ///     Dynamically specify what port to use to run test
+        /// </summary>
+        public static Func<int> TcpPortNumberGenerator = () =>
+        {
+            var l = new TcpListener(IPAddress.Loopback, 0);
+            l.Start();
+            int port = ((IPEndPoint)l.LocalEndpoint).Port;
+            l.Stop();
+            return port;
+        };
+
         internal static string signalxScriptDownload { set; get; }
 
         internal static string signalRScriptDownload { set; get; }
@@ -93,7 +107,7 @@ namespace SignalXLib.TestHelperLib
             RunInternal(fun, false, numberOfRetryOnTestFailure, numberOfMustRetryNoMatterWhat, callerName);
         }
 
-        private static void RunInternal(
+        static void RunInternal(
             Func<SignalX, SignalXAssertionLib, SignalXTestDefinition> fun,
             bool expectFailure,
             int numberOfRetryOnTestFailure = 0,
@@ -151,31 +165,14 @@ namespace SignalXLib.TestHelperLib
                 }
             }
         }
-        
-
-        /// <summary>
-        /// Dynamically specify what port to use to run test
-        /// </summary>
-        public static Func<int> TcpPortNumberGenerator = () =>
-        {
-            var l = new TcpListener(IPAddress.Loopback, 0);
-            l.Start();
-            int port = ((IPEndPoint)l.LocalEndpoint).Port;
-            l.Stop();
-            return port;
-        };
 
         internal static bool IsPortIsAvailable(int port)
         {
             IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
             TcpConnectionInformation[] tcpConnInfoArray = ipGlobalProperties.GetActiveTcpConnections();
             foreach (TcpConnectionInformation t in tcpConnInfoArray)
-            {
                 if (t.LocalEndPoint.Port == port)
-                {
                     return false;
-                }
-            }
             return true;
         }
 
@@ -220,7 +217,7 @@ namespace SignalXLib.TestHelperLib
 
                 var testObject = new TestObject();
                 testObject.BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-                testObject.FileName = "\\index" + TestFileNameGenerator()+ ".html";
+                testObject.FileName = "\\index" + TestFileNameGenerator() + ".html";
                 testObject.PageHtml = WrapScriptInHtml(scriptTags, script, "<h1>Signalx tests running ....</h1>");
 
                 testObject = scenarioDefinition.OnClientPrepared == null ? testObject : scenarioDefinition.OnClientPrepared.Invoke(testObject);
@@ -233,18 +230,16 @@ namespace SignalXLib.TestHelperLib
             scenarioDefinition.TestEvents = scenarioDefinition.TestEvents ?? new TestEventHandler();
             scenarioDefinition.TestEvents.OnAppStarted = () => { scenarioDefinition?.OnAppStarted?.Invoke(); };
 
-            var port = TcpPortNumberGenerator();
+            int port = TcpPortNumberGenerator();
             if (!IsPortIsAvailable(port))
-            {
                 throw new Exception($"The specified tcp port {port} is already in use");
-            }
 
             CheckExpectations(
                 exceptionTracker,
                 signalX,
                 scenarioDefinition.NumberOfClients,
                 () => { scenarioDefinition?.Checks?.Invoke(); },
-                "http://localhost:" +port ,
+                "http://localhost:" + port,
                 testObjects,
                 scenarioDefinition.BrowserType,
                 scenarioDefinition.TestEvents);
@@ -267,7 +262,7 @@ namespace SignalXLib.TestHelperLib
                     _drivers.Add(
                         new FirefoxDriver(
                             option
-                        // Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                            // Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                         ));
 
             try
@@ -354,7 +349,7 @@ namespace SignalXLib.TestHelperLib
             }
         }
 
-        private static void QuitAllBrowsers(
+        static void QuitAllBrowsers(
             List<IWebDriver> _drivers,
             List<Process> browserProcess,
             Thread thread,
@@ -403,7 +398,7 @@ namespace SignalXLib.TestHelperLib
             }
         }
 
-        private static void CloseAChromeTab(string check)
+        static void CloseAChromeTab(string check)
         {
             /* Process[] procsChrome = Process.GetProcessesByName("chrome");
 
@@ -436,7 +431,7 @@ namespace SignalXLib.TestHelperLib
         }
 
         [SecurityPermission(SecurityAction.Demand, ControlThread = true)]
-        private static void KillTheThread(Thread thread)
+        static void KillTheThread(Thread thread)
         {
             try
             {

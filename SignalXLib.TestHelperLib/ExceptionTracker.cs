@@ -5,6 +5,7 @@ namespace SignalXLib.TestHelperLib
     public class ExceptionTracker
     {
         public Exception Exception { get; set; }
+
         public string Context { set; get; }
     }
 }

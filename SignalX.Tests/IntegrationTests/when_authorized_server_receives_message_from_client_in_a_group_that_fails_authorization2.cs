@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System.Collections.Generic;
 
     [TestClass]
     public class when_authorized_server_receives_message_from_client_in_a_group_that_fails_authorization2
@@ -15,7 +15,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => true);
+                    signalx.AuthenticationHandler(request => true);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -26,10 +26,9 @@
                         {
                             signalx.ServerAuthorizedSingleAccess(
                                 "sample",
-                                request =>
-                                {
-                                    failed = true;
-                                }, new List<string>() { "groupB" });
+                                request => { failed = true; },
+                                new List<string>
+                                    { "groupB" });
                         },
                         () =>
                         {
@@ -46,7 +45,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => true);
+                    signalx.AuthenticationHandler(request => true);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -57,7 +56,9 @@
                         {
                             signalx.ServerAuthorized(
                                 "sample",
-                                request => { failed = true; }, new List<string>() { "groupB" });
+                                request => { failed = true; },
+                                new List<string>
+                                    { "groupB" });
                         },
                         () =>
                         {
@@ -74,23 +75,22 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => true);
+                    signalx.AuthenticationHandler(request => true);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupB',function(){ signalx.server.sample(100); });
                                    }); ",
-                        onAppStarted: () =>
+                        () =>
                         {
                             signalx.ServerAuthorizedSingleAccess(
                                 "sample",
-                                request =>
-                                {
-                                    failed = true;
-                                }, new List<string>() { "groupB" });
+                                request => { failed = true; },
+                                new List<string>
+                                    { "groupB" });
                         },
-                        checks: () =>
+                        () =>
                         {
                             assert.WaitForSomeTime(SignalXTester.MaxTestTimeSpan);
                             assert.IsTrue(failed);
@@ -105,7 +105,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request) => true);
+                    signalx.AuthenticationHandler(request => true);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -116,10 +116,9 @@
                         {
                             signalx.ServerAuthorized(
                                 "sample",
-                                request =>
-                                {
-                                    failed = true;
-                                }, new List<string>() { "groupB" });
+                                request => { failed = true; },
+                                new List<string>
+                                    { "groupB" });
                         },
                         () =>
                         {

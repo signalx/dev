@@ -10,6 +10,11 @@
 
         public int Count => this._connections.Count;
 
+        public string FirstOrDefault()
+        {
+            return this.GetAll()?.FirstOrDefault();
+        }
+
         public void Add(SignalX SignalX, T key, string connectionId)
         {
             if (!SignalX.Settings.ManageUserConnections)

@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System;
 
     [TestClass]
     public class when_server_executes_javascript_on_all_clients
@@ -34,7 +34,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                    (response) => { result = Convert.ToInt32(response); },
+                                    response => { result = Convert.ToInt32(response); },
                                     TimeSpan.FromSeconds(10));
                             })
                     );
@@ -60,8 +60,8 @@
                             () =>
                             {
                                 signalX.RunJavaScriptOnAllClients(
-                                    $"return 5*10",
-                                    (response) => { result = Convert.ToInt32(response); },
+                                    "return 5*10",
+                                    response => { result = Convert.ToInt32(response); },
                                     TimeSpan.FromSeconds(15));
                             }));
                 });
@@ -119,7 +119,7 @@
                             () =>
                             {
                                 signalX.RunJavaScriptOnAllClients(
-                                    $"return 5*10",
+                                    "return 5*10",
                                     (response, request, error) => { result = Convert.ToInt32(response); },
                                     TimeSpan.FromSeconds(15));
                             }));
@@ -152,7 +152,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                    (response) => { result = Convert.ToInt32(response); },
+                                    response => { result = Convert.ToInt32(response); },
                                     TimeSpan.FromSeconds(10));
                             })
                     );
@@ -178,8 +178,8 @@
                             () =>
                             {
                                 signalX.RunJavaScriptOnAllClients(
-                                    $"return 5*10*20",
-                                    (response) => { result = Convert.ToInt32(response); },
+                                    "return 5*10*20",
+                                    response => { result = Convert.ToInt32(response); },
                                     TimeSpan.FromSeconds(15));
                             }));
                 });
@@ -230,14 +230,14 @@
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
-                        script: "",
-                        onAppStarted: () => { },
-                        checks: () => { assert.AreEqual(50, result); },
-                        events: new TestEventHandler(
-                            onClientLoaded: () =>
+                        "",
+                        () => { },
+                        () => { assert.AreEqual(50, result); },
+                        new TestEventHandler(
+                            () =>
                             {
                                 signalX.RunJavaScriptOnAllClients(
-                                    $"return 5*10*20",
+                                    "return 5*10*20",
                                     (response, request, error) => { result = Convert.ToInt32(response); },
                                     TimeSpan.FromSeconds(15));
                             }));

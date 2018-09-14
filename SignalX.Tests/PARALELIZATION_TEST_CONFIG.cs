@@ -5,9 +5,9 @@
 
 namespace SignalXLib.Tests
 {
-    using SignalXLib.TestHelperLib;
     using System;
     using System.IO;
+    using SignalXLib.TestHelperLib;
 
     public class ScriptSource
     {
@@ -25,7 +25,7 @@ namespace SignalXLib.Tests
                     return File.ReadAllText(baseDir + $"lib\\{signalr}");
 
                 case ScriptLibraries.SIGNALX:
-                    return File.ReadAllText(baseDir + $"index.js");
+                    return File.ReadAllText(baseDir + "index.js");
 
                 default:
                     throw new FileLoadException("Cannot find file for " + cdn);
