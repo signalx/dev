@@ -8,12 +8,11 @@
 
     public class TestReceiver : ISignalXClientReceiver
     {
-        SignalX SignalX;
+       
 
-        public TestReceiver(SignalX signalX)
-        {
-            this.SignalX = signalX ?? throw new ArgumentNullException(nameof(signalX));
-            this.LastMessageReceived = new TestMessageModel();
+        public TestReceiver()
+        {this.LastMessageReceived = new TestMessageModel();
+
         }
 
         public TestMessageModel LastMessageReceived { set; get; }
@@ -46,7 +45,6 @@
         public void ReceiveScripts(string contextConnectionId, string script, HubCallerContext context, IGroupManager groups, IHubCallerConnectionContext<dynamic> clients)
         {
             this.LastMessageReceived = new TestMessageModel();
-
             this.LastMessageReceived.Script = script;
         }
 
@@ -62,9 +60,20 @@
             SignalX.RespondToScriptRequest(context, clients, groups);
         }
 
-        public void SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId, List<string> groupList)
+        public void SendMessageToServer(
+            SignalX signalX, 
+            HubCallerContext context,
+            IHubCallerConnectionContext<dynamic> clients,
+            IGroupManager groups,
+            string handler,
+            dynamic message,
+            string replyTo,
+            object sender,
+            string messageId,
+            List<string> groupList)
         {
-            SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList);
+          
+          signalX.RespondToServer(context?? signalX.NullHubCallerContext, clients, groups,handler,  message, sender, replyTo?? signalX.NullHubCallerContext.ConnectionId, groupList);
         }
     }
 }

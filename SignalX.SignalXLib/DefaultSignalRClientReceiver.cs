@@ -5,7 +5,7 @@
     using Microsoft.AspNet.SignalR.Hubs;
     using Microsoft.AspNet.SignalR.Infrastructure;
 
-    class DefaultSignalRClientReceiver : ISignalXClientReceiver
+   class DefaultSignalRClientReceiver : ISignalXClientReceiver
     {
         // SignalX SignalX= Lib.SignalX.Instance;
 
@@ -104,8 +104,7 @@
         /// <param name="groupList"></param>
         public void SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId, List<string> groupList)
         {
-            SignalX.Advanced.Trace($"Sending message {message} to server from {messageId} having groups {string.Join(",", groupList ?? new List<string>())} with reply to {replyTo}");
-            SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList);
+           SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList, false);
         }
     }
 }

@@ -16,7 +16,7 @@
         public void Send(string handler, dynamic message, string replyTo, dynamic sender, string messageId, List<string> groups)
         {
             this.signalX.Advanced.Trace($"Received message from client {handler}...");
-            this.signalX.SendMessageToServer(this.Context, this.Clients, this.Groups, handler, message, replyTo, sender, messageId, groups);
+            this.signalX.SendMessageToServer(this.Context, this.Clients, this.Groups, handler, message, replyTo, sender, messageId, groups, false);
         }
 
         //not async because it already behaves as async from client clide
@@ -40,9 +40,7 @@
 
         public void SignalXClientReady()
         {
-            this.signalX.Advanced.Trace("Client is ready...");
-            this.signalX.Settings.HasOneOrMoreConnections = true;
-            this.signalX.ConnectionCount++;
+            this.signalX.SetSignalXClientAsReady();
         }
 
         public void SignalXClientReadyError(string message, string error)

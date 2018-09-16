@@ -26,6 +26,34 @@ namespace SignalXLib.TestHelperLib
                 throw new Exception($"Expected {obj1} to be equal to {obj2} " + message);
         }
 
+        public async Task<bool> WillPassBeforeGivenTime(TimeSpan timeSpan, Action operation)
+        {
+            var startTime = DateTime.Now;
+            Exception lastException = null;
+            do
+            {
+                try
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(100));
+                    operation();
+                    lastException = null;
+                }
+                catch (Exception e)
+                {
+                    lastException = e;
+                }
+            }
+            while ((DateTime.Now - startTime).TotalMilliseconds< timeSpan.TotalMilliseconds 
+            && lastException!=null);
+
+            if (lastException != null)
+            {
+                //$"Could not pass within given time {timeSpan}"
+                throw lastException;
+            }
+
+            return true;
+        }
         public void AreDifferent(object item1, object item2, string message = "")
         {
             string obj1 = JsonConvert.SerializeObject(item1);

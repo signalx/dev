@@ -17,10 +17,10 @@
         {
             if (string.IsNullOrEmpty(clientMethodName))
                 throw new ArgumentNullException(nameof(clientMethodName));
-            if (signalX.Settings.SignalXClientDetails.ContainsKey(clientMethodName))
-                signalX.Settings.SignalXClientDetails[clientMethodName].Disabled = status;
+            if (signalX.SignalXClientDetails.ContainsKey(clientMethodName))
+                signalX.SignalXClientDetails[clientMethodName].Disabled = status;
             else
-                signalX.Settings.SignalXClientDetails.GetOrAdd(clientMethodName, new ClientDetails { Disabled = status });
+                signalX.SignalXClientDetails.GetOrAdd(clientMethodName, new ClientDetails { Disabled = status });
         }
 
         /// <summary>
@@ -37,7 +37,7 @@
             signalX.Advanced.Trace($"Disabling all clients ...");
 
             signalX.Settings.DisabledAllClients = true;
-            foreach (string s in signalX.Settings.SignalXClientDetails.Select(x => x.Key).ToList())
+            foreach (string s in signalX.SignalXClientDetails.Select(x => x.Key).ToList())
                 signalX.UpdateClient(s, true);
         }
 
@@ -75,7 +75,7 @@
             signalX.Advanced.Trace($"Enabling all clients ...");
 
             signalX.Settings.DisabledAllClients = false;
-            foreach (string s in signalX.Settings.SignalXClientDetails.Select(x => x.Key).ToList())
+            foreach (string s in signalX.SignalXClientDetails.Select(x => x.Key).ToList())
                 signalX.UpdateClient(s, false);
         }
 
@@ -90,9 +90,9 @@
                 return true;
             }
 
-            if (signalX.Settings.SignalXServerExecutionDetails.ContainsKey(serverHandlerName))
+            if (signalX.SignalXServerExecutionDetails.ContainsKey(serverHandlerName))
             {
-                var allowedGroups = signalX.Settings.SignalXServerExecutionDetails[serverHandlerName].AllowedGroups;
+                var allowedGroups = signalX.SignalXServerExecutionDetails[serverHandlerName].AllowedGroups;
                 signalX.Advanced.Trace($"Checking if request is coming from a client with group allowed to access server {serverHandlerName}...");
                 foreach (var allowedGroup in allowedGroups)
                 {
@@ -105,8 +105,8 @@
             }
 
             if (signalX.Settings.RequireAuthorizationForAllHandlers ||
-                signalX.Settings.SignalXServerExecutionDetails.ContainsKey(serverHandlerName) &&
-                signalX.Settings.SignalXServerExecutionDetails[serverHandlerName].RequiresAuthorization)
+                signalX.SignalXServerExecutionDetails.ContainsKey(serverHandlerName) &&
+                signalX.SignalXServerExecutionDetails[serverHandlerName].RequiresAuthorization)
             {
                 signalX.Advanced.Trace($"Checking if request is authorized to access the server {serverHandlerName} because authorization function has been set ...");
 
@@ -277,9 +277,9 @@
             string camelCased = char.ToLowerInvariant(name[0]) + name.Substring(1);
             string unCamelCased = char.ToUpperInvariant(name[0]) + name.Substring(1);
 
-            if ((signalX.Settings.SignalXServers.ContainsKey(camelCased) || signalX.Settings.SignalXServers.ContainsKey(unCamelCased)) && !signalX.Settings.AllowDynamicServerInternal && !allowDynamicServerForThisInstance)
+            if ((signalX.SignalXServers.ContainsKey(camelCased) || signalX.SignalXServers.ContainsKey(unCamelCased)) && !signalX.Settings.AllowDynamicServerInternal && !allowDynamicServerForThisInstance)
             {
-  var exc= new Exception("Server with name '" + name + "' has already been created");
+              var exc= new Exception("Server with name '" + name + "' has already been created");
                 signalX.Advanced.Trace(exc.Message,exc);
 
                 throw exc;
@@ -287,26 +287,26 @@
               
             try
             {
-                if (signalX.Settings.SignalXServers.ContainsKey(camelCased))
+                if (signalX.SignalXServers.ContainsKey(camelCased))
                 {
-                    signalX.Settings.SignalXServers[camelCased] = server;
-                    signalX.Settings.SignalXServerExecutionDetails[camelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames);
+                    signalX.SignalXServers[camelCased] = server;
+                    signalX.SignalXServerExecutionDetails[camelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames);
 
                     if (camelCased != unCamelCased)
                     {
-                        signalX.Settings.SignalXServers[unCamelCased] = server;
-                        signalX.Settings.SignalXServerExecutionDetails[unCamelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames);
+                        signalX.SignalXServers[unCamelCased] = server;
+                        signalX.SignalXServerExecutionDetails[unCamelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames);
                     }
                 }
                 else
                 {
-                    signalX.Settings.SignalXServers.GetOrAdd(camelCased, server);
-                    signalX.Settings.SignalXServerExecutionDetails.GetOrAdd(camelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames));
+                    signalX.SignalXServers.GetOrAdd(camelCased, server);
+                    signalX.SignalXServerExecutionDetails.GetOrAdd(camelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames));
 
                     if (camelCased != unCamelCased)
                     {
-                        signalX.Settings.SignalXServers.GetOrAdd(unCamelCased, server);
-                        signalX.Settings.SignalXServerExecutionDetails.GetOrAdd(unCamelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames));
+                        signalX.SignalXServers.GetOrAdd(unCamelCased, server);
+                        signalX.SignalXServerExecutionDetails.GetOrAdd(unCamelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames));
                     }
                 }
             }
@@ -433,7 +433,7 @@
             if (signalX.Settings.StartCountingOutGoingMessages)
                 Interlocked.Increment(ref signalX.Settings.OutGoingCounter);
 
-            signalX.Settings.Receiver.Receive(user, name, data);
+            signalX.Receiver.Receive(user, name, data);
         }
 
         /// <summary>
@@ -451,21 +451,21 @@
             if (signalX.Settings.StartCountingOutGoingMessages)
                 Interlocked.Increment(ref signalX.Settings.OutGoingCounter);
 
-            signalX.Settings.Receiver.ReceiveAsOther(name, data, excludedUserId, groupName);
+            signalX.Receiver.ReceiveAsOther(name, data, excludedUserId, groupName);
         }
 
         internal static void CallServer(this SignalX signalX, SignalXRequest request)
         {
             signalX.Advanced.Trace($"Running call to server {request?.Handler}...");
 
-            ServerHandlerDetails executionDetails = signalX.Settings.SignalXServerExecutionDetails[request.Handler];
+            ServerHandlerDetails executionDetails = signalX.SignalXServerExecutionDetails[request.Handler];
             if (executionDetails.IsSingleWriter)
                 using (executionDetails.SingleWriter.Write())
                 {
-                    signalX.Settings.SignalXServers[request.Handler].Invoke(request, signalX.Settings.SignalXServerExecutionDetails[request.Handler].State);
+                    signalX.SignalXServers[request.Handler].Invoke(request, signalX.SignalXServerExecutionDetails[request.Handler].State);
                 }
             else
-                signalX.Settings.SignalXServers[request.Handler].Invoke(request, signalX.Settings.SignalXServerExecutionDetails[request.Handler].State);
+                signalX.SignalXServers[request.Handler].Invoke(request, signalX.SignalXServerExecutionDetails[request.Handler].State);
         }
 
         public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script, string groupName, Action<dynamic> onResponse = null, TimeSpan? delay = null)
@@ -567,7 +567,7 @@
             groups.Add(context?.ConnectionId, groupName);
             signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXGroupJoin.ToString(), groupName));
 
-            signalX.Settings.Receiver.ReceiveInGroupManager("join", context?.ConnectionId, groupName, context, clients, groups);
+            signalX.Receiver.ReceiveInGroupManager("join", context?.ConnectionId, groupName, context, clients, groups);
         }
 
         internal static void LeaveGroup(
@@ -580,7 +580,7 @@
             signalX.Advanced.Trace($"User {context?.ConnectionId} is leaving group {groupName}...");
             groups.Remove(context?.ConnectionId, groupName);
             signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXGroupLeave.ToString(), groupName));
-            signalX.Settings.Receiver.ReceiveInGroupManager("leave", context?.ConnectionId, groupName, context, clients, groups);
+            signalX.Receiver.ReceiveInGroupManager("leave", context?.ConnectionId, groupName, context, clients, groups);
         }
 
         public static string GenerateUniqueNameId()
@@ -628,14 +628,14 @@
                  }";
 
             var methods = "; window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})};" +
-                signalX.Settings.SignalXServers.Aggregate(clientReady + clientAgent + "var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  var messageToSend={handler:'" + signalXServer.Key + "',message:m, replyTo:rt,sender:sen, groupList:signalx.groupList}; console.log(JSON.stringify(signalx.groupList));  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId,signalx.groupList||[]); if(repTo){return messageId}else{ return deferred.promise();}   },")).Trim()
+                signalX.SignalXServers.Aggregate(clientReady + clientAgent + "var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  var messageToSend={handler:'" + signalXServer.Key + "',message:m, replyTo:rt,sender:sen, groupList:signalx.groupList}; console.log(JSON.stringify(signalx.groupList));  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId,signalx.groupList||[]); if(repTo){return messageId}else{ return deferred.promise();}   },")).Trim()
                 + "}; $sx; ";
 
             if (signalX.Settings.StartCountingInComingMessages)
                 Interlocked.Increment(ref signalX.Settings.InComingCounter);
 
             signalX.Advanced.Trace($"Sending script to client ...");
-            signalX.Settings.Receiver.ReceiveScripts(context?.ConnectionId, methods, context, groups, clients);
+            signalX.Receiver.ReceiveScripts(context?.ConnectionId, methods, context, groups, clients);
 
             signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestForMethodsCompleted.ToString(), methods));
         }

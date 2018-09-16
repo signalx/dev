@@ -28,7 +28,7 @@
                     bool HasOneOrMoreConnections = signalx.Settings.HasOneOrMoreConnections;
                     HubConfiguration HubConfiguration = signalx.Settings.HubConfiguration;
                     bool LogAgentMessagesOnClient = signalx.Settings.LogAgentMessagesOnClient;
-                    ISignalXClientReceiver Receiver = signalx.Settings.Receiver;
+                   // ISignalXClientReceiver Receiver = signalx.Settings.Receiver;
                     bool RequireAuthorizationForAllHandlers = signalx.Settings.RequireAuthorizationForAllHandlers;
 
                     signalx.AuthenticationHandler(request => true);

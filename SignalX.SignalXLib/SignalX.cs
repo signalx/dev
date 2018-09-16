@@ -1,11 +1,14 @@
 ﻿namespace SignalXLib.Lib
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Security.Principal;
     using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
+    using Microsoft.AspNet.SignalR.Owin;
 
     public class SignalX : IDisposable
     {
@@ -43,19 +46,42 @@
 
                  ";
 
-        public SignalXAdvanced Advanced = new SignalXAdvanced();
+        public SignalXAdvanced Advanced {set;get;}
+
+        //todo rename this to reflect what is actually happening!
+        public void SetSignalXClientAsReady()
+        {
+            this.Advanced.Trace("Client is ready...");
+            this.Settings.HasOneOrMoreConnections = true;
+            this.ConnectionCount++;
+        }
 
         public SignalXSettings Settings = new SignalXSettings();
+        protected internal ConcurrentDictionary<string, Action<SignalXRequest, SignalXServerState>> SignalXServers { set; get; }
+
+        internal ConcurrentDictionary<string, ClientDetails> SignalXClientDetails { set; get; }
+
+        internal ConcurrentDictionary<string, ServerHandlerDetails> SignalXServerExecutionDetails { set; get; }
 
         SignalX()
         {
+            this.NullHubCallerContext = new HubCallerContext(new ServerRequest(new ConcurrentDictionary<string, object>()), Guid.NewGuid().ToString());
+
+            Advanced = new SignalXAdvanced();
+            this.Advanced.Trace("Initializing Framework SIgnalX ...");
+            this.SignalXServers = new ConcurrentDictionary<string, Action<SignalXRequest, SignalXServerState>>();
+            this.SignalXClientDetails = new ConcurrentDictionary<string, ClientDetails>();
+            this.SignalXServerExecutionDetails = new ConcurrentDictionary<string, ServerHandlerDetails>();
+
             this.Connections = new ConnectionMapping<string>();
             this.OnErrorMessageReceivedFromClient = new List<Action<string, SignalXRequest>>();
             this.OnDebugMessageReceivedFromClient = new List<Action<string, SignalXRequest>>();
             this.OnClientReady = new List<Action<SignalXRequest>>();
+            this.Receiver = ReceiverCreator != null ? ReceiverCreator(this) : new DefaultSignalRClientReceiver();
             this.Advanced.Trace("SIgnalX framework initialized");
         }
-
+        [Obsolete("Not intended for client access")]
+        internal ISignalXClientReceiver Receiver { set; get; }
         /// <summary>
         ///     Is used only if SignalX.ManageUserConnections has been set to true, otherwise
         ///     Connections remains empty, even if there has been connections
@@ -74,6 +100,23 @@
         static SignalX instance { set; get; }
 
         public ulong ConnectionCount { get; internal set; }
+
+        internal static Func<SignalX, ISignalXClientReceiver> ReceiverCreator = null;
+
+        public static SignalX CreateInstance(Func<SignalX, ISignalXClientReceiver> receiverCreator)
+        {
+            lock (padlock)
+            {
+                if (instance != null)
+                {
+                    throw new Exception("SignalX Instance has already been created. Try using SignalX.Instance to get instance");
+                }
+
+                ReceiverCreator = receiverCreator;
+                return Instance;
+            }
+        }
+
 
         public static SignalX Instance
         {
@@ -106,6 +149,10 @@
         {
             instance = null;
             this.Settings.Dispose();
+            this.SignalXClientDetails = null;
+            this.SignalXServerExecutionDetails = null;
+            ReceiverCreator = null;
+
         }
 
         public void SetUpClientErrorMessageHandler(Action<string, SignalXRequest> handler)
@@ -120,8 +167,40 @@
             this.OnDebugMessageReceivedFromClient.Add(handler);
         }
 
+        public HubCallerContext NullHubCallerContext;
+
+        public void RespondToServer(
+            string handler,
+            dynamic message,
+            object sender = null,
+            string replyTo = null,
+            List<string> groupList = null)
+        {
+            RespondToServer(this.NullHubCallerContext, null,null,handler, message, sender, replyTo, groupList);
+        }
+
+        public void RespondToServer(
+            
+            HubCallerContext context ,
+            IHubCallerConnectionContext<dynamic> clients ,
+            IGroupManager groups ,
+            string handler,
+            dynamic message,
+            object sender=null,
+            string replyTo=null,
+            List<string> groupList=null)
+        {
+            Task.Factory.StartNew(
+                () =>
+                {
+                    var messageId = Guid.NewGuid().ToString();
+                    SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList, true);
+                }, CancellationToken.None, TaskCreationOptions.DenyChildAttach | TaskCreationOptions.LongRunning, TaskScheduler.Default); 
+        }
+
+
         [Obsolete("Not intended for client use")]
-        public void SendMessageToServer(
+        internal void SendMessageToServer(
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,
@@ -130,9 +209,10 @@
             string replyTo,
             object sender,
             string messageId,
-            List<string> groupList)
+            List<string> groupList,bool isInternalCall)
         {
-            this.Advanced.Trace($"Sending message from {messageId} to server {handler} ...");
+            Advanced.Trace($"Sending message {message} to server from {messageId} having groups {string.Join(",", groupList ?? new List<string>())} with reply to {replyTo}");
+
             IPrincipal user = context?.User;
             string error = "";
             try
@@ -152,7 +232,7 @@
                             messageId = messageId
                         }));
 
-                if (string.IsNullOrEmpty(handler) || !this.Settings.SignalXServers.ContainsKey(handler))
+                if (string.IsNullOrEmpty(handler) || !this.SignalXServers.ContainsKey(handler))
                 {
                     string e = "Error request for unknown server name " + handler;
                     this.Advanced.Trace(e);
@@ -161,9 +241,9 @@
                     return;
                 }
 
-                var request = new SignalXRequest(this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User, groupList, context?.Request);
+                var request = new SignalXRequest(this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User, groupList, context?.Request,context,clients,groups);
 
-                if (!this.CanProcess(context, handler, request, false))
+                if (!this.CanProcess(context, handler, request, isInternalCall))
                 {
                     this.Settings.WarningHandler.ForEach(h => h?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required"));
                     return;
@@ -204,39 +284,48 @@
         internal bool AllowToSend(string name, dynamic data)
         {
             this.Advanced.Trace($"Checking if {name} can be sent a message", data);
-            if (this.Settings.DisabledAllClients)
+
+            if (!string.IsNullOrEmpty(name))
             {
-                if (!this.Settings.SignalXClientDetails.ContainsKey(name) ||
-                    this.Settings.SignalXClientDetails.ContainsKey(name) && this.Settings.SignalXClientDetails[name].Disabled)
+                if (this.Settings.DisabledAllClients)
                 {
-                    this.Settings.WarningHandler.ForEach(
-                        h => h?.Invoke(
-                            "DataSendingNotActivated",
-                            new
-                            {
-                                Name = name,
-                                Data = data,
-                                Issue = $"Sending message to client {name} has been disabled. DisabledAllClients is activated"
-                            }));
-                    return false;
+                    if (!this.SignalXClientDetails.ContainsKey(name) ||
+                        this.SignalXClientDetails.ContainsKey(name) && this.SignalXClientDetails[name].Disabled)
+                    {
+                        this.Settings.WarningHandler.ForEach(
+                            h => h?.Invoke(
+                                "DataSendingNotActivated",
+                                new
+                                {
+                                    Name = name,
+                                    Data = data,
+                                    Issue = $"Sending message to client {name} has been disabled. DisabledAllClients is activated"
+                                }));
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (this.SignalXClientDetails.ContainsKey(name) && this.SignalXClientDetails[name].Disabled)
+                    {
+                        this.Settings.WarningHandler.ForEach(
+                            h => h?.Invoke(
+                                "DataSendingNotActivated",
+                                new
+                                {
+                                    Name = name,
+                                    Data = data,
+                                    Issue = $"Sending message to client {name} has been disabled"
+                                }));
+                        return false;
+                    }
                 }
             }
             else
             {
-                if (this.Settings.SignalXClientDetails.ContainsKey(name) && this.Settings.SignalXClientDetails[name].Disabled)
-                {
-                    this.Settings.WarningHandler.ForEach(
-                        h => h?.Invoke(
-                            "DataSendingNotActivated",
-                            new
-                            {
-                                Name = name,
-                                Data = data,
-                                Issue = $"Sending message to client {name} has been disabled"
-                            }));
-                    return false;
-                }
+                //todo fix bug when name is null and still allowing message sending, especially calls origination from within server
             }
+            
 
             if (!this.Settings.HasOneOrMoreConnections)
             {
@@ -270,7 +359,7 @@
             if (this.Settings.StartCountingOutGoingMessages)
                 Interlocked.Increment(ref this.Settings.OutGoingCounter);
 
-            this.Settings.Receiver.ReceiveByGroup(replyTo, responseData, groupName);
+            this.Receiver.ReceiveByGroup(replyTo, responseData, groupName);
         }
     }
 }

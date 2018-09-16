@@ -3,14 +3,33 @@
     using System;
     using System.Collections.Generic;
     using System.Security.Principal;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.AspNet.SignalR;
+    using Microsoft.AspNet.SignalR.Hubs;
 
     public class SignalXRequest
     {
         readonly SignalX SignalX;
 
-        internal SignalXRequest(SignalX signalX, string replyTo, object sender, string messageId, dynamic message, string user, string handler, IPrincipal principalUser, List<string> groups, IRequest request)
+        internal SignalXRequest(
+            SignalX signalX, 
+            string replyTo,
+            object sender, 
+            string messageId, 
+            dynamic message,
+            string user, 
+            string handler,
+            IPrincipal principalUser, 
+            List<string> groups, 
+            IRequest request,
+            HubCallerContext context,
+            IHubCallerConnectionContext<dynamic> clients,
+            IGroupManager groupsManager)
         {
+            Context = context;
+            Clients = clients;
+            GroupsManager = groupsManager;
             this.SignalX = signalX ?? throw new ArgumentNullException(nameof(signalX));
             this.ReplyTo = replyTo;
             this.Sender = sender;
@@ -23,6 +42,11 @@
             this.Groups = groups ?? new List<string>();
             this.Request = request;
         }
+
+        HubCallerContext Context { set; get; }
+            IHubCallerConnectionContext<dynamic> Clients { set; get; }
+        IGroupManager GroupsManager { set; get; }
+
 
         // public string UserId { get; set; }
 
@@ -49,11 +73,7 @@
 
         public string Handler { get; }
 
-        //public void RespondToAll(object response, string groupName = null)
-        //{
-        //    if (!string.IsNullOrEmpty(ReplyTo))
-        //        SignalX.RespondToAll(ReplyTo, response, groupName);
-        //}
+       
 
         public void RespondToAllInGroup(string replyTo, object response, string groupName)
         {
@@ -67,11 +87,6 @@
             this.SignalX.RespondToAll(replyTo, response);
         }
 
-        //public void RespondToUser(string userId, string replyTo, object response)
-        //{
-        //    if (replyTo == null) throw new ArgumentNullException(nameof(replyTo));
-        //    this.SignalX.RespondToUser(userId, replyTo, response);
-        //}
 
         /// <summary>
         ///     Reply to a specific client
@@ -93,6 +108,34 @@
         {
             if (!string.IsNullOrEmpty(this.User))
                 this.SignalX.RespondToUser(this.User, this.ReplyTo, response);
+        }
+
+      
+        /// <summary>
+        /// Forward request To Server and wait till server completes. The original message and 'reply to' is forwarded if none is provided
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="message"></param>
+        /// <param name="replyTo"></param>
+        public void Forward(string handler,dynamic message=null, string replyTo=null )
+        {
+            this.SignalX.SendMessageToServer(Context,Clients,GroupsManager,handler,message??Message,replyTo??ReplyTo,Sender, MessageId,Groups,true);
+        }
+
+        /// <summary>
+        /// Forward request to  server asynchronously The original message and 'reply to' is forwarded if none is provided
+        /// </summary>
+        /// <param name="handler"></param>
+        /// <param name="message"></param>
+        /// <param name="replyTo"></param>
+        public Task ForwardAsync(string handler, dynamic message = null, string replyTo = null)
+        {
+           return  Task.Factory.StartNew(
+                () =>
+                {
+                    this.SignalX.SendMessageToServer(Context, Clients, GroupsManager, handler, message ?? Message, replyTo ?? ReplyTo, Sender, MessageId, Groups, true);
+                }, CancellationToken.None, TaskCreationOptions.DenyChildAttach | TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
         }
 
         /// <summary>

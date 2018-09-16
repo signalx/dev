@@ -16,17 +16,13 @@
         public SignalXSettings()
         {
             this.HubConfiguration = new HubConfiguration { EnableDetailedErrors = true };
-            this.Receiver = new DefaultSignalRClientReceiver();
-            this.SignalXServers = new ConcurrentDictionary<string, Action<SignalXRequest, SignalXServerState>>();
-            this.SignalXClientDetails = new ConcurrentDictionary<string, ClientDetails>();
-            this.SignalXServerExecutionDetails = new ConcurrentDictionary<string, ServerHandlerDetails>();
+            
             this.ExceptionHandler = new List<Action<string, Exception>>();
             this.WarningHandler = new List<Action<string, object>>();
             this.ConnectionEventsHandler = new List<Action<string, object>>();
         }
 
-        [Obsolete("Not intended for client access")]
-        public ISignalXClientReceiver Receiver { set; get; }
+       
 
         internal bool DisabledAllClients { set; get; }
 
@@ -55,12 +51,7 @@
 
         public bool RequireAuthorizationForPersistentConnections { get; set; }
 
-        protected internal ConcurrentDictionary<string, Action<SignalXRequest, SignalXServerState>> SignalXServers { set; get; }
-
-        internal ConcurrentDictionary<string, ClientDetails> SignalXClientDetails { set; get; }
-
-        internal ConcurrentDictionary<string, ServerHandlerDetails> SignalXServerExecutionDetails { set; get; }
-
+       
         internal bool StartCountingOutGoingMessages { set; get; }
 
         internal bool StartCountingInComingMessages { set; get; }
@@ -76,8 +67,9 @@
         public void Dispose()
         {
             this.MyApp?.Dispose();
-            this.SignalXClientDetails = null;
-            this.SignalXServerExecutionDetails = null;
+            //todo dispose properly
+            //this.SignalXClientDetails = null;
+            //this.SignalXServerExecutionDetails = null;
         }
     }
 }
