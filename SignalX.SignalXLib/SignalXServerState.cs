@@ -1,7 +1,9 @@
 ﻿namespace SignalXLib.Lib
 {
+    using System.Dynamic;
+
     public class SignalXServerState
     {
-        public dynamic Data = new { };
+        public ExpandoObject Data = new ExpandoObject();
     }
 }

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Security.Principal;
     using System.Threading;
     using System.Threading.Tasks;
@@ -59,7 +60,6 @@
             this.Advanced = new SignalXAdvanced();
             this.Advanced.Trace("Initializing Framework SIgnalX ...");
             this.SignalXServers = new ConcurrentDictionary<string, Func<SignalXRequest, SignalXServerState, Task>>();
-
             this.SignalXClientDetails = new ConcurrentDictionary<string, ClientDetails>();
             this.SignalXServerExecutionDetails = new ConcurrentDictionary<string, ServerHandlerDetails>();
 
@@ -171,10 +171,16 @@
 
         public void RespondToServer(
             string handler,
+            dynamic message)
+        {
+            RespondToServer( handler, message, null, null, null);
+        }
+        public void RespondToServer(
+            string handler,
             dynamic message,
-            object sender = null,
-            string replyTo = null,
-            List<string> groupList = null)
+            object sender ,
+            string replyTo ,
+            List<string> groupList )
         {
             RespondToServer(this.NullHubCallerContext, null, null, handler, message, sender, replyTo, groupList);
         }
@@ -356,5 +362,10 @@
 
             this.Receiver.ReceiveByGroup(replyTo, responseData, groupName);
         }
+    }
+
+    public class SignalXServerSender
+    {
+
     }
 }

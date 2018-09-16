@@ -265,10 +265,11 @@
                         signalx.debug.f ("successfully loaded signalr script from /signalr/hubs ");
                         chat.client.groupManager = function (groupName, operation) {
                             if (operation === "join") {
-                                console.log('joinging group '+groupName);
+                                signalx.debug.f('joined group '+groupName);
                                 signalx.groupList.push(groupName);
                             }
                             if (operation === "leave") {
+                                signalx.debug.f('left group ' + groupName);
                                 signalx.groupList = signalx.groupList.filter(e => e !== groupName); 
                             }
                             signalx.groupNotifications = signalx.groupNotifications || [];
@@ -279,11 +280,13 @@
                         };
                         signalx.groups = {
                             join: function (grpName, f) {
+                                signalx.debug.f('joining group ' + groupName);
                                 signalx.groupNotifications = [];
                                 signalx.groupNotifications.push(f);
                                 chat.server.joinGroup(grpName);
                             },
                             leave: function (grpName, f) {
+                                signalx.debug.f('leaving group ' + groupName);
                                 signalx.groupNotifications = [];
                                 signalx.groupNotifications.push(f);
                                  chat.server.leaveGroup(grpName);

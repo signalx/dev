@@ -32,7 +32,7 @@
                 request.RespondToSender(message);
             });
             signalX.SetSignalXClientAsReady();
-            signalX.RespondToServer("sam","abc");
+            signalX.RespondToServer("sam", "abc");
             await WillPassBeforeGivenTime(TimeSpan.FromSeconds(1000),
                 () =>
                 {
