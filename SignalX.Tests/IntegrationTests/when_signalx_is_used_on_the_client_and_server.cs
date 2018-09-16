@@ -29,14 +29,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                request =>
+                                (request) =>
                                 {
                                     assert.AreEqual<string>("GetSomething", request.Message, "server must get the correct message");
                                     request.RespondToAll(request.ReplyTo, 100);
                                 });
                             signalx.Server(
                                 "sample2",
-                                request => { assert.AreEqual<int>(700, request.Message); });
+                                (request) => { assert.AreEqual<int>(700, request.Message); });
                         });
                 });
         }
@@ -62,14 +62,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                request =>
+                                (request) =>
                                 {
                                     assert.AreEqual<string>("GetSomething", request.Message, "server must get the correct message");
                                     request.RespondToAll(request.ReplyTo, 100);
                                 });
                             signalx.Server(
                                 "sample2",
-                                request => { assert.AreEqual<int>(700, request.Message); });
+                                (request) => { assert.AreEqual<int>(700, request.Message); });
                         });
                 });
         }
@@ -93,14 +93,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                request =>
+                                (request) =>
                                 {
                                     assert.AreEqual<string>("GetSomething", request.Message, "server must get the correct message");
                                     request.RespondToAll(request.ReplyTo, 100);
                                 });
                             signalx.Server(
                                 "sample2",
-                                request => { assert.AreEqual<int>(700, request.Message); });
+                                (request) => { assert.AreEqual<int>(700, request.Message); });
                         });
                 });
         }
@@ -124,14 +124,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                request =>
+                                (request) =>
                                 {
                                     assert.AreEqual<string>("GetSomething", request.Message, "server must get the correct message");
                                     request.RespondToAll(request.ReplyTo, 100);
                                 });
                             signalx.Server(
                                 "sample2",
-                                request => { assert.AreEqual<int>(700, request.Message); });
+                                (request) => { assert.AreEqual<int>(700, request.Message); });
                         });
                 });
         }
@@ -154,14 +154,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                request =>
+                                (request) =>
                                 {
                                     assert.AreEqual<string>("GetSomething", request.Message, "server must get the correct message");
                                     request.RespondToAll(request.ReplyTo, 100);
                                 });
                             signalx.Server(
                                 "sample2",
-                                request => { assert.AreEqual<int>(700, request.Message); });
+                                (request) => { assert.AreEqual<int>(700, request.Message); });
                         });
                 });
         }
@@ -185,14 +185,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                request =>
+                                (request) =>
                                 {
                                     assert.AreEqual<string>("GetSomething", request.Message, "server must get the correct message");
                                     request.RespondToAll(request.ReplyTo, 100);
                                 });
                             signalx.Server(
                                 "sample2",
-                                request => { assert.AreEqual<int>(700, request.Message); });
+                                (request) => { assert.AreEqual<int>(700, request.Message); });
                         });
                 });
         }
@@ -220,9 +220,9 @@
                                 });",
                         () =>
                         {
-                            signalX.Server("ServerHandler", request => { signalX.RespondToAll("ClientHandler", request.Message); });
+                            signalX.Server("ServerHandler", (request) => { signalX.RespondToAll("ClientHandler", request.Message); });
 
-                            signalX.Server("TestServerFeedbackHandler", request => { finalMessage = request.Message as string; });
+                            signalX.Server("TestServerFeedbackHandler", (request) => { finalMessage = request.Message as string; });
                         },
                         () => { assert.AreEqual(message1 + message2, finalMessage); });
                 });
@@ -248,9 +248,9 @@
                                 });",
                         () =>
                         {
-                            signalX.Server("ServerHandler", request => { signalX.RespondToAll(request.ReplyTo, request.Message); });
+                            signalX.Server("ServerHandler", (request) => { signalX.RespondToAll(request.ReplyTo, request.Message); });
 
-                            signalX.Server("TestServerFeedbackHandler", request => { finalMessage = request.Message as string; });
+                            signalX.Server("TestServerFeedbackHandler", (request) => { finalMessage = request.Message as string; });
                         },
                         () => { assert.AreEqual(message1 + message2, finalMessage); });
                 });
@@ -275,9 +275,9 @@
                                 });",
                         () =>
                         {
-                            signalX.Server("ServerHandler", request => { signalX.RespondToAll(request.ReplyTo, request.Message); });
+                            signalX.Server("ServerHandler", (request) => { signalX.RespondToAll(request.ReplyTo, request.Message); });
 
-                            signalX.Server("TestServerFeedbackHandler", request => { finalMessage = request.Message as string; });
+                            signalX.Server("TestServerFeedbackHandler", (request) => { finalMessage = request.Message as string; });
                         },
                         () => { assert.AreEqual(message1, finalMessage); });
                 });
@@ -303,9 +303,9 @@
                                 });",
                         () =>
                         {
-                            signalx.Server("ServerHandler", request => { signalx.RespondToAll(request.ReplyTo, request.Message); });
+                            signalx.Server("ServerHandler", (request) => { signalx.RespondToAll(request.ReplyTo, request.Message); });
 
-                            signalx.Server("TestServerFeedbackHandler", request => { finalMessage = request.Message as string; });
+                            signalx.Server("TestServerFeedbackHandler", (request) => { finalMessage = request.Message as string; });
                         },
                         () => { assert.AreEqual(message1 + message2, finalMessage); },
                         new TestEventHandler(
@@ -337,9 +337,9 @@
                                 });",
                         () =>
                         {
-                            signalx.Server("ServerHandler", request => { signalx.RespondToAll(request.ReplyTo, request.Message); });
+                            signalx.Server("ServerHandler", (request) => { signalx.RespondToAll(request.ReplyTo, request.Message); });
 
-                            signalx.Server("TestServerFeedbackHandler", request => { finalMessage = message3; });
+                            signalx.Server("TestServerFeedbackHandler", (request) => { finalMessage = message3; });
                         },
                         () => { assert.AreEqual(message3, finalMessage); }
                     );
@@ -370,13 +370,13 @@
                         {
                             signalX.AllowDynamicServer = false;
                             //SET UP SERVER
-                            signalX.Server("ServerHandler", request => { signalX.RespondToAll(request.ReplyTo, request.Message); });
+                            signalX.Server("ServerHandler", (request) => { signalX.RespondToAll(request.ReplyTo, request.Message); });
                             //this server will be ignored
-                            signalX.Server("TestServerFeedbackHandler", request => { finalMessage = message3; });
+                            signalX.Server("TestServerFeedbackHandler", (request) => { finalMessage = message3; });
                             try
                             {
                                 //this server will run
-                                signalX.Server("TestServerFeedbackHandler", request => { finalMessage = message1; });
+                                signalX.Server("TestServerFeedbackHandler", (request) => { finalMessage = message1; });
                             }
                             catch (Exception e)
                             {
@@ -417,11 +417,11 @@
                         {
                             signalX.AllowDynamicServer = true;
                             //SET UP SERVER
-                            signalX.Server("ServerHandler", request => { signalX.RespondToAll(request.ReplyTo, request.Message); });
+                            signalX.Server("ServerHandler", (request) => { signalX.RespondToAll(request.ReplyTo, request.Message); });
                             //this server will be ignored
-                            signalX.Server("TestServerFeedbackHandler", request => { finalMessage = message3; });
+                            signalX.Server("TestServerFeedbackHandler", (request) => { finalMessage = message3; });
                             //this server will run
-                            signalX.Server("TestServerFeedbackHandler", request => { finalMessage = message1; });
+                            signalX.Server("TestServerFeedbackHandler", (request) => { finalMessage = message1; });
                         },
                         () =>
                         {
@@ -497,41 +497,41 @@
                             //SET UP SERVER
                             signalX.Server(
                                 groupWatcher,
-                                request =>
+                                (request) =>
                                 {
                                     VerifiedJoinedGroup = request.Message as string == groupName;
                                     signalX.RespondToAllInGroup(clientGroupReceiver, request.Message, groupName);
                                 });
                             signalX.Server(
                                 groupWatcher2,
-                                request => { VerifiedJoinedGroup2 = request.Message as string == groupName; });
+                                (request) => { VerifiedJoinedGroup2 = request.Message as string == groupName; });
                             signalX.Server(
                                 ServerHandler,
-                                request => { signalX.RespondToAll(ClientHandler, Message); });
+                                (request) => { signalX.RespondToAll(ClientHandler, Message); });
                             signalX.Server(
                                 TestServerFeedbackHandler,
-                                request =>
+                                (request) =>
                                 {
                                     FinalMessage = request.Message as string;
                                     signalX.RespondToAll(request.ReplyTo, FinalMessage);
                                 });
                             signalX.Server(
                                 TestServerFeedbackHandler2,
-                                request =>
+                                (request) =>
                                 {
                                     FinalMessage2 = request.Message as string;
                                     signalX.RespondToAll(request.ReplyTo, FinalMessage2);
                                 });
                             signalX.Server(
                                 TestServerFeedbackHandler3,
-                                request =>
+                                (request) =>
                                 {
                                     FinalMessage3 = request.Message as string;
                                     signalX.RespondToAll(request.ReplyTo, FinalMessage3);
                                 });
                             signalX.Server(
                                 TestServerFeedbackHandler4,
-                                request => { FinalMessage4 = request.Message as string; });
+                                (request) => { FinalMessage4 = request.Message as string; });
                         },
                         () =>
                         {

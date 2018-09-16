@@ -264,8 +264,8 @@
                         //debug
                         signalx.debug.f ("successfully loaded signalr script from /signalr/hubs ");
                         chat.client.groupManager = function (groupName, operation) {
-                            
                             if (operation === "join") {
+                                console.log('joinging group '+groupName);
                                 signalx.groupList.push(groupName);
                             }
                             if (operation === "leave") {
@@ -281,7 +281,7 @@
                             join: function (grpName, f) {
                                 signalx.groupNotifications = [];
                                 signalx.groupNotifications.push(f);
-                                 chat.server.joinGroup(grpName);
+                                chat.server.joinGroup(grpName);
                             },
                             leave: function (grpName, f) {
                                 signalx.groupNotifications = [];

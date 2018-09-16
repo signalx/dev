@@ -245,154 +245,7 @@
             signalX.Settings.ConnectionEventsHandler.Add(handler);
         }
 
-        /// <summary>
-        ///     Sets up a server
-        /// </summary>
-        /// <param name="signalX"></param>
-        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
-        /// <param name="server"></param>
-        /// <param name="groupNames"></param>
-        /// <param name="requireAuthorization">
-        ///     Indicates if the set authorization should be checked before allowing access to the
-        ///     server
-        /// </param>
-        /// <param name="isSingleWriter">Set whether or not requests should be queued and only one allowed in at a time</param>
-        /// <param name="allowDynamicServerForThisInstance">
-        ///     Sets if it is allowed for another server to be created with same name.
-        ///     In such a case, the existing server will be discarded
-        /// </param>
-        public static void Server(
-            this SignalX signalX,
-            string name,
-            Action<SignalXRequest, SignalXServerState> server,
-            List<string> groupNames = null,
-            bool requireAuthorization = false,
-            bool isSingleWriter = false,
-            bool allowDynamicServerForThisInstance = false)
-        {
-            signalX.Advanced.Trace($"Creating a server {name} with authorized groups {string.Join(",", groupNames?? new List<string>())} and requires authorization : {requireAuthorization}, is set to single write : {isSingleWriter} and allows dynamic server for this instance {allowDynamicServerForThisInstance}");
-
-            groupNames = groupNames ?? new List<string>();
-            name = name.Trim();
-            string camelCased = char.ToLowerInvariant(name[0]) + name.Substring(1);
-            string unCamelCased = char.ToUpperInvariant(name[0]) + name.Substring(1);
-
-            if ((signalX.SignalXServers.ContainsKey(camelCased) || signalX.SignalXServers.ContainsKey(unCamelCased)) && !signalX.Settings.AllowDynamicServerInternal && !allowDynamicServerForThisInstance)
-            {
-              var exc= new Exception("Server with name '" + name + "' has already been created");
-                signalX.Advanced.Trace(exc.Message,exc);
-
-                throw exc;
-            }
-              
-            try
-            {
-                if (signalX.SignalXServers.ContainsKey(camelCased))
-                {
-                    signalX.SignalXServers[camelCased] = server;
-                    signalX.SignalXServerExecutionDetails[camelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames);
-
-                    if (camelCased != unCamelCased)
-                    {
-                        signalX.SignalXServers[unCamelCased] = server;
-                        signalX.SignalXServerExecutionDetails[unCamelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames);
-                    }
-                }
-                else
-                {
-                    signalX.SignalXServers.GetOrAdd(camelCased, server);
-                    signalX.SignalXServerExecutionDetails.GetOrAdd(camelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames));
-
-                    if (camelCased != unCamelCased)
-                    {
-                        signalX.SignalXServers.GetOrAdd(unCamelCased, server);
-                        signalX.SignalXServerExecutionDetails.GetOrAdd(unCamelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames));
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                signalX.Advanced.Trace($"Error creating a server {name} with authorized groups {string.Join(",", groupNames ?? new List<string>())} and requires authorization : {requireAuthorization}, is set to single write : {isSingleWriter} and allows dynamic server for this instance {allowDynamicServerForThisInstance}",e);
-                
-                signalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while creating server {name}", e));
-            }
-        }
-
-        /// <summary>
-        ///     Sets up a server that requires authorization to be checked before it is called
-        /// </summary>
-        /// <param name="signalX"></param>
-        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
-        /// <param name="server"></param>
-        public static void ServerAuthorized(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames = null)
-        {
-          
-            signalX.ServerAuthorized(name, (r, s) => server(r), groupNames);
-        }
-
-        /// <summary>
-        ///     Sets up a server where authorization is checked before access and requests should be queued with only one allowed
-        ///     in at a time
-        /// </summary>
-        /// <param name="signalX"></param>
-        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
-        /// <param name="server"></param>
-        public static void ServerAuthorizedSingleAccess(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames = null)
-        {
-            signalX.ServerAuthorizedSingleAccess(name, (r, s) => server(r), groupNames);
-        }
-
-        /// <summary>
-        ///     Sets up a server
-        /// </summary>
-        /// <param name="signalX"></param>
-        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
-        /// <param name="server"></param>
-        /// <param name="groupName"></param>
-        /// <param name="requireAuthorization"></param>
-        public static void Server(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames = null, bool requireAuthorization = false)
-        {
-            signalX.Server(name, (r, s) => server(r), groupNames: groupNames, requireAuthorization: requireAuthorization);
-        }
-
-        /// <summary>
-        ///     Sets up a server where requests should be queued with only one allowed in at a time
-        /// </summary>
-        /// <param name="signalX"></param>
-        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
-        /// <param name="server"></param>
-        /// <param name="groupName"></param>
-        /// <param name="requireAuthorization"></param>
-        public static void ServerSingleAccess(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames = null, bool requireAuthorization = false)
-        {
-            signalX.Server(name, (r, s) => server(r), requireAuthorization: requireAuthorization, groupNames: groupNames, isSingleWriter: true);
-        }
-
-        /// <summary>
-        ///     Sets up a server where authorization is checked before access
-        /// </summary>
-        /// <param name="signalX"></param>
-        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
-        /// <param name="server"></param>
-        /// <param name="groupName"></param>
-        public static void ServerAuthorized(this SignalX signalX, string name, Action<SignalXRequest, SignalXServerState> server, List<string> groupNames = null)
-        {
-            signalX.Server(name, server, requireAuthorization: true, groupNames: groupNames);
-        }
-
-        /// <summary>
-        ///     Sets up a server where authorization is checked before access and requests should be queued with only one allowed
-        ///     in at a time
-        /// </summary>
-        /// <param name="signalX"></param>
-        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
-        /// <param name="server"></param>
-        /// <param name="groupName"></param>
-        public static void ServerAuthorizedSingleAccess(this SignalX signalX, string name, Action<SignalXRequest, SignalXServerState> server, List<string> groupNames = null)
-        {
-            signalX.Server(name, server, groupNames: groupNames, requireAuthorization: true, isSingleWriter: true);
-        }
-
+       
         public static async Task<double> GetOutGoingMessageSpeedAsync(this SignalX signalX, TimeSpan duration)
         {
             signalX.Settings.OutGoingCounter = 0;
@@ -454,18 +307,17 @@
             signalX.Receiver.ReceiveAsOther(name, data, excludedUserId, groupName);
         }
 
-        internal static void CallServer(this SignalX signalX, SignalXRequest request)
+        internal static async Task CallServer(this SignalX signalX, SignalXRequest request)
         {
             signalX.Advanced.Trace($"Running call to server {request?.Handler}...");
-
             ServerHandlerDetails executionDetails = signalX.SignalXServerExecutionDetails[request.Handler];
             if (executionDetails.IsSingleWriter)
                 using (executionDetails.SingleWriter.Write())
                 {
-                    signalX.SignalXServers[request.Handler].Invoke(request, signalX.SignalXServerExecutionDetails[request.Handler].State);
+                   await  signalX.SignalXServers[request.Handler].Invoke(request, signalX.SignalXServerExecutionDetails[request.Handler].State).ConfigureAwait(false);
                 }
             else
-                signalX.SignalXServers[request.Handler].Invoke(request, signalX.SignalXServerExecutionDetails[request.Handler].State);
+               await (signalX.SignalXServers[request.Handler]).Invoke(request, signalX.SignalXServerExecutionDetails[request.Handler].State).ConfigureAwait(false);
         }
 
         public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script, string groupName, Action<dynamic> onResponse = null, TimeSpan? delay = null)
@@ -628,7 +480,7 @@
                  }";
 
             var methods = "; window.signalxidgen=window.signalxidgen||function(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);    return v.toString(16);})};" +
-                signalX.SignalXServers.Aggregate(clientReady + clientAgent + "var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  var messageToSend={handler:'" + signalXServer.Key + "',message:m, replyTo:rt,sender:sen, groupList:signalx.groupList}; console.log(JSON.stringify(signalx.groupList));  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId,signalx.groupList||[]); if(repTo){return messageId}else{ return deferred.promise();}   },")).Trim()
+                signalX.SignalXServers.Aggregate(clientReady + clientAgent + "var $sx= {", (current, signalXServer) => current + (signalXServer.Key + @":function(m,repTo,sen,msgId){ var deferred = $.Deferred();  window.signalxid=window.signalxid||window.signalxidgen();   sen=sen||window.signalxid;repTo=repTo||''; var messageId=window.signalxidgen(); var rt=repTo; if(typeof repTo==='function'){ signalx.waitingList(messageId,repTo);rt=messageId;  }  if(!repTo){ signalx.waitingList(messageId,deferred);rt=messageId;  }  var messageToSend={handler:'" + signalXServer.Key + "',message:m, replyTo:rt,sender:sen, groupList:signalx.groupList}; console.log(JSON.stringify(signalx.groupList));  chat.server.send('" + signalXServer.Key + "',m ||'',rt,sen,messageId,signalx.groupList||[]); console.log('sending ..'+JSON.stringify(signalx.groupList)+'  to '+'" + signalXServer.Key + "'); if(repTo){return messageId}else{ return deferred.promise();}   },")).Trim()
                 + "}; $sx; ";
 
             if (signalX.Settings.StartCountingInComingMessages)
@@ -639,5 +491,160 @@
 
             signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.SignalXRequestForMethodsCompleted.ToString(), methods));
         }
+
+
+
+        #region ServerDefinitions
+
+        /// <summary>
+        ///     Sets up a server
+        /// </summary>
+        /// <param name="signalX"></param>
+        /// <param name="serverType"></param>
+        /// <param name="name">A unique name for the server, unless dynamic server is allowed</param>
+        /// <param name="server"></param>
+        /// <param name="groupNames"></param>
+        /// <param name="requireAuthorization">
+        ///     Indicates if the set authorization should be checked before allowing access to the
+        ///     server
+        /// </param>
+        /// <param name="isSingleWriter">Set whether or not requests should be queued and only one allowed in at a time</param>
+        /// <param name="allowDynamicServerForThisInstance">
+        ///     Sets if it is allowed for another server to be created with same name.
+        ///     In such a case, the existing server will be discarded
+        /// </param>
+        internal static void ServerBase(
+            this SignalX signalX,
+            ServerType serverType,
+            string name,
+            Func<SignalXRequest, SignalXServerState, Task> server,
+            List<string> groupNames =null
+           )
+        {
+            bool requireAuthorization = false;
+            bool isSingleWriter = false;
+            bool allowDynamicServerForThisInstance = false;
+
+            switch (serverType)
+            {
+                case ServerType.Default:
+                    break;
+                case ServerType.SingleAccess:
+                    isSingleWriter = true;
+                    break;
+                case ServerType.Authorized:
+                    requireAuthorization = true;
+                    break;
+                case ServerType.AuthorizedSingleAccess:
+                    requireAuthorization = true;
+                    isSingleWriter = true;
+                    break;
+                case ServerType.Dynamic:
+                    allowDynamicServerForThisInstance = true;
+                    break;
+                case ServerType.DynamicAuthorized:
+                    allowDynamicServerForThisInstance = true;
+                    requireAuthorization = true;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(serverType), serverType, null);
+            }
+
+            signalX.Advanced.Trace($"Creating a server {name} with authorized groups {string.Join(",", groupNames ?? new List<string>())} and requires authorization : {requireAuthorization}, is set to single write : {isSingleWriter} and allows dynamic server for this instance {allowDynamicServerForThisInstance}");
+
+            groupNames = groupNames ?? new List<string>();
+            name = name.Trim();
+            string camelCased = char.ToLowerInvariant(name[0]) + name.Substring(1);
+            string unCamelCased = char.ToUpperInvariant(name[0]) + name.Substring(1);
+
+            if ((signalX.SignalXServers.ContainsKey(camelCased) || signalX.SignalXServers.ContainsKey(unCamelCased)) && !signalX.Settings.AllowDynamicServerInternal && !allowDynamicServerForThisInstance)
+            {
+                var exc = new Exception("Server with name '" + name + "' has already been created");
+                signalX.Advanced.Trace(exc.Message, exc);
+
+                throw exc;
+            }
+
+            try
+            {
+                if (signalX.SignalXServers.ContainsKey(camelCased))
+                {
+                    signalX.SignalXServers[camelCased] = server;
+                    signalX.SignalXServerExecutionDetails[camelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames);
+
+                    if (camelCased != unCamelCased)
+                    {
+                        signalX.SignalXServers[unCamelCased] = server;
+                        signalX.SignalXServerExecutionDetails[unCamelCased] = new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames);
+                    }
+                }
+                else
+                {
+                    signalX.SignalXServers.GetOrAdd(camelCased, server);
+                    signalX.SignalXServerExecutionDetails.GetOrAdd(camelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames));
+
+                    if (camelCased != unCamelCased)
+                    {
+                        signalX.SignalXServers.GetOrAdd(unCamelCased, server);
+                        signalX.SignalXServerExecutionDetails.GetOrAdd(unCamelCased, new ServerHandlerDetails(requireAuthorization, isSingleWriter, groupNames));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                signalX.Advanced.Trace($"Error creating a server {name} with authorized groups {string.Join(",", groupNames ?? new List<string>())} and requires authorization : {requireAuthorization}, is set to single write : {isSingleWriter} and allows dynamic server for this instance {allowDynamicServerForThisInstance}", e);
+
+                signalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while creating server {name}", e));
+            }
+        }
+
+        public static void ServerAsync(this SignalX signalX, string name, Func<SignalXRequest, SignalXServerState, Task> server, List<string> groupNames = null)
+        {
+            signalX.ServerBase(ServerType.Default, name,  server, groupNames: groupNames);
+        }
+        public static void ServerAsync(this SignalX signalX, string name, Func<SignalXRequest, Task> server, List<string> groupNames = null)
+        {
+            signalX.ServerBase(ServerType.Default, name, (r,s)=> server(r), groupNames: groupNames);
+        }
+        public static void ServerAsync(this SignalX signalX, ServerType serverType, string name, Func<SignalXRequest, SignalXServerState, Task> server, List<string> groupNames = null)
+        {
+            signalX.ServerBase(serverType, name,  server, groupNames: groupNames);
+        }
+
+        public static void ServerAsync(this SignalX signalX, ServerType serverType, string name, Func<SignalXRequest, Task> server, List<string> groupNames = null)
+        {
+            signalX.ServerBase(serverType, name, (r, s) => server(r), groupNames: groupNames);
+        }
+        public static void Server(this SignalX signalX, string name, Action<SignalXRequest, SignalXServerState> server, List<string> groupNames = null)
+        {
+            signalX.ServerBase(ServerType.Default, name, (r, s) => {
+                server(r,s);
+                return Task.FromResult(true);
+            }, groupNames: groupNames);
+        }
+        public static void Server(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames = null)
+        {
+            signalX.ServerBase(ServerType.Default, name, (r, s) => {
+                server(r);
+                return Task.FromResult(true);
+            }, groupNames: groupNames);
+        }
+        public static void Server(this SignalX signalX, ServerType serverType, string name, Action<SignalXRequest, SignalXServerState> server, List<string> groupNames = null)
+        {
+            signalX.ServerBase(serverType, name, (r, s) => {
+                server(r,s);
+                return Task.FromResult(true);
+            }, groupNames: groupNames);
+        }
+        public static void Server(this SignalX signalX, ServerType serverType, string name, Action<SignalXRequest> server, List<string> groupNames = null)
+        {
+            signalX.ServerBase(serverType, name, (r, s) => {
+                server(r);
+                return Task.FromResult(true);
+            }, groupNames: groupNames);
+        }
+
+        
+        #endregion
     }
 }

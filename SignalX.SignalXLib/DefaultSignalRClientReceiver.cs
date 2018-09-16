@@ -1,11 +1,12 @@
 ﻿namespace SignalXLib.Lib
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using Microsoft.AspNet.SignalR.Infrastructure;
 
-   class DefaultSignalRClientReceiver : ISignalXClientReceiver
+    class DefaultSignalRClientReceiver : ISignalXClientReceiver
     {
         // SignalX SignalX= Lib.SignalX.Instance;
 
@@ -102,9 +103,9 @@
         /// <param name="sender"></param>
         /// <param name="messageId"></param>
         /// <param name="groupList"></param>
-        public void SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId, List<string> groupList)
+        public async Task SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId, List<string> groupList)
         {
-           SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList, false);
+            await SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList, false);
         }
     }
 }

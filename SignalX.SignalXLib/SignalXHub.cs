@@ -13,10 +13,11 @@
         readonly SignalX signalX = SignalX.Instance;
 
         //not async because it already behaves as async from client clide
-        public void Send(string handler, dynamic message, string replyTo, dynamic sender, string messageId, List<string> groups)
+        public async Task Send(string handler, dynamic message, string replyTo, dynamic sender, string messageId, List<string> groups)
         {
             this.signalX.Advanced.Trace($"Received message from client {handler}...");
-            this.signalX.SendMessageToServer(this.Context, this.Clients, this.Groups, handler, message, replyTo, sender, messageId, groups, false);
+            Task task = this.signalX.SendMessageToServer(this.Context, this.Clients, this.Groups, handler, message, replyTo, sender, messageId, groups, false);
+            await task.ConfigureAwait(false);
         }
 
         //not async because it already behaves as async from client clide

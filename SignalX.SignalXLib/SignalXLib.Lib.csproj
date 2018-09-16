@@ -51,6 +51,7 @@
     <Compile Include="ReaderWriterLockSlimExtensions.cs" />
     <Compile Include="ResponseAfterScriptRuns.cs" />
     <Compile Include="ServerHandlerDetails.cs" />
+    <Compile Include="ServerType.cs" />
     <Compile Include="SignalrErrorHandler.cs" />
     <Compile Include="SignalXAdvanced.cs" />
     <Compile Include="SignalXAdvancedLogType.cs" />

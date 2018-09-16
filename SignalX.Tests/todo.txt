@@ -17,3 +17,5 @@ investigate SetUpAgents with SIGNALXCLIENTAGENT
 test various types of server config such as single writer
 
 test EnableClient/disbale etc
+
+fix all warning

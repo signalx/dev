@@ -19,6 +19,8 @@
         internal static string SIGNALXCLIENTERRORHANDLER = "SIGNALXCLIENTERRORHANDLER";
         internal static string SIGNALXCLIENTDEBUGHANDLER = "SIGNALXCLIENTDEBUGHANDLER";
 
+        internal static Func<SignalX, ISignalXClientReceiver> ReceiverCreator;
+
         public readonly string ClientDebugSnippet = @"
                     signalx.debug(function(ev,e){ signalx.ready(function(){ signalx.server." + SIGNALXCLIENTDEBUGHANDLER + @"(JSON.stringify(e),function(MSG){  });  }); });
                  ";
@@ -46,30 +48,18 @@
 
                  ";
 
-        public SignalXAdvanced Advanced {set;get;}
-
-        //todo rename this to reflect what is actually happening!
-        public void SetSignalXClientAsReady()
-        {
-            this.Advanced.Trace("Client is ready...");
-            this.Settings.HasOneOrMoreConnections = true;
-            this.ConnectionCount++;
-        }
+        public HubCallerContext NullHubCallerContext;
 
         public SignalXSettings Settings = new SignalXSettings();
-        protected internal ConcurrentDictionary<string, Action<SignalXRequest, SignalXServerState>> SignalXServers { set; get; }
-
-        internal ConcurrentDictionary<string, ClientDetails> SignalXClientDetails { set; get; }
-
-        internal ConcurrentDictionary<string, ServerHandlerDetails> SignalXServerExecutionDetails { set; get; }
 
         SignalX()
         {
             this.NullHubCallerContext = new HubCallerContext(new ServerRequest(new ConcurrentDictionary<string, object>()), Guid.NewGuid().ToString());
 
-            Advanced = new SignalXAdvanced();
+            this.Advanced = new SignalXAdvanced();
             this.Advanced.Trace("Initializing Framework SIgnalX ...");
-            this.SignalXServers = new ConcurrentDictionary<string, Action<SignalXRequest, SignalXServerState>>();
+            this.SignalXServers = new ConcurrentDictionary<string, Func<SignalXRequest, SignalXServerState, Task>>();
+
             this.SignalXClientDetails = new ConcurrentDictionary<string, ClientDetails>();
             this.SignalXServerExecutionDetails = new ConcurrentDictionary<string, ServerHandlerDetails>();
 
@@ -80,8 +70,18 @@
             this.Receiver = ReceiverCreator != null ? ReceiverCreator(this) : new DefaultSignalRClientReceiver();
             this.Advanced.Trace("SIgnalX framework initialized");
         }
+
+        public SignalXAdvanced Advanced { set; get; }
+
+        protected internal ConcurrentDictionary<string, Func<SignalXRequest, SignalXServerState, Task>> SignalXServers { set; get; }
+
+        internal ConcurrentDictionary<string, ClientDetails> SignalXClientDetails { set; get; }
+
+        internal ConcurrentDictionary<string, ServerHandlerDetails> SignalXServerExecutionDetails { set; get; }
+
         [Obsolete("Not intended for client access")]
         internal ISignalXClientReceiver Receiver { set; get; }
+
         /// <summary>
         ///     Is used only if SignalX.ManageUserConnections has been set to true, otherwise
         ///     Connections remains empty, even if there has been connections
@@ -100,23 +100,6 @@
         static SignalX instance { set; get; }
 
         public ulong ConnectionCount { get; internal set; }
-
-        internal static Func<SignalX, ISignalXClientReceiver> ReceiverCreator = null;
-
-        public static SignalX CreateInstance(Func<SignalX, ISignalXClientReceiver> receiverCreator)
-        {
-            lock (padlock)
-            {
-                if (instance != null)
-                {
-                    throw new Exception("SignalX Instance has already been created. Try using SignalX.Instance to get instance");
-                }
-
-                ReceiverCreator = receiverCreator;
-                return Instance;
-            }
-        }
-
 
         public static SignalX Instance
         {
@@ -152,7 +135,26 @@
             this.SignalXClientDetails = null;
             this.SignalXServerExecutionDetails = null;
             ReceiverCreator = null;
+        }
 
+        //todo rename this to reflect what is actually happening!
+        public void SetSignalXClientAsReady()
+        {
+            this.Advanced.Trace("Client is ready...");
+            this.Settings.HasOneOrMoreConnections = true;
+            this.ConnectionCount++;
+        }
+
+        public static SignalX CreateInstance(Func<SignalX, ISignalXClientReceiver> receiverCreator)
+        {
+            lock (padlock)
+            {
+                if (instance != null)
+                    throw new Exception("SignalX Instance has already been created. Try using SignalX.Instance to get instance");
+
+                ReceiverCreator = receiverCreator;
+                return Instance;
+            }
         }
 
         public void SetUpClientErrorMessageHandler(Action<string, SignalXRequest> handler)
@@ -167,8 +169,6 @@
             this.OnDebugMessageReceivedFromClient.Add(handler);
         }
 
-        public HubCallerContext NullHubCallerContext;
-
         public void RespondToServer(
             string handler,
             dynamic message,
@@ -176,31 +176,26 @@
             string replyTo = null,
             List<string> groupList = null)
         {
-            RespondToServer(this.NullHubCallerContext, null,null,handler, message, sender, replyTo, groupList);
+            RespondToServer(this.NullHubCallerContext, null, null, handler, message, sender, replyTo, groupList);
         }
 
-        public void RespondToServer(
-            
-            HubCallerContext context ,
-            IHubCallerConnectionContext<dynamic> clients ,
-            IGroupManager groups ,
+        public async Task RespondToServer(
+            HubCallerContext context,
+            IHubCallerConnectionContext<dynamic> clients,
+            IGroupManager groups,
             string handler,
             dynamic message,
-            object sender=null,
-            string replyTo=null,
-            List<string> groupList=null)
+            object sender = null,
+            string replyTo = null,
+            List<string> groupList = null)
         {
-            Task.Factory.StartNew(
-                () =>
-                {
-                    var messageId = Guid.NewGuid().ToString();
-                    SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList, true);
-                }, CancellationToken.None, TaskCreationOptions.DenyChildAttach | TaskCreationOptions.LongRunning, TaskScheduler.Default); 
+            string messageId = Guid.NewGuid().ToString();
+            Task task = SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList, true);
+            await task.ConfigureAwait(false);
         }
 
-
         [Obsolete("Not intended for client use")]
-        internal void SendMessageToServer(
+        internal async Task SendMessageToServer(
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,
@@ -209,9 +204,10 @@
             string replyTo,
             object sender,
             string messageId,
-            List<string> groupList,bool isInternalCall)
+            List<string> groupList,
+            bool isInternalCall)
         {
-            Advanced.Trace($"Sending message {message} to server from {messageId} having groups {string.Join(",", groupList ?? new List<string>())} with reply to {replyTo}");
+            this.Advanced.Trace($"Sending message {message} to server from {messageId} having groups {string.Join(",", groupList ?? new List<string>())} with reply to {replyTo}");
 
             IPrincipal user = context?.User;
             string error = "";
@@ -241,7 +237,7 @@
                     return;
                 }
 
-                var request = new SignalXRequest(this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User, groupList, context?.Request,context,clients,groups);
+                var request = new SignalXRequest(this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User, groupList, context?.Request, context, clients, groups);
 
                 if (!this.CanProcess(context, handler, request, isInternalCall))
                 {
@@ -249,7 +245,7 @@
                     return;
                 }
 
-                this.CallServer(request);
+                await this.CallServer(request).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -325,7 +321,6 @@
             {
                 //todo fix bug when name is null and still allowing message sending, especially calls origination from within server
             }
-            
 
             if (!this.Settings.HasOneOrMoreConnections)
             {

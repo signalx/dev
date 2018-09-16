@@ -15,7 +15,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => false);
+                    signalx.AuthenticationHandler((request ) => false);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -24,9 +24,9 @@
                                    }); ",
                         () =>
                         {
-                            signalx.ServerAuthorizedSingleAccess(
+                            signalx.Server(ServerType.AuthorizedSingleAccess,
                                 "sample",
-                                request => { failed = true; },
+                                (request) => { failed = true; },
                                 new List<string>
                                     { "groupB" });
                         },
@@ -45,7 +45,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => false);
+                    signalx.AuthenticationHandler((request ) => false);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -54,9 +54,9 @@
                                    }); ",
                         () =>
                         {
-                            signalx.ServerAuthorized(
+                            signalx.Server(ServerType.Authorized,
                                 "sample",
-                                request => { failed = true; },
+                                (request) => { failed = true; },
                                 new List<string>
                                     { "groupB" });
                         },

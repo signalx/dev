@@ -31,7 +31,7 @@
                    // ISignalXClientReceiver Receiver = signalx.Settings.Receiver;
                     bool RequireAuthorizationForAllHandlers = signalx.Settings.RequireAuthorizationForAllHandlers;
 
-                    signalx.AuthenticationHandler(request => true);
+                    signalx.AuthenticationHandler((request ) => true);
                     signalx.DisableAllClients();
                     signalx.DisableClient("test");
                     signalx.EnableAllClients();
@@ -46,10 +46,10 @@
                     {
                         OnAppStarted = () =>
                         {
-                            signalx.Server(SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
-                            signalx.ServerAuthorized(SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
-                            signalx.ServerAuthorizedSingleAccess(SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
-                            signalx.ServerSingleAccess(SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
+                            signalx.Server(SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), (request) => { });
+                            signalx.Server(ServerType.Authorized,SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), (request) => { });
+                            signalx.Server(ServerType.AuthorizedSingleAccess,SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), (request) => { });
+                            signalx.Server(ServerType.SingleAccess,SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), (request) => { });
                         },
                         TestEvents = new TestEventHandler(
                             () => { assert.AreEqual(1, (int)signalx.ConnectionCount); })

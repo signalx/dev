@@ -49,14 +49,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                request =>
+                                (request) =>
                                 {
                                     request.RespondToAllInGroup("handler", "done", "groupA");
                                     assert.WaitForSomeTime(TimeSpan.FromSeconds(10));
                                 });
                             signalx.Server(
                                 "final",
-                                request => { counter++; });
+                                (request) => { counter++; });
                         },
                         () => { assert.AreNotEqual(0, counter); });
                 },
@@ -95,14 +95,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                request =>
+                                (request) =>
                                 {
                                     request.RespondToAllInGroup("handler", "done", "groupA");
                                     assert.WaitForSomeTime(TimeSpan.FromSeconds(10));
                                 });
                             signalx.Server(
                                 "final",
-                                request => { counter++; });
+                                (request) => { counter++; });
                         },
                         () => { assert.AreEqual(1, counter); });
                 },
@@ -141,14 +141,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                request =>
+                                (request) =>
                                 {
                                     request.RespondToAllInGroup("handler", "done", "groupA");
                                     assert.WaitForSomeTime(TimeSpan.FromSeconds(10));
                                 });
                             signalx.Server(
                                 "final",
-                                request => { counter++; });
+                                (request) => { counter++; });
                         },
                         () => { assert.AreEqual(0, counter); });
                 },
@@ -177,21 +177,22 @@
                                    });",
                             @"
                              signalx.ready(function (server) {
-                              signalx.groups.join('groupA');
-                                    signalx.client.handler=function(){
+                              signalx.groups.join('groupA',function(){ signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
                                      signalx.server.sample(100,'handler');
+                                   });
+                                    
                                    });"
                         },
                         () =>
                         {
                             signalx.Server(
                                 "sample",
-                                request => { request.RespondToAllInGroup("handler", "done", "groupA"); });
+                                (request) => { request.RespondToAllInGroup("handler", "done", "groupA"); });
                             signalx.Server(
                                 "final",
-                                request => { counter++; });
+                                (request) => { counter++; });
                         },
                         () => { assert.AreEqual(2, counter); });
                 },
@@ -213,29 +214,33 @@
                         {
                             @"
                              signalx.ready(function (server) {
-                              signalx.groups.join('groupB');
+                              signalx.groups.join('groupB',function(){
+
                                     signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
                                      signalx.server.sample(100,'handler');
+                                    });
                                    });",
                             @"
                              signalx.ready(function (server) {
-                              signalx.groups.join('groupA');
-                                    signalx.client.handler=function(){
+                              signalx.groups.join('groupA',function(){
+                                        signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
                                      signalx.server.sample(100,'handler');
+                                    });
+
                                    });"
                         },
                         () =>
                         {
                             signalx.Server(
                                 "sample",
-                                request => { request.RespondToAllInGroup("handler", "done", "groupA"); });
+                                (request) => { request.RespondToAllInGroup("handler", "done", "groupA"); });
                             signalx.Server(
                                 "final",
-                                request => { counter++; });
+                                (request) => { counter++; });
                         },
                         () => { assert.AreEqual(4, counter); });
                 },
@@ -257,29 +262,33 @@
                         {
                             @"
                              signalx.ready(function (server) {
-                                 signalx.groups.join('groupB');
+                                 signalx.groups.join('groupB',function(){
+
                                     signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
                                      signalx.server.sample(100,'handler');
+                                      });
                                    });",
                             @"
                              signalx.ready(function (server) {
-                               signalx.groups.join('groupA');
+                               signalx.groups.join('groupA',function(){
+
                                     signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
                                      signalx.server.sample(100,'handler');
+                                    });
                                    });"
                         },
                         () =>
                         {
                             signalx.Server(
                                 "sample",
-                                request => { request.RespondToAllInGroup("handler", "done", "groupA"); });
+                                (request) => { request.RespondToAllInGroup("handler", "done", "groupA"); });
                             signalx.Server(
                                 "final",
-                                request => { counter++; });
+                                (request) => { counter++; });
                         },
                         () => { assert.AreEqual(2, counter); });
                 },
@@ -301,29 +310,36 @@
                         {
                             @"
                              signalx.ready(function (server) {
-                                signalx.groups.join('groupA');
+                               signalx.groups.join('groupA',function(){
+
                                     signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
                                      signalx.server.sample(100,'handler');
+                                    });
                                    });",
                             @"
                              signalx.ready(function (server) {
-                               signalx.groups.join('groupA');
+                               signalx.groups.join('groupA',function(){
+
                                     signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
                                      signalx.server.sample(100,'handler');
+                                    });
                                    });"
                         },
                         () =>
                         {
                             signalx.Server(
                                 "sample",
-                                request => { request.RespondToAllInGroup("handler", "done", "groupA"); });
+                                (request) =>
+                                {
+                                    request.RespondToAllInGroup("handler", "done", "groupA");
+                                });
                             signalx.Server(
                                 "final",
-                                request => { counter++; });
+                                (request) => { counter++; });
                         },
                         () => { assert.AreEqual(4, counter); });
                 },
@@ -347,9 +363,9 @@
                         2,
                         () =>
                         {
-                            signalx.ServerSingleAccess(
+                            signalx.Server(ServerType.SingleAccess,
                                 "sample",
-                                request => { counter++; });
+                                (request) => { counter++; });
                         },
                         () => { assert.AreEqual(numberOfClients, counter); });
                 },
@@ -373,9 +389,9 @@
                         numberOfClients,
                         () =>
                         {
-                            signalx.ServerSingleAccess(
+                            signalx.Server(ServerType.SingleAccess,
                                 "sample",
-                                request => { counter++; });
+                                (request) => { counter++; });
                         },
                         () => { assert.AreEqual(numberOfClients, counter); });
                 },
@@ -403,9 +419,9 @@
                         },
                         () =>
                         {
-                            signalx.ServerSingleAccess(
+                            signalx.Server(ServerType.SingleAccess,
                                 "sample",
-                                request => { counter++; });
+                                (request) => { counter++; });
                         },
                         () => { assert.AreNotEqual(2, counter); });
                 },
@@ -433,9 +449,9 @@
                         },
                         () =>
                         {
-                            signalx.ServerSingleAccess(
+                            signalx.Server(ServerType.SingleAccess,
                                 "sample",
-                                request => { counter++; });
+                                (request) => { counter++; });
                         },
                         () => { assert.AreEqual(2, counter); });
                 },

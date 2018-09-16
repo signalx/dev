@@ -13,6 +13,7 @@
 
             SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTREADY} ...");
             SignalX.Server(
+                ServerType.Dynamic,
                 SignalX.SIGNALXCLIENTREADY,
                 (request, state) =>
                 {
@@ -31,13 +32,11 @@
                             else
                                 SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke(error, e));
                         }
-                },
-                requireAuthorization: false,
-                isSingleWriter: false,
-                allowDynamicServerForThisInstance: true);
+                });
 
             SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTAGENT} ...");
             SignalX.Server(
+                ServerType.Dynamic,
                 SignalX.SIGNALXCLIENTAGENT,
                 (request, state) =>
                 {
@@ -60,13 +59,11 @@
 
                     //removed coz of possibility of result aggregation from clients
                     // SignalX.OnResponseAfterScriptRuns = null;
-                },
-                requireAuthorization: false,
-                isSingleWriter: false,
-                allowDynamicServerForThisInstance: true);
+                });
 
             SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTERRORHANDLER} ...");
             SignalX.Server(
+                ServerType.Dynamic,
                 SignalX.SIGNALXCLIENTERRORHANDLER,
                 (request, state) =>
                 {
@@ -81,13 +78,11 @@
                         {
                             SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
                         }
-                },
-                requireAuthorization: false,
-                isSingleWriter: false,
-                allowDynamicServerForThisInstance: true);
+                });
 
             SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTDEBUGHANDLER} ...");
             SignalX.Server(
+                ServerType.Dynamic,
                 SignalX.SIGNALXCLIENTDEBUGHANDLER,
                 (request, state) =>
                 {
@@ -101,10 +96,7 @@
                         {
                             SignalX.Settings.WarningHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
                         }
-                },
-                requireAuthorization: false,
-                isSingleWriter: false,
-                allowDynamicServerForThisInstance: true);
+                });
         }
     }
 }

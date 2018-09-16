@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using SignalXLib.Lib;
@@ -60,7 +61,7 @@
             SignalX.RespondToScriptRequest(context, clients, groups);
         }
 
-        public void SendMessageToServer(
+        public async Task SendMessageToServer(
             SignalX signalX, 
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
@@ -72,8 +73,7 @@
             string messageId,
             List<string> groupList)
         {
-          
-          signalX.RespondToServer(context?? signalX.NullHubCallerContext, clients, groups,handler,  message, sender, replyTo?? signalX.NullHubCallerContext.ConnectionId, groupList);
+           await  signalX.RespondToServer(context?? signalX.NullHubCallerContext, clients, groups,handler,  message, sender, replyTo?? signalX.NullHubCallerContext.ConnectionId, groupList);
         }
     }
 }

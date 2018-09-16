@@ -1,7 +1,6 @@
 ﻿namespace SignalXLib.Lib
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using Microsoft.AspNet.SignalR;
 
@@ -16,13 +15,11 @@
         public SignalXSettings()
         {
             this.HubConfiguration = new HubConfiguration { EnableDetailedErrors = true };
-            
+
             this.ExceptionHandler = new List<Action<string, Exception>>();
             this.WarningHandler = new List<Action<string, object>>();
             this.ConnectionEventsHandler = new List<Action<string, object>>();
         }
-
-       
 
         internal bool DisabledAllClients { set; get; }
 
@@ -51,7 +48,6 @@
 
         public bool RequireAuthorizationForPersistentConnections { get; set; }
 
-       
         internal bool StartCountingOutGoingMessages { set; get; }
 
         internal bool StartCountingInComingMessages { set; get; }

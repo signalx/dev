@@ -27,7 +27,6 @@
             }
 
             app.MapSignalR(hubConfig);
-            
         }
     }
 }

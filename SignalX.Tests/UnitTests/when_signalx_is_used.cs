@@ -25,10 +25,10 @@
             {
                 request.RespondToSender(message);
             });
-            signalX.Server("sam",(request) =>
+            signalX.Server("sam",async (request) =>
             {
-                request.Forward("us");
-                request.ForwardAsync("us");
+                //request.Forward("us");
+               await request.ForwardAsync("us");
                 request.RespondToSender(message);
             });
             signalX.SetSignalXClientAsReady();
