@@ -22,7 +22,7 @@ namespace SignalXLib.TestHelperLib
         public static TimeSpan MaxTestTimeSpan = TimeSpan.FromSeconds(30);
         public static TimeSpan MaxTestWaitTimeBeforeChecks = TimeSpan.FromSeconds(3);
         public static bool EmbedeLibraryScripts = true;
-        public static TimeSpan MaxWaitTimeForAllExpectedConnectionsToArrive = TimeSpan.FromSeconds(60);
+        public static TimeSpan MaxWaitTimeForAllExpectedConnectionsToArrive = TimeSpan.FromSeconds(30);
 
         /// <summary>
         ///     Specify the method that generates the file name of each web page used in test

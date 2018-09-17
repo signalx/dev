@@ -1,5 +1,5 @@
 ﻿/*!
- * SignalX JavaScript Library v3.0.0-pre
+ * SignalX JavaScript Library v4.0.0-pre
  * https://github.com/signalx
  */
 (function ($, window, undefined) {
@@ -186,7 +186,7 @@
                 } catch (e) {
                     signalx.error.f({
                         error: e,
-                        context: func,
+                        context: JSON.stringify(func),
                         description: "Error while executing method in signalx.ready"
                     });
                 }
@@ -280,13 +280,13 @@
                         };
                         signalx.groups = {
                             join: function (grpName, f) {
-                                signalx.debug.f('joining group ' + groupName);
+                                signalx.debug.f('joining group ' + grpName);
                                 signalx.groupNotifications = [];
                                 signalx.groupNotifications.push(f);
                                 chat.server.joinGroup(grpName);
                             },
                             leave: function (grpName, f) {
-                                signalx.debug.f('leaving group ' + groupName);
+                                signalx.debug.f('leaving group ' + grpName);
                                 signalx.groupNotifications = [];
                                 signalx.groupNotifications.push(f);
                                  chat.server.leaveGroup(grpName);
