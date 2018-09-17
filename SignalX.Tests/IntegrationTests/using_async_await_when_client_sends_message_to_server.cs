@@ -34,7 +34,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -42,7 +42,7 @@
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -73,7 +73,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -81,7 +81,7 @@
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -111,7 +111,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -119,7 +119,7 @@
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -149,7 +149,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -157,7 +157,7 @@
                                     signalx.RespondToOthers(request.User, request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -186,7 +186,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -194,7 +194,7 @@
                                     signalx.RespondToUser(request.User, request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -221,7 +221,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -229,7 +229,7 @@
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -258,7 +258,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -266,7 +266,7 @@
                                     request.RespondToSender(100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -297,7 +297,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -305,7 +305,7 @@
                                     request.RespondToSender(100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -335,7 +335,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -343,7 +343,7 @@
                                     request.RespondToSender(100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -373,7 +373,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -381,7 +381,7 @@
                                     request.RespondToOthers(100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -410,7 +410,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -418,7 +418,7 @@
                                     request.RespondToSender(100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -445,7 +445,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -453,7 +453,7 @@
                                     request.RespondToUser(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
@@ -480,7 +480,7 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample",
                                 async request =>
                                 {
@@ -488,7 +488,7 @@
                                     request.RespondToAll(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
-                            signalx.Server(
+                            signalx.ServerAsync(
                                 "sample2",
                                 async request =>
                                 {
