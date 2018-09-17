@@ -54,6 +54,7 @@
     <Compile Include="CodeTest\AssertExtensions.cs" />
     <Compile Include="CodeTest\async_void_test.cs" />
     <Compile Include="IntegrationTests\signalx_api_exploration.cs" />
+    <Compile Include="IntegrationTests\using_async_await_when_client_sends_message_to_server.cs" />
     <Compile Include="IntegrationTests\when_authorized_server_receives_message_from_client_in_a_group.cs" />
     <Compile Include="IntegrationTests\when_authorized_server_receives_message_from_client_in_a_group_it_should_fail_if_authorization_handler_fails.cs" />
     <Compile Include="IntegrationTests\when_authorized_server_receives_message_from_client_in_a_group_that_fails_authorization.cs" />

@@ -5,6 +5,7 @@
     using SignalXLib.TestHelperLib;
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     [TestClass]
     public class when_server_receives_message_from_multiple_clients
@@ -445,7 +446,10 @@
                             signalx.Server(
                                 ServerType.SingleAccess,
                                 "sample",
-                                request => { counter++; });
+                                 request =>
+                                {
+                                    counter++;
+                                });
                         },
                         () => { assert.AreEqual(2, counter); });
                 },
