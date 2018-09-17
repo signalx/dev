@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Tests
 {
-    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
+    using System;
 
     [TestClass]
     public class when_server_executes_javascript_on_all_clients

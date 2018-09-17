@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Threading;
 
-    class ServerHandlerDetails
+    internal class ServerHandlerDetails
     {
         public ServerHandlerDetails(bool requiresAuthorization, bool isSingleWriter, List<string> allowedGroups)
         {

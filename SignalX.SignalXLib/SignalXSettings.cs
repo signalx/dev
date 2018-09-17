@@ -1,8 +1,8 @@
 ﻿namespace SignalXLib.Lib
 {
+    using Microsoft.AspNet.SignalR;
     using System;
     using System.Collections.Generic;
-    using Microsoft.AspNet.SignalR;
 
     public class SignalXSettings : IDisposable
     {

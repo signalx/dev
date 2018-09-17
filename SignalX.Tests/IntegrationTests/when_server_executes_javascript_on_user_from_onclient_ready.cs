@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Tests
 {
-    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
+    using System;
 
     [TestClass]
     public class when_server_executes_javascript_on_user_from_onclient_ready
@@ -32,14 +32,14 @@
                                 () => { });
                             signalX.Server(
                                 "sample",
-                                (request) =>
+                                request =>
                                 {
                                     assert.AreEqual(100, (int)request.Message, "server must get the correct message");
                                     request.RespondToUser(request.User, 100);
                                 });
                             signalX.Server(
                                 "sample2",
-                                (request) => { result = (int)request.Message; });
+                                request => { result = (int)request.Message; });
                         },
                         () => { assert.AreEqual(result, 10); }
                     );
@@ -71,14 +71,14 @@
                                 () => { throw new Exception("On client ready exception"); });
                             signalX.Server(
                                 "sample",
-                                (request) =>
+                                request =>
                                 {
                                     assert.AreEqual(100, (int)request.Message, "server must get the correct message");
                                     request.RespondToUser(request.User, 100);
                                 });
                             signalX.Server(
                                 "sample2",
-                                (request) => { result = (int)request.Message; });
+                                request => { result = (int)request.Message; });
                         },
                         () => { assert.AreEqual(result, 10); }
                     );
@@ -110,14 +110,14 @@
                                 () => { throw new Exception("On client ready exception"); });
                             signalX.Server(
                                 "sample",
-                                (request) =>
+                                request =>
                                 {
                                     assert.AreEqual(100, (int)request.Message, "server must get the correct message");
                                     request.RespondToUser(request.User, 100);
                                 });
                             signalX.Server(
                                 "sample2",
-                                (request) => { result = (int)request.Message; });
+                                request => { result = (int)request.Message; });
                         },
                         () => { assert.AreEqual(result, 10); }
                     );

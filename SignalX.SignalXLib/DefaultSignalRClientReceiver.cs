@@ -1,12 +1,12 @@
 ﻿namespace SignalXLib.Lib
 {
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using Microsoft.AspNet.SignalR.Infrastructure;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
 
-    class DefaultSignalRClientReceiver : ISignalXClientReceiver
+    internal class DefaultSignalRClientReceiver : ISignalXClientReceiver
     {
         // SignalX SignalX= Lib.SignalX.Instance;
 

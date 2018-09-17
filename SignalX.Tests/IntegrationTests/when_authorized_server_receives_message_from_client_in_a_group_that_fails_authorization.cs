@@ -14,7 +14,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => { return request.Groups.Contains("groupB"); });
+                    signalx.AuthenticationHandler(request => { return request.Groups.Contains("groupB"); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -23,9 +23,10 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.AuthorizedSingleAccess,
+                            signalx.Server(
+                                ServerType.AuthorizedSingleAccess,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -42,7 +43,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => { return request.Groups.Contains("groupB"); });
+                    signalx.AuthenticationHandler(request => { return request.Groups.Contains("groupB"); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -51,9 +52,10 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.Authorized,
+                            signalx.Server(
+                                ServerType.Authorized,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -70,7 +72,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => { return request.Groups.Contains("groupB"); });
+                    signalx.AuthenticationHandler(request => { return request.Groups.Contains("groupB"); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -79,9 +81,10 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.AuthorizedSingleAccess,
+                            signalx.Server(
+                                ServerType.AuthorizedSingleAccess,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -98,7 +101,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => { return request.Groups.Contains("groupB"); });
+                    signalx.AuthenticationHandler(request => { return request.Groups.Contains("groupB"); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -107,9 +110,10 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.Authorized,
+                            signalx.Server(
+                                ServerType.Authorized,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {

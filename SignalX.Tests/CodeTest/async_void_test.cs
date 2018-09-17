@@ -1,19 +1,20 @@
-﻿using System.Text;
-using System.Threading.Tasks;
-
-namespace SignalXLib.Tests
+﻿namespace SignalXLib.Tests
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SignalXLib.Lib;
+    using SignalXLib.TestHelperLib;
+    using SignalXAppBuilderExtensions = SignalXLib.Lib.Extensions.SignalXAppBuilderExtensions;
+
     [TestClass]
     public class async_void_test
     {
         [TestMethod]
         public void EnsureNoAsyncVoidTests()
         {
-          //  AssertExtensions.AssertNoAsyncVoidMethods(GetType().Assembly);
-            AssertExtensions.AssertNoAsyncVoidMethods(typeof(SignalXLib.Lib.SignalX).Assembly);
-            AssertExtensions.AssertNoAsyncVoidMethods(typeof(SignalXLib.TestHelperLib.SignalXTester).Assembly);
-            AssertExtensions.AssertNoAsyncVoidMethods(typeof(SignalXLib.Lib.Extensions.SignalXAppBuilderExtensions).Assembly);
+            //  AssertExtensions.AssertNoAsyncVoidMethods(GetType().Assembly);
+            AssertExtensions.AssertNoAsyncVoidMethods(typeof(SignalX).Assembly);
+            AssertExtensions.AssertNoAsyncVoidMethods(typeof(SignalXTester).Assembly);
+            AssertExtensions.AssertNoAsyncVoidMethods(typeof(SignalXAppBuilderExtensions).Assembly);
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿namespace SignalXLib.Lib
 {
-    using System;
     using Microsoft.AspNet.SignalR;
     using Owin;
+    using System;
 
     public static class SignalXAppBuilderExtensions
     {
-        static readonly SignalX SignalX = SignalX.Instance;
+        private static readonly SignalX SignalX = SignalX.Instance;
 
         /// <summary>
         ///     If you already did MapSignalR in your app, then you done need to use this!

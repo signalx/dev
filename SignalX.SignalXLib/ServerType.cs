@@ -19,6 +19,7 @@
         ///     in at a time
         /// </summary>
         AuthorizedSingleAccess,
+
         Dynamic,
         DynamicAuthorized
     }

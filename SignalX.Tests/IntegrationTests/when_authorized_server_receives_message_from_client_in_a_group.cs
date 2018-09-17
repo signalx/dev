@@ -14,19 +14,19 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupA',function(){ signalx.server.sample(100); });
-                                     
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.SingleAccess,
+                            signalx.Server(
+                                ServerType.SingleAccess,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () => { assert.IsTrue(failed); });
                 });
@@ -39,19 +39,19 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupA',function(){  signalx.server.sample(100); });
-                                    
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.SingleAccess,
+                            signalx.Server(
+                                ServerType.SingleAccess,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -68,19 +68,19 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
                         @"signalx.ready(function (server) {
                              signalx.groups.join('groupA', function(){ signalx.server.sample(100); });
-                                     
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.AuthorizedSingleAccess,
+                            signalx.Server(
+                                ServerType.AuthorizedSingleAccess,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -97,7 +97,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -106,9 +106,10 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.Authorized,
+                            signalx.Server(
+                                ServerType.Authorized,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -125,7 +126,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -134,9 +135,9 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server( 
+                            signalx.Server(
                                 "sample",
-                               (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () => { assert.IsTrue(failed); });
                 });
@@ -149,7 +150,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -160,7 +161,7 @@
                         {
                             signalx.Server(
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -188,7 +189,7 @@
                         {
                             signalx.Server(
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {

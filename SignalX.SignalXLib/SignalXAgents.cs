@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Lib
 {
-    using System;
     using Newtonsoft.Json;
+    using System;
 
-    class SignalXAgents
+    internal class SignalXAgents
     {
         public void SetUpAgents(SignalX SignalX)
         {

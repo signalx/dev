@@ -1,20 +1,19 @@
 ﻿namespace SignalXLib.Lib
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Security.Principal;
-    using System.Threading;
-    using System.Threading.Tasks;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using Microsoft.AspNet.SignalR.Owin;
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Security.Principal;
+    using System.Threading;
+    using System.Threading.Tasks;
 
     public class SignalX : IDisposable
     {
         internal static object padlock = new object();
-        static readonly SignalXAgents SignalXAgents = new SignalXAgents();
+        private static readonly SignalXAgents SignalXAgents = new SignalXAgents();
         internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT";
         internal static string SIGNALXCLIENTREADY = "SIGNALXCLIENTREADY";
         internal static string SIGNALXCLIENTERRORHANDLER = "SIGNALXCLIENTERRORHANDLER";
@@ -53,7 +52,7 @@
 
         public SignalXSettings Settings = new SignalXSettings();
 
-        SignalX()
+        private SignalX()
         {
             this.NullHubCallerContext = new HubCallerContext(new ServerRequest(new ConcurrentDictionary<string, object>()), Guid.NewGuid().ToString());
 
@@ -97,7 +96,7 @@
 
         internal List<Action<SignalXRequest>> OnClientReady { set; get; }
 
-        static SignalX instance { set; get; }
+        private static SignalX instance { set; get; }
 
         public ulong ConnectionCount { get; internal set; }
 
@@ -171,16 +170,10 @@
 
         public void RespondToServer(
             string handler,
-            dynamic message)
-        {
-            RespondToServer( handler, message, null, null, null);
-        }
-        public void RespondToServer(
-            string handler,
             dynamic message,
-            object sender ,
-            string replyTo ,
-            List<string> groupList )
+            object sender = null,
+            string replyTo = null,
+            List<string> groupList = null)
         {
             RespondToServer(this.NullHubCallerContext, null, null, handler, message, sender, replyTo, groupList);
         }
@@ -366,6 +359,5 @@
 
     public class SignalXServerSender
     {
-
     }
 }

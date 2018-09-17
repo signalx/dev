@@ -1,15 +1,15 @@
 ﻿namespace SignalXLib.Tests
 {
-    using System;
-    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
+    using System;
+    using System.Collections.Generic;
 
     [TestClass]
     public class when_server_receives_message_from_multiple_clients
     {
-        static readonly int numberOfRety = 0;
+        private static readonly int numberOfRety = 0;
 
         [TestCleanup]
         public void Cleanup()
@@ -49,14 +49,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                (request) =>
+                                request =>
                                 {
                                     request.RespondToAllInGroup("handler", "done", "groupA");
                                     assert.WaitForSomeTime(TimeSpan.FromSeconds(10));
                                 });
                             signalx.Server(
                                 "final",
-                                (request) => { counter++; });
+                                request => { counter++; });
                         },
                         () => { assert.AreNotEqual(0, counter); });
                 },
@@ -95,14 +95,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                (request) =>
+                                request =>
                                 {
                                     request.RespondToAllInGroup("handler", "done", "groupA");
                                     assert.WaitForSomeTime(TimeSpan.FromSeconds(10));
                                 });
                             signalx.Server(
                                 "final",
-                                (request) => { counter++; });
+                                request => { counter++; });
                         },
                         () => { assert.AreEqual(1, counter); });
                 },
@@ -141,14 +141,14 @@
                         {
                             signalx.Server(
                                 "sample",
-                                (request) =>
+                                request =>
                                 {
                                     request.RespondToAllInGroup("handler", "done", "groupA");
                                     assert.WaitForSomeTime(TimeSpan.FromSeconds(10));
                                 });
                             signalx.Server(
                                 "final",
-                                (request) => { counter++; });
+                                request => { counter++; });
                         },
                         () => { assert.AreEqual(0, counter); });
                 },
@@ -182,17 +182,16 @@
                                       }
                                      signalx.server.sample(100,'handler');
                                    });
-                                    
                                    });"
                         },
                         () =>
                         {
                             signalx.Server(
                                 "sample",
-                                (request) => { request.RespondToAllInGroup("handler", "done", "groupA"); });
+                                request => { request.RespondToAllInGroup("handler", "done", "groupA"); });
                             signalx.Server(
                                 "final",
-                                (request) => { counter++; });
+                                request => { counter++; });
                         },
                         () => { assert.AreEqual(2, counter); });
                 },
@@ -215,7 +214,6 @@
                             @"
                              signalx.ready(function (server) {
                               signalx.groups.join('groupB',function(){
-
                                     signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
@@ -230,17 +228,16 @@
                                       }
                                      signalx.server.sample(100,'handler');
                                     });
-
                                    });"
                         },
                         () =>
                         {
                             signalx.Server(
                                 "sample",
-                                (request) => { request.RespondToAllInGroup("handler", "done", "groupA"); });
+                                request => { request.RespondToAllInGroup("handler", "done", "groupA"); });
                             signalx.Server(
                                 "final",
-                                (request) => { counter++; });
+                                request => { counter++; });
                         },
                         () => { assert.AreEqual(4, counter); });
                 },
@@ -263,7 +260,6 @@
                             @"
                              signalx.ready(function (server) {
                                  signalx.groups.join('groupB',function(){
-
                                     signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
@@ -273,7 +269,6 @@
                             @"
                              signalx.ready(function (server) {
                                signalx.groups.join('groupA',function(){
-
                                     signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
@@ -285,10 +280,10 @@
                         {
                             signalx.Server(
                                 "sample",
-                                (request) => { request.RespondToAllInGroup("handler", "done", "groupA"); });
+                                request => { request.RespondToAllInGroup("handler", "done", "groupA"); });
                             signalx.Server(
                                 "final",
-                                (request) => { counter++; });
+                                request => { counter++; });
                         },
                         () => { assert.AreEqual(2, counter); });
                 },
@@ -311,7 +306,6 @@
                             @"
                              signalx.ready(function (server) {
                                signalx.groups.join('groupA',function(){
-
                                     signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
@@ -321,7 +315,6 @@
                             @"
                              signalx.ready(function (server) {
                                signalx.groups.join('groupA',function(){
-
                                     signalx.client.handler=function(){
                                         signalx.server.final();
                                       }
@@ -333,13 +326,10 @@
                         {
                             signalx.Server(
                                 "sample",
-                                (request) =>
-                                {
-                                    request.RespondToAllInGroup("handler", "done", "groupA");
-                                });
+                                request => { request.RespondToAllInGroup("handler", "done", "groupA"); });
                             signalx.Server(
                                 "final",
-                                (request) => { counter++; });
+                                request => { counter++; });
                         },
                         () => { assert.AreEqual(4, counter); });
                 },
@@ -363,9 +353,10 @@
                         2,
                         () =>
                         {
-                            signalx.Server(ServerType.SingleAccess,
+                            signalx.Server(
+                                ServerType.SingleAccess,
                                 "sample",
-                                (request) => { counter++; });
+                                request => { counter++; });
                         },
                         () => { assert.AreEqual(numberOfClients, counter); });
                 },
@@ -389,9 +380,10 @@
                         numberOfClients,
                         () =>
                         {
-                            signalx.Server(ServerType.SingleAccess,
+                            signalx.Server(
+                                ServerType.SingleAccess,
                                 "sample",
-                                (request) => { counter++; });
+                                request => { counter++; });
                         },
                         () => { assert.AreEqual(numberOfClients, counter); });
                 },
@@ -419,9 +411,10 @@
                         },
                         () =>
                         {
-                            signalx.Server(ServerType.SingleAccess,
+                            signalx.Server(
+                                ServerType.SingleAccess,
                                 "sample",
-                                (request) => { counter++; });
+                                request => { counter++; });
                         },
                         () => { assert.AreNotEqual(2, counter); });
                 },
@@ -449,9 +442,10 @@
                         },
                         () =>
                         {
-                            signalx.Server(ServerType.SingleAccess,
+                            signalx.Server(
+                                ServerType.SingleAccess,
                                 "sample",
-                                (request) => { counter++; });
+                                request => { counter++; });
                         },
                         () => { assert.AreEqual(2, counter); });
                 },

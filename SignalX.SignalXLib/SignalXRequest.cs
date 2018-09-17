@@ -1,15 +1,15 @@
 ﻿namespace SignalXLib.Lib
 {
+    using Microsoft.AspNet.SignalR;
+    using Microsoft.AspNet.SignalR.Hubs;
     using System;
     using System.Collections.Generic;
     using System.Security.Principal;
     using System.Threading.Tasks;
-    using Microsoft.AspNet.SignalR;
-    using Microsoft.AspNet.SignalR.Hubs;
 
     public class SignalXRequest
     {
-        readonly SignalX SignalX;
+        private readonly SignalX SignalX;
 
         internal SignalXRequest(
             SignalX signalX,
@@ -42,11 +42,11 @@
             this.Request = request;
         }
 
-        HubCallerContext Context { get; }
+        private HubCallerContext Context { get; }
 
-        IHubCallerConnectionContext<dynamic> Clients { get; }
+        private IHubCallerConnectionContext<dynamic> Clients { get; }
 
-        IGroupManager GroupsManager { get; }
+        private IGroupManager GroupsManager { get; }
 
         // public string UserId { get; set; }
 
@@ -120,7 +120,8 @@
         //}
 
         /// <summary>
-        ///     Forward request to  server asynchronously The original message and 'reply to' is forwarded if none is provided
+        ///     Forward request to  another server asynchronously The original message and 'reply to' is forwarded if none is
+        ///     provided
         /// </summary>
         /// <param name="handler"></param>
         /// <param name="message"></param>
@@ -140,6 +141,21 @@
         {
             if (!string.IsNullOrEmpty(this.User))
                 this.SignalX.RespondToOthers(this.User, this.ReplyTo, response, groupName);
+        }
+
+        public void RespondToServer(
+            string handler,
+            dynamic message,
+            object sender = null,
+            string replyTo = null,
+            List<string> groupList = null)
+        {
+            this.SignalX.RespondToServer(
+                handler,
+                message,
+                sender,
+                replyTo,
+                groupList);
         }
     }
 }

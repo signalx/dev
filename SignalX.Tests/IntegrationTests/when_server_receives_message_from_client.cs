@@ -14,7 +14,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => false);
+                    signalx.AuthenticationHandler(request => false);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -23,9 +23,10 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.SingleAccess,
+                            signalx.Server(
+                                ServerType.SingleAccess,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () => { assert.IsTrue(failed); });
                 });
@@ -38,7 +39,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => false);
+                    signalx.AuthenticationHandler(request => false);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -47,9 +48,10 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.SingleAccess,
+                            signalx.Server(
+                                ServerType.SingleAccess,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -66,7 +68,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => false);
+                    signalx.AuthenticationHandler(request => false);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -75,9 +77,10 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.AuthorizedSingleAccess,
+                            signalx.Server(
+                                ServerType.AuthorizedSingleAccess,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -94,7 +97,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => false);
+                    signalx.AuthenticationHandler(request => false);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -103,9 +106,10 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.Authorized,
+                            signalx.Server(
+                                ServerType.Authorized,
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -122,7 +126,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => false);
+                    signalx.AuthenticationHandler(request => false);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -133,7 +137,7 @@
                         {
                             signalx.Server(
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () => { assert.IsTrue(failed); });
                 });
@@ -146,7 +150,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => false);
+                    signalx.AuthenticationHandler(request => false);
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -157,7 +161,7 @@
                         {
                             signalx.Server(
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {
@@ -184,7 +188,7 @@
                         {
                             signalx.Server(
                                 "sample",
-                                (request) => { failed = true; });
+                                request => { failed = true; });
                         },
                         () =>
                         {

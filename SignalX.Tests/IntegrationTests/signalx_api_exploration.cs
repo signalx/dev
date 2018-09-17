@@ -1,10 +1,10 @@
 ﻿namespace SignalXLib.Tests.IntegrationTests
 {
-    using System;
     using Microsoft.AspNet.SignalR;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
+    using System;
 
     [TestClass]
     public class signalx_api_exploration
@@ -15,6 +15,7 @@
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     signalx.SetUpClientErrorMessageHandler((error, request) => { });
                     signalx.SetUpClientDebugMessageHandler((error, request) => { });
                     SignalX mySignalX = SignalX.Instance;
@@ -28,10 +29,10 @@
                     bool HasOneOrMoreConnections = signalx.Settings.HasOneOrMoreConnections;
                     HubConfiguration HubConfiguration = signalx.Settings.HubConfiguration;
                     bool LogAgentMessagesOnClient = signalx.Settings.LogAgentMessagesOnClient;
-                   // ISignalXClientReceiver Receiver = signalx.Settings.Receiver;
+                    // ISignalXClientReceiver Receiver = signalx.Settings.Receiver;
                     bool RequireAuthorizationForAllHandlers = signalx.Settings.RequireAuthorizationForAllHandlers;
 
-                    signalx.AuthenticationHandler((request ) => true);
+                    signalx.AuthenticationHandler(request => true);
                     signalx.DisableAllClients();
                     signalx.DisableClient("test");
                     signalx.EnableAllClients();
@@ -46,10 +47,10 @@
                     {
                         OnAppStarted = () =>
                         {
-                            signalx.Server(SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), (request) => { });
-                            signalx.Server(ServerType.Authorized,SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), (request) => { });
-                            signalx.Server(ServerType.AuthorizedSingleAccess,SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), (request) => { });
-                            signalx.Server(ServerType.SingleAccess,SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), (request) => { });
+                            signalx.Server(SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
+                            signalx.Server(ServerType.Authorized, SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
+                            signalx.Server(ServerType.AuthorizedSingleAccess, SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
+                            signalx.Server(ServerType.SingleAccess, SignalXExtensions.GenerateUniqueNameId().Replace("-", ""), request => { });
                         },
                         TestEvents = new TestEventHandler(
                             () => { assert.AreEqual(1, (int)signalx.ConnectionCount); })
@@ -63,6 +64,7 @@
             SignalXTester.Run(
                 (signalx, assert) =>
                 {
+                    SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     int traceCount = 0;
                     signalx.Advanced.OnTrace(
                         (s, m, e, l) =>

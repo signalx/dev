@@ -1,16 +1,16 @@
 ﻿namespace SignalXLib.Lib
 {
+    using Microsoft.AspNet.SignalR;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.AspNet.SignalR;
 
     //use GlobalHost.HubPipeline.RequireAuthentication(); to lock sown all your hubs
 
     public partial class SignalXHub : Hub
     {
-        readonly SignalX signalX = SignalX.Instance;
+        private readonly SignalX signalX = SignalX.Instance;
 
         //not async because it already behaves as async from client clide
         public async Task Send(string handler, dynamic message, string replyTo, dynamic sender, string messageId, List<string> groups)
