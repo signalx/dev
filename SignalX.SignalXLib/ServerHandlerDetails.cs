@@ -11,6 +11,7 @@
             this.IsSingleWriter = isSingleWriter;
             this.SingleWriter = new ReaderWriterLockSlim();
             this.AllowedGroups = allowedGroups;
+            State = new SignalXServerState();
         }
 
         internal bool RequiresAuthorization { get; }

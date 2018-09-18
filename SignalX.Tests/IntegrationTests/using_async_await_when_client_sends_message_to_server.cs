@@ -38,7 +38,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual(100, (int)request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -46,7 +46,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    result = (int)request.Message;
+                                    result = request.MessageAs<int>();
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         },
@@ -77,7 +77,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual(100, (int)request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -85,7 +85,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    result = (int)request.Message;
+                                    result = request.MessageAs<int>();
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         },
@@ -115,7 +115,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual(100, (int)request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -123,7 +123,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    result = (int)request.Message;
+                                    result = request.MessageAs<int>();
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         },
@@ -153,7 +153,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual(100, request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     signalx.RespondToOthers(request.User, request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -161,7 +161,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    result = (int)request.Message;
+                                    result = request.MessageAs<int>();
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         },
@@ -190,7 +190,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual(100, request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     signalx.RespondToUser(request.User, request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -198,7 +198,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    assert.AreEqual<int>(10, request.Message);
+                                    assert.AreEqual<int>(10, request.MessageAs<int>());
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         });
@@ -225,7 +225,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual<int>(100, request.Message, "server must get the correct message");
+                                    assert.AreEqual<int>(100, request.MessageAs<int>(), "server must get the correct message");
                                     signalx.RespondToAll(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -233,7 +233,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    assert.AreEqual(10, request.Message);
+                                    assert.AreEqual(10, request.MessageAs<int>());
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         });
@@ -262,7 +262,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual(100, (int)request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     request.RespondToSender(100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -270,7 +270,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    result = (int)request.Message;
+                                    result = request.MessageAs<int>();
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         },
@@ -301,7 +301,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual(100, (int)request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     request.RespondToSender(100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -309,7 +309,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    result = (int)request.Message;
+                                    result = request.MessageAs<int>();
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         },
@@ -339,7 +339,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual(100, (int)request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     request.RespondToSender(100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -347,7 +347,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    result = (int)request.Message;
+                                    result = request.MessageAs<int>();
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         },
@@ -377,7 +377,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual(100, request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     request.RespondToOthers(100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -385,7 +385,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    result = (int)request.Message;
+                                    result = request.MessageAs<int>();
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         },
@@ -414,7 +414,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual<int>(100, request.Message, "server must get the correct message");
+                                    assert.AreEqual<int>(100, request.MessageAs<int>(), "server must get the correct message");
                                     request.RespondToSender(100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -422,7 +422,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    assert.AreEqual<int>(10, request.Message);
+                                    assert.AreEqual<int>(10, request.MessageAs<int>());
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         });
@@ -449,7 +449,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual<int>(100, request.Message, "server must get the correct message");
+                                    assert.AreEqual<int>(100, request.MessageAs<int>(), "server must get the correct message");
                                     request.RespondToUser(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -457,7 +457,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    assert.AreEqual<int>(10, request.Message);
+                                    assert.AreEqual<int>(10, request.MessageAs<int>());
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         });
@@ -484,7 +484,7 @@
                                 "sample",
                                 async request =>
                                 {
-                                    assert.AreEqual<int>(100, request.Message, "server must get the correct message");
+                                    assert.AreEqual<int>(100, request.MessageAs<int>(), "server must get the correct message");
                                     request.RespondToAll(request.ReplyTo, 100);
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
@@ -492,7 +492,7 @@
                                 "sample2",
                                 async request =>
                                 {
-                                    assert.AreEqual<int>(10, request.Message);
+                                    assert.AreEqual<int>(10, request.MessageAs<int>());
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });
                         });

@@ -19,7 +19,7 @@
         public void Receive(
             string user,
             string replyTo,
-            dynamic message
+            object message
         )
         {
             IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
@@ -27,13 +27,15 @@
             hubContext.Clients.Client(user).broadcastMessage(replyTo, message);
         }
 
+       
+
         /// <summary>
         ///     Called by framework
         /// </summary>
         /// <param name="clientName"></param>
         /// <param name="message"></param>
         /// <param name="groupName"></param>
-        public void ReceiveByGroup(string clientName, dynamic message, string groupName)
+        public void ReceiveByGroup(string clientName, object message, string groupName)
         {
             IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
             if (!string.IsNullOrEmpty(groupName))
@@ -48,7 +50,7 @@
         /// <param name="clientName"></param>
         /// <param name="message"></param>
         /// <param name="excludedConnection"></param>
-        public void ReceiveAsOther(string clientName, dynamic message, string excludedConnection, string groupName)
+        public void ReceiveAsOther(string clientName, object message, string excludedConnection, string groupName)
         {
             IHubContext hubContext = GlobalHost.DependencyResolver.Resolve<IConnectionManager>().GetHubContext<SignalXHub>();
             if (!string.IsNullOrEmpty(groupName))
@@ -80,14 +82,14 @@
         /// <param name="context"></param>
         /// <param name="clients"></param>
         /// <param name="groups"></param>
-        public void ReceiveInGroupManager(string operation, string userId, dynamic groupName, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
+        public void ReceiveInGroupManager(string operation, string userId, string groupName, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
         {
             clients.Caller?.groupManager(groupName, operation);
         }
 
-        public void RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
+        public async Task RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
         {
-            SignalX.RespondToScriptRequest(context, clients, groups);
+          await  SignalX.RespondToScriptRequest(context, clients, groups).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -103,7 +105,7 @@
         /// <param name="sender"></param>
         /// <param name="messageId"></param>
         /// <param name="groupList"></param>
-        public async Task SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, dynamic message, string replyTo, object sender, string messageId, List<string> groupList)
+        public async Task SendMessageToServer(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string handler, string message, string replyTo, object sender, string messageId, List<string> groupList)
         {
             await SignalX.SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList, false);
         }

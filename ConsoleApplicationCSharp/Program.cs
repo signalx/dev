@@ -17,7 +17,7 @@ namespace ConsoleApplicationCSharp
             {
                 SignalX SignalX = SignalX.Instance;
                 SignalX.Settings.RequireAuthorizationForAllHandlers = false;
-                SignalX.AuthenticationHandler((r) => true);
+                SignalX.AuthenticationHandler((r) => Task.FromResult(true));
 
                 SignalX.OnWarning(
                     (m, e) =>
@@ -34,15 +34,15 @@ namespace ConsoleApplicationCSharp
                 SignalX.Server("Sample", request =>
                 {
                     var messageId = SignalXExtensions.GenerateUniqueNameId();
-                    SignalX.RespondToAll("Myclient", messageId + " - " + request.Message + ": Thank you for sending me the message ");
-                    SignalX.RespondToAll("Myclient", messageId + " - " + request.Message + ": Hang on i'm not done yet");
+                    SignalX.RespondToAll("Myclient", messageId + " - " + request.MessageAsJsonString + ": Thank you for sending me the message ");
+                    SignalX.RespondToAll("Myclient", messageId + " - " + request.MessageAsJsonString + ": Hang on i'm not done yet");
                     Task.Delay(TimeSpan.FromMilliseconds(1000)).ContinueWith(x =>
                     {
-                        SignalX.RespondToAll("Myclient", messageId + " - " + request.Message + ": So im almost done");
+                        SignalX.RespondToAll("Myclient", messageId + " - " + request.MessageAsJsonString + ": So im almost done");
                     });
                     Task.Delay(TimeSpan.FromMilliseconds(1000)).ContinueWith(x =>
                     {
-                        SignalX.RespondToAll("Myclient", messageId + " - " + request.Message + ": Im' done!");
+                        SignalX.RespondToAll("Myclient", messageId + " - " + request.MessageAsJsonString + ": Im' done!");
                     });
                 });
                 SignalX.Server(
@@ -69,7 +69,7 @@ namespace ConsoleApplicationCSharp
                 SignalX.Server("Sample2",
                     (request) =>
                     {
-                        SignalX.RespondToAll(string.IsNullOrEmpty(request.ReplyTo) ? "Myclient" : request.ReplyTo, request.MessageId + ":" + request.Sender + " sent me this message : " + request.Message + " and asked me to reply to " + request.ReplyTo);
+                        SignalX.RespondToAll(string.IsNullOrEmpty(request.ReplyTo) ? "Myclient" : request.ReplyTo, request.MessageId + ":" + request.Sender + " sent me this message : " + request.MessageAsJsonString + " and asked me to reply to " + request.ReplyTo);
                     });
 
                 SignalX.Server("Sample3", (request) => request.RespondToSender(request.ReplyTo));

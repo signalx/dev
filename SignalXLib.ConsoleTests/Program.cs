@@ -32,9 +32,9 @@ namespace SignalXLib.ConsoleTests
                    
                         Console.WriteLine("tests succeeded!");
                         SignalX.RunJavaScriptOnAllClients("alert('yo');for(i=0;i<10000;i++) {console.log(Math.pow(999, Math.pow(9, 2)));}",
-                            (response, request, error) =>
+                            (response) =>
                             {
-                           var     result = Convert.ToInt32(response);
+                           var     result =response.MessageAs<int>();
                             }, TimeSpan.FromSeconds(5));
                         break;
                     }

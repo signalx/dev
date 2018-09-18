@@ -4,6 +4,7 @@
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     [TestClass]
     public class when_authorized_server_receives_message_from_client_in_a_group_that_fails_authorization2
@@ -15,7 +16,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => true);
+                    signalx.AuthenticationHandler(request => Task.FromResult(true));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -46,7 +47,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => true);
+                    signalx.AuthenticationHandler(request => Task.FromResult(true));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -77,7 +78,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => true);
+                    signalx.AuthenticationHandler(request => Task.FromResult(true));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -108,7 +109,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => true);
+                    signalx.AuthenticationHandler(request => Task.FromResult(true));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(

@@ -17,21 +17,25 @@
                 SignalX.SIGNALXCLIENTREADY,
                 (request, state) =>
                 {
+                    SignalX?.Advanced.Trace($"Running all client ready handlers  '{request?.MessageAsJsonString}'  ...");
                     foreach (Action<SignalXRequest> action in SignalX.OnClientReady)
-                        try
+                    {
+ try
                         {
                             action.Invoke(request);
                             request.RespondToSender("");
                         }
                         catch (Exception e)
                         {
-                            string error = $"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}";
+                            string error = $"Error while obtaining response from client after server executed script on client : Response was {request?.MessageAsJsonString} from sender {request?.Sender}";
                             SignalX.Advanced.Trace(e, error);
                             if (SignalX.Settings.ContinueClientExecutionWhenAnyServerOnClientReadyFails)
                                 request.RespondToSender("Error while executing server ready, but server has allowed client to continue execution regardless");
                             else
                                 SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke(error, e));
                         }
+                    }
+                       
                 });
 
             SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTAGENT} ...");
@@ -40,21 +44,18 @@
                 SignalX.SIGNALXCLIENTAGENT,
                 (request, state) =>
                 {
+                    SignalX?.Advanced.Trace($"Received message from client agent '{request?.MessageAsJsonString}' ...");
                     try
                     {
-                        dynamic str = request.Message.ToString();
-                        dynamic response = JsonConvert.DeserializeObject<ResponseAfterScriptRuns>(str);
-                        SignalX.OnResponseAfterScriptRuns?.Invoke(response.Result, request, response.Error);
-                        /*
-                          todo check why this is not working as dynamic
-                          todo maybe needs to specify/check serialization for hub
-                          SignalX.OnResponseAfterScriptRuns ?.Invoke(request.Message.Result, request, request.Message.Error);
-
-                         */
+                        var response = request.MessageAs<ResponseAfterScriptRuns>();
+                        response.Request = request;
+                        SignalX.OnResponseAfterScriptRuns?.Invoke(response);
+                        
                     }
                     catch (Exception e)
                     {
-                        SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
+                        SignalX.Advanced.Trace(e, $"Error while handling client agent with message {request?.MessageAsJsonString}...");
+                        SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.MessageAsJsonString} from sender {request?.Sender}", e));
                     }
 
                     //removed coz of possibility of result aggregation from clients
@@ -67,16 +68,17 @@
                 SignalX.SIGNALXCLIENTERRORHANDLER,
                 (request, state) =>
                 {
+                    SignalX?.Advanced.Trace($"Running client error handlers with message '{request?.MessageAsJsonString}' ...");
+
                     foreach (Action<string, SignalXRequest> action in SignalX.OnErrorMessageReceivedFromClient)
                         try
                         {
-                            dynamic str = request.Message.ToString();
-
-                            action?.Invoke(str, request);
+                            action?.Invoke(request.MessageAsJsonString, request);
                         }
                         catch (Exception e)
                         {
-                            SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
+                            SignalX.Advanced.Trace(e);
+                            SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.MessageAsJsonString} from sender {request?.Sender}", e));
                         }
                 });
 
@@ -86,16 +88,21 @@
                 SignalX.SIGNALXCLIENTDEBUGHANDLER,
                 (request, state) =>
                 {
+                    SignalX?.Advanced.Trace($"Running client debug handlers with message '{request?.MessageAsJsonString}' ...");
+
                     foreach (Action<string, SignalXRequest> action in SignalX.OnDebugMessageReceivedFromClient)
-                        try
+                    {
+                    try
                         {
-                            dynamic str = request.Message.ToString();
-                            action?.Invoke(str, request);
+                            action?.Invoke(request.MessageAsJsonString, request);
                         }
                         catch (Exception e)
                         {
-                            SignalX.Settings.WarningHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.Message} from sender {request?.Sender}", e));
+                            SignalX.Advanced.Trace(e);
+                            SignalX.Settings.WarningHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.MessageAsJsonString} from sender {request?.Sender}", e));
                         }
+                    }
+
                 });
         }
     }

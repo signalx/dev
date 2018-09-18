@@ -17,8 +17,8 @@ let main argv =
     let url="http://localhost:44111"
     use server=WebApp.Start<Startup>(url)
     let SignalX = SignalX.Instance;
-    SignalX.Server("Sample",fun request -> request.RespondToUser("Myclient",request.Message ))
-    SignalX.Server("Sample2",fun request -> SignalX.RespondToAll(request.ReplyTo,(request.Message.ToString()+request.Sender.ToString())))
+    SignalX.Server("Sample",fun request -> request.RespondToUser("Myclient",request.MessageAs<string>() ))
+    SignalX.Server("Sample2",fun request -> SignalX.RespondToAll(request.ReplyTo,(request.MessageAs<string>()+request.Sender.ToString())))
     SignalX.Server("Sample3",fun request -> request.RespondToUser(request.ReplyTo,""))
     System.Diagnostics.Process.Start(url)
     Console.ReadLine()

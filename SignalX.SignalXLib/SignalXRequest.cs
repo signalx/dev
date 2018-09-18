@@ -4,8 +4,37 @@
     using Microsoft.AspNet.SignalR.Hubs;
     using System;
     using System.Collections.Generic;
+    using System.Dynamic;
     using System.Security.Principal;
     using System.Threading.Tasks;
+    using Newtonsoft.Json;
+
+    public interface ISignalXSerializer
+    {
+        T DeserializeObject<T>(string data);
+        string SerializeObject(object data);
+    }
+
+    public class JsonSignalXSerializer:ISignalXSerializer
+    {
+        JsonSerializerSettings JsonSerializerSettings { set; get; }
+        public JsonSignalXSerializer(JsonSerializerSettings jsonSerializerSettings=null)
+        {
+            JsonSerializerSettings = jsonSerializerSettings?? new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+        }
+        public T DeserializeObject<T>(string data)
+        {
+            return  JsonConvert.DeserializeObject<T>(data, JsonSerializerSettings);
+        }
+
+        public string SerializeObject(object data)
+        {
+         return    JsonConvert.SerializeObject(data, JsonSerializerSettings);
+        }
+    }
 
     public class SignalXRequest
     {
@@ -16,7 +45,7 @@
             string replyTo,
             object sender,
             string messageId,
-            dynamic message,
+            string message,
             string user,
             string handler,
             IPrincipal principalUser,
@@ -33,13 +62,34 @@
             this.ReplyTo = replyTo;
             this.Sender = sender;
             this.MessageId = messageId;
-            this.Message = message;
+            this.MessageAsJsonString = message;
             //UserId = principalUser?.Identity?.Name;
             this.User = user;
             this.Handler = handler;
             this.PrincipalUser = principalUser;
             this.Groups = groups ?? new List<string>();
             this.Request = request;
+        }
+
+        public T MessageAs<T>(string message=null)
+        {
+            try
+            {
+                SignalX.Advanced.Trace($"Deserializing message string {message??this.MessageAsJsonString} to type {typeof(T).FullName}...");
+
+                if (string.IsNullOrEmpty(message??this.MessageAsJsonString))
+                {
+                    return default(T);
+                }
+                return  SignalXExtensions.Serializer.DeserializeObject<T>(message ?? this.MessageAsJsonString);
+            }
+            catch (Exception e)
+            {
+                SignalX.Advanced.Trace(e,$"Error deserializing message string {message ?? this.MessageAsJsonString} to type {typeof(T).FullName}...");
+                this.SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke("MessageSerializationError", e));
+
+                return default(T);
+            }
         }
 
         private HubCallerContext Context { get; }
@@ -58,7 +108,7 @@
 
         public string MessageId { get; }
 
-        public dynamic Message { get; }
+        public string MessageAsJsonString { get; }
 
         //[Obsolete("Will soon be removed in subsequent versions. Please obtain UserId from PrincipalUser instead")]
         //public string UserId { get; }
@@ -126,9 +176,9 @@
         /// <param name="handler"></param>
         /// <param name="message"></param>
         /// <param name="replyTo"></param>
-        public async Task ForwardAsync(string handler, dynamic message = null, string replyTo = null)
+        public async Task ForwardAsync(string handler, string message = null, string replyTo = null)
         {
-            Task task = this.SignalX.SendMessageToServer(this.Context, this.Clients, this.GroupsManager, handler, message ?? this.Message, replyTo ?? this.ReplyTo, this.Sender, this.MessageId, this.Groups, true);
+            Task task = this.SignalX.SendMessageToServer(this.Context, this.Clients, this.GroupsManager, handler, message ?? this.MessageAsJsonString, replyTo ?? this.ReplyTo, this.Sender, this.MessageId, this.Groups, true);
             await task.ConfigureAwait(false);
         }
 

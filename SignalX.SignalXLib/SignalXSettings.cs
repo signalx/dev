@@ -3,6 +3,7 @@
     using Microsoft.AspNet.SignalR;
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     public class SignalXSettings : IDisposable
     {
@@ -29,7 +30,7 @@
 
         internal IDisposable MyApp { get; set; }
 
-        internal Func<SignalXRequest, bool> AuthenticatedWhen { set; get; }
+        internal Func<SignalXRequest, Task<bool>> AuthenticatedWhen { set; get; }
 
         internal List<Action<string, object>> WarningHandler { set; get; }
 
@@ -46,6 +47,9 @@
 
         public bool RequireAuthorizationForAllHandlers { get; set; }
 
+        /// <summary>
+        /// Setting this could potentially deadlock
+        /// </summary>
         public bool RequireAuthorizationForPersistentConnections { get; set; }
 
         internal bool StartCountingOutGoingMessages { set; get; }

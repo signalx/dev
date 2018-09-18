@@ -13,7 +13,7 @@
         private readonly SignalX signalX = SignalX.Instance;
 
         //not async because it already behaves as async from client clide
-        public async Task Send(string handler, dynamic message, string replyTo, dynamic sender, string messageId, List<string> groups)
+        public async Task Send(string handler, string message, string replyTo, dynamic sender, string messageId, List<string> groups)
         {
             this.signalX.Advanced.Trace($"Received message from client {handler}...");
             Task task = this.signalX.SendMessageToServer(this.Context, this.Clients, this.Groups, handler, message, replyTo, sender, messageId, groups, false);
@@ -32,11 +32,11 @@
             this.signalX.LeaveGroup(this.Context, this.Clients, this.Groups, groupName);
         }
 
-        public void GetMethods()
+        public async Task GetMethods()
         {
             this.signalX.Advanced.Trace("Sending methods to client...");
 
-            this.signalX.RespondToScriptRequest(this.Context, this.Clients, this.Groups);
+          await  this.signalX.RespondToScriptRequest(this.Context, this.Clients, this.Groups).ConfigureAwait(false);
         }
 
         public void SignalXClientReady()

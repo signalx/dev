@@ -1,5 +1,6 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
@@ -14,7 +15,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => { return Task.FromResult(request.Groups.Contains("groupA")); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -39,7 +40,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => { return Task.FromResult(request.Groups.Contains("groupA")); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -68,7 +69,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => { return Task.FromResult(request.Groups.Contains("groupA")); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -97,7 +98,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => { return Task.FromResult(request.Groups.Contains("groupA")); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -126,7 +127,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => { return Task.FromResult(request.Groups.Contains("groupA")); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -150,7 +151,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler(request => request.Groups.Contains("groupA"));
+                    signalx.AuthenticationHandler(request => { return Task.FromResult(request.Groups.Contains("groupA")); });
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(

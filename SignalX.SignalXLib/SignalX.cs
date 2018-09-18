@@ -92,7 +92,7 @@
         internal List<Action<string, SignalXRequest>> OnDebugMessageReceivedFromClient { set; get; }
 
         //needs more care to refactor
-        internal Action<dynamic, SignalXRequest, string> OnResponseAfterScriptRuns { set; get; }
+        internal Action<ResponseAfterScriptRuns> OnResponseAfterScriptRuns { set; get; }
 
         internal List<Action<SignalXRequest>> OnClientReady { set; get; }
 
@@ -199,7 +199,7 @@
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,
             string handler,
-            dynamic message,
+            string message,
             string replyTo,
             object sender,
             string messageId,
@@ -236,9 +236,9 @@
                     return;
                 }
 
-                var request = new SignalXRequest(this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User, groupList, context?.Request, context, clients, groups);
+                var request = new SignalXRequest(  this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User, groupList, context?.Request, context, clients, groups);
 
-                if (!this.CanProcess(context, handler, request, isInternalCall))
+                if (! await this.CanProcess(context, handler, request, isInternalCall).ConfigureAwait(false))
                 {
                     this.Settings.WarningHandler.ForEach(h => h?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required"));
                     return;
@@ -249,7 +249,7 @@
             catch (Exception e)
             {
                 error = "An error occured on the server while processing message " + message + " with id " +
-                    messageId + " received from  " + sender + " [ user = " + user?.Identity?.Name + "] for a response to " + replyTo + " - ERROR: " +
+                    messageId + " received from  " + sender + " [ user = " + user?.Identity?.Name + "] for a response to " + replyTo + ". Check that you are using ServerAsync() to register an async server and not Server() - ERROR: " +
                     e?.Message;
                 this.Advanced.Trace(error, e);
                 if (!string.IsNullOrEmpty(context?.ConnectionId))

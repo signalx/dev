@@ -17,7 +17,7 @@ namespace SignalXLib.TestsNuget
             {
                 try
                 {
-                    SignalX.Instance.Server("Sample", request => request.RespondToUser("Myclient", $"yooo server : " + request.Message));
+                    SignalX.Instance.Server("Sample", request => request.RespondToUser("Myclient", $"yooo server : " + request.MessageAsJsonString));
                     Console.WriteLine("quiting server in next 5 minute");
                     Reader.ReadLine(TimeSpan.FromMinutes(5));
                 }

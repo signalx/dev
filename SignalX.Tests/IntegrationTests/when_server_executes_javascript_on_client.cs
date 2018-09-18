@@ -14,6 +14,7 @@
             SignalXTester.Run(
                 (signalX, assert) =>
                 {
+                   
                     int result = 0;
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
@@ -34,7 +35,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                    response => { result = Convert.ToInt32(response); },
+                                    (response) => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(10));
                             })
                     );
@@ -61,7 +62,7 @@
                             {
                                 signalX.RunJavaScriptOnAllClients(
                                     "return 5*10",
-                                    response => { result = Convert.ToInt32(response); },
+                                    response => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(15));
                             }));
                 });
@@ -93,7 +94,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                    (response, request, error) => { result = Convert.ToInt32(response); },
+                                    (response) => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(10));
                             })
                     );
@@ -120,7 +121,7 @@
                             {
                                 signalX.RunJavaScriptOnAllClients(
                                     "return 5*10",
-                                    (response, request, error) => { result = Convert.ToInt32(response); },
+                                    (response) => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(15));
                             }));
                 });
@@ -152,7 +153,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                    response => { result = Convert.ToInt32(response); },
+                                    response => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(10));
                             })
                     );
@@ -179,7 +180,7 @@
                             {
                                 signalX.RunJavaScriptOnAllClients(
                                     "return 5*10*20",
-                                    response => { result = Convert.ToInt32(response); },
+                                    response => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(15));
                             }));
                 });
@@ -211,7 +212,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                    (response, request, error) => { result = Convert.ToInt32(response); },
+                                    (response) => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(10));
                             })
                     );
@@ -238,7 +239,7 @@
                             {
                                 signalX.RunJavaScriptOnAllClients(
                                     "return 5*10*20",
-                                    (response, request, error) => { result = Convert.ToInt32(response); },
+                                    (response) => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(15));
                             }));
                 });

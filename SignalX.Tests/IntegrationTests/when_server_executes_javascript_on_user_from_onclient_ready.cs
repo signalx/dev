@@ -34,12 +34,12 @@
                                 "sample",
                                 request =>
                                 {
-                                    assert.AreEqual(100, (int)request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     request.RespondToUser(request.User, 100);
                                 });
                             signalX.Server(
                                 "sample2",
-                                request => { result = (int)request.Message; });
+                                request => { result = request.MessageAs<int>(); });
                         },
                         () => { assert.AreEqual(result, 10); }
                     );
@@ -73,12 +73,12 @@
                                 "sample",
                                 request =>
                                 {
-                                    assert.AreEqual(100, (int)request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     request.RespondToUser(request.User, 100);
                                 });
                             signalX.Server(
                                 "sample2",
-                                request => { result = (int)request.Message; });
+                                request => { result = request.MessageAs<int>(); });
                         },
                         () => { assert.AreEqual(result, 10); }
                     );
@@ -112,12 +112,12 @@
                                 "sample",
                                 request =>
                                 {
-                                    assert.AreEqual(100, (int)request.Message, "server must get the correct message");
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
                                     request.RespondToUser(request.User, 100);
                                 });
                             signalX.Server(
                                 "sample2",
-                                request => { result = (int)request.Message; });
+                                request => { result = request.MessageAs<int>(); });
                         },
                         () => { assert.AreEqual(result, 10); }
                     );
@@ -154,7 +154,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                        response => { result = Convert.ToInt32(response); }
+                                        response => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -187,7 +187,7 @@
                                     signalX.RunJavaScriptOnUser(
                                         signalX.Connections.FirstOrDefault(),
                                         "return 5*10",
-                                        response => { result = Convert.ToInt32(response); }
+                                        response => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -225,7 +225,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                        (response, request, error) => { result = Convert.ToInt32(response); }
+                                        (response) => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -258,7 +258,7 @@
                                     signalX.RunJavaScriptOnUser(
                                         signalX.Connections.FirstOrDefault(),
                                         "return 5*10",
-                                        (response, request, error) => { result = Convert.ToInt32(response); }
+                                        (response) => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -297,7 +297,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                        response => { result = Convert.ToInt32(response); }
+                                        response => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -330,7 +330,7 @@
                                     signalX.RunJavaScriptOnUser(
                                         signalX.Connections.FirstOrDefault(),
                                         "return 5*10",
-                                        response => { result = Convert.ToInt32(response); }
+                                        response => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -368,7 +368,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                        (response, request, error) => { result = Convert.ToInt32(response); }
+                                        (response) => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -401,7 +401,7 @@
                                     signalX.RunJavaScriptOnUser(
                                         signalX.Connections.FirstOrDefault(),
                                         "return 5*10",
-                                        (response, request, error) => { result = Convert.ToInt32(response); }
+                                        (response) => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -437,7 +437,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                response => { result = Convert.ToInt32(response); }
+                                response => { result = response.MessageAs<int>(); }
                             );
                         },
                         () => { assert.AreEqual(result, 3); },
@@ -466,7 +466,7 @@
                             signalX.RunJavaScriptOnUser(
                                 signalX.Connections.FirstOrDefault(),
                                 "return 5*10",
-                                response => { result = Convert.ToInt32(response); }
+                                response => { result = response.MessageAs<int>(); }
                             );
                         },
                         () => { assert.AreEqual(50, result); },
@@ -500,7 +500,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                (response, request, error) => { result = Convert.ToInt32(response); }
+                                (response) => { result = response.MessageAs<int>(); }
                             );
                         },
                         () => { assert.AreEqual(result, 3); },
@@ -529,7 +529,7 @@
                             signalX.RunJavaScriptOnUser(
                                 signalX.Connections.FirstOrDefault(),
                                 "return 5*10",
-                                (response, request, error) => { result = Convert.ToInt32(response); }
+                                (response) => { result = response.MessageAs<int>(); }
                             );
                         },
                         () => { assert.AreEqual(50, result); },

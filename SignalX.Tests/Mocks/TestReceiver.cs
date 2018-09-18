@@ -15,7 +15,7 @@
 
         public List<TestMessageModel> MessagesReceived { set; get; }
 
-        public void Receive(string userId, string clientName, dynamic message)
+        public void Receive(string userId, string clientName, object message)
         {
             this.MessagesReceived.Add(
                 new TestMessageModel
@@ -26,7 +26,7 @@
                 });
         }
 
-        public void ReceiveByGroup(string clientName, dynamic message, string groupName = null)
+        public void ReceiveByGroup(string clientName, object message, string groupName = null)
         {
             this.MessagesReceived.Add(
                 new TestMessageModel
@@ -37,7 +37,9 @@
                 });
         }
 
-        public void ReceiveAsOther(string clientName, dynamic message, string excludedConnection, string groupName = null)
+       
+
+        public void ReceiveAsOther(string clientName, object message, string excludedConnection, string groupName = null)
         {
             this.MessagesReceived.Add(
                 new TestMessageModel
@@ -58,7 +60,7 @@
                 });
         }
 
-        public void ReceiveInGroupManager(string operation, string userId, dynamic message, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
+        public void ReceiveInGroupManager(string operation, string userId, string message, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
         {
             this.MessagesReceived.Add(
                 new TestMessageModel
@@ -68,9 +70,9 @@
                 });
         }
 
-        public void RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
+        public async Task RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
         {
-            SignalX.RespondToScriptRequest(context, clients, groups);
+         await   SignalX.RespondToScriptRequest(context, clients, groups).ConfigureAwait(false);
         }
 
         public async Task SendMessageToServer(
@@ -79,7 +81,7 @@
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,
             string handler,
-            dynamic message,
+            string message,
             string replyTo,
             object sender,
             string messageId,
