@@ -8,11 +8,11 @@
         {
             this.Receiver = receiver;
             this.SignalX = SignalX.Instance;
-            this.Receiver.RequestScripts(this.SignalX, this.SignalX.NullHubCallerContext, null, null,"test");
+            this.Receiver.RequestScripts(this.SignalX, this.SignalX.NullHubCallerContext, null, null, "test");
         }
 
-        private SignalX SignalX { get; }
+        SignalX SignalX { get; }
 
-        private ISignalXClientReceiver Receiver { get; }
+        ISignalXClientReceiver Receiver { get; }
     }
 }

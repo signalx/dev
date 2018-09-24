@@ -1,6 +1,6 @@
 ﻿namespace SignalXLib.Lib
 {
-    internal class ClientDetails
+    class ClientDetails
     {
         internal string Name { set; get; }
 

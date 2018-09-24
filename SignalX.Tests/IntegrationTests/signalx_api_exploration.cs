@@ -1,11 +1,11 @@
 ﻿namespace SignalXLib.Tests.IntegrationTests
 {
+    using System;
+    using System.Threading.Tasks;
     using Microsoft.AspNet.SignalR;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System;
-    using System.Threading.Tasks;
 
     [TestClass]
     public class signalx_api_exploration
@@ -74,7 +74,7 @@
                                 traceCount++;
                         });
                     signalx.Advanced.OnTrace(
-                        (c,s, m, e) =>
+                        (c, s, m, e) =>
                         {
                             if (traceCount == 1)
                                 traceCount++;

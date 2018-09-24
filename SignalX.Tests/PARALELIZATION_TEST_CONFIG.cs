@@ -5,9 +5,9 @@
 
 namespace SignalXLib.Tests
 {
-    using SignalXLib.TestHelperLib;
     using System;
     using System.IO;
+    using SignalXLib.TestHelperLib;
 
     public class ScriptSource
     {

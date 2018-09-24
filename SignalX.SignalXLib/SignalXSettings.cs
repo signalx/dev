@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Lib
 {
-    using Microsoft.AspNet.SignalR;
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Microsoft.AspNet.SignalR;
 
     public class SignalXSettings : IDisposable
     {
@@ -48,7 +48,7 @@
         public bool RequireAuthorizationForAllHandlers { get; set; }
 
         /// <summary>
-        /// Setting this could potentially deadlock
+        ///     Setting this could potentially deadlock
         /// </summary>
         public bool RequireAuthorizationForPersistentConnections { get; set; }
 

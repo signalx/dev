@@ -1,11 +1,11 @@
 ﻿namespace SignalXLib.Tests
 {
     using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using SignalXLib.Lib;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
 
     public class TestReceiver : ISignalXClientReceiver
     {
@@ -38,8 +38,6 @@
                 });
         }
 
-       
-
         public void ReceiveAsOther(string correlationId, string clientName, object message, string excludedConnection, string groupName = null)
         {
             this.MessagesReceived.Add(
@@ -71,10 +69,10 @@
                 });
         }
 
-        public async Task RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups,string correlationId)
+        public async Task RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string correlationId)
         {
-             correlationId = correlationId?? Guid.NewGuid().ToString();
-            await   SignalX.RespondToScriptRequest(correlationId, context, clients, groups).ConfigureAwait(false);
+            correlationId = correlationId ?? Guid.NewGuid().ToString();
+            await SignalX.RespondToScriptRequest(correlationId, context, clients, groups).ConfigureAwait(false);
         }
 
         public async Task SendMessageToServer(

@@ -3,5 +3,5 @@
     public class SignalXServerState
     {
         public dynamic Data { set; get; }
-    };
+    }
 }

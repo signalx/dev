@@ -4,9 +4,12 @@
 
     public class ResponseAfterScriptRuns
     {
-        private SignalX SignalX = Lib.SignalX.Instance;
+        readonly SignalX SignalX = SignalX.Instance;
+
         public string CorrelationId { set; get; }
+
         public SignalXRequest Request { set; get; }
+
         public string Error { get; set; }
 
         public string MessageAsJsonString { get; set; }
@@ -15,17 +18,15 @@
         {
             try
             {
-                SignalX.Advanced.Trace(CorrelationId, $"Deserializing message string {message ?? this.MessageAsJsonString} to type {typeof(T).FullName}...");
+                this.SignalX.Advanced.Trace(this.CorrelationId, $"Deserializing message string {message ?? this.MessageAsJsonString} to type {typeof(T).FullName}...");
 
                 if (string.IsNullOrEmpty(message ?? this.MessageAsJsonString))
-                {
                     return default(T);
-                }
-                return SignalX.Serializer.DeserializeObject<T>(message ?? this.MessageAsJsonString, CorrelationId);
+                return this.SignalX.Serializer.DeserializeObject<T>(message ?? this.MessageAsJsonString, this.CorrelationId);
             }
             catch (Exception e)
             {
-                SignalX.Advanced.Trace(CorrelationId, e, $"Error deserializing message string {message ?? this.MessageAsJsonString} to type {typeof(T).FullName}...");
+                this.SignalX.Advanced.Trace(this.CorrelationId, e, $"Error deserializing message string {message ?? this.MessageAsJsonString} to type {typeof(T).FullName}...");
                 this.SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke("MessageSerializationError", e));
 
                 return default(T);

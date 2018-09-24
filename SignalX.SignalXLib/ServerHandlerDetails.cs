@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using System.Threading;
 
-    internal class ServerHandlerDetails
+    class ServerHandlerDetails
     {
         public ServerHandlerDetails(bool requiresAuthorization, bool isSingleWriter, List<string> allowedGroups)
         {
@@ -11,7 +11,7 @@
             this.IsSingleWriter = isSingleWriter;
             this.SingleWriter = new ReaderWriterLockSlim();
             this.AllowedGroups = allowedGroups;
-            State = new SignalXServerState();
+            this.State = new SignalXServerState();
         }
 
         internal bool RequiresAuthorization { get; }

@@ -16,7 +16,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => Task.FromResult(false));
+                    signalx.AuthenticationHandler(request => Task.FromResult(false));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -25,9 +25,10 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.AuthorizedSingleAccess,
+                            signalx.Server(
+                                ServerType.AuthorizedSingleAccess,
                                 "sample",
-                                (request) => { failed = true; },
+                                request => { failed = true; },
                                 new List<string>
                                     { "groupB" });
                         },
@@ -46,7 +47,7 @@
                 (signalx, assert) =>
                 {
                     bool failed = false;
-                    signalx.AuthenticationHandler((request ) => Task.FromResult(false));
+                    signalx.AuthenticationHandler(request => Task.FromResult(false));
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
                     return new SignalXTestDefinition(
@@ -55,9 +56,10 @@
                                    }); ",
                         () =>
                         {
-                            signalx.Server(ServerType.Authorized,
+                            signalx.Server(
+                                ServerType.Authorized,
                                 "sample",
-                                (request) => { failed = true; },
+                                request => { failed = true; },
                                 new List<string>
                                     { "groupB" });
                         },

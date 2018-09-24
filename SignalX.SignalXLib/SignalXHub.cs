@@ -1,16 +1,16 @@
 ﻿namespace SignalXLib.Lib
 {
-    using Microsoft.AspNet.SignalR;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.AspNet.SignalR;
 
     //use GlobalHost.HubPipeline.RequireAuthentication(); to lock sown all your hubs
 
     public partial class SignalXHub : Hub
     {
-        private readonly SignalX signalX = SignalX.Instance;
+        readonly SignalX signalX = SignalX.Instance;
 
         //not async because it already behaves as async from client clide
         public async Task Send(string handler, string message, string replyTo, dynamic sender, string messageId, List<string> groups)
@@ -23,24 +23,24 @@
         //not async because it already behaves as async from client clide
         public void JoinGroup(string groupName)
         {
-            var correlationId = Guid.NewGuid().ToString();
-            this.signalX.JoinGroup(Context.ConnectionId + "_" + correlationId, this.Context, this.Clients, this.Groups, groupName);
+            string correlationId = Guid.NewGuid().ToString();
+            this.signalX.JoinGroup(this.Context.ConnectionId + "_" + correlationId, this.Context, this.Clients, this.Groups, groupName);
         }
 
         //not async because it already behaves as async from client clide
         public void LeaveGroup(string groupName)
         {
-            var correlationId = Guid.NewGuid().ToString();
-            this.signalX.LeaveGroup(Context.ConnectionId + "_" + correlationId, this.Context, this.Clients, this.Groups, groupName);
+            string correlationId = Guid.NewGuid().ToString();
+            this.signalX.LeaveGroup(this.Context.ConnectionId + "_" + correlationId, this.Context, this.Clients, this.Groups, groupName);
         }
 
         public async Task GetMethods()
         {
-            var correlationId = Guid.NewGuid().ToString();
+            string correlationId = Guid.NewGuid().ToString();
 
-            this.signalX.Advanced.Trace(Context.ConnectionId + "_" + correlationId, "Sending methods to client...");
+            this.signalX.Advanced.Trace(this.Context.ConnectionId + "_" + correlationId, "Sending methods to client...");
 
-            await this.signalX.RespondToScriptRequest(Context.ConnectionId + "_" + correlationId, this.Context, this.Clients, this.Groups).ConfigureAwait(false);
+            await this.signalX.RespondToScriptRequest(this.Context.ConnectionId + "_" + correlationId, this.Context, this.Clients, this.Groups).ConfigureAwait(false);
         }
 
         public void SignalXClientReady()
@@ -65,7 +65,7 @@
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            this.signalX.Advanced.Trace(Context.ConnectionId + "_" + Guid.NewGuid(), "Client is disconnected");
+            this.signalX.Advanced.Trace(this.Context.ConnectionId + "_" + Guid.NewGuid(), "Client is disconnected");
             this.signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.OnDisconnected.ToString(), null));
             string name = this.Context?.User?.Identity?.Name ?? this.Context?.ConnectionId;
 

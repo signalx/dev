@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System;
 
     [TestClass]
     public class when_server_executes_javascript_on_user_from_onclient_ready
@@ -225,7 +225,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                        (response) => { result = response.MessageAs<int>(); }
+                                        response => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -258,7 +258,7 @@
                                     signalX.RunJavaScriptOnUser(
                                         signalX.Connections.FirstOrDefault(),
                                         "return 5*10",
-                                        (response) => { result = response.MessageAs<int>(); }
+                                        response => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -368,7 +368,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                        (response) => { result = response.MessageAs<int>(); }
+                                        response => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -401,7 +401,7 @@
                                     signalX.RunJavaScriptOnUser(
                                         signalX.Connections.FirstOrDefault(),
                                         "return 5*10",
-                                        (response) => { result = response.MessageAs<int>(); }
+                                        response => { result = response.MessageAs<int>(); }
                                     );
                                 });
                         },
@@ -500,7 +500,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                (response) => { result = response.MessageAs<int>(); }
+                                response => { result = response.MessageAs<int>(); }
                             );
                         },
                         () => { assert.AreEqual(result, 3); },
@@ -529,7 +529,7 @@
                             signalX.RunJavaScriptOnUser(
                                 signalX.Connections.FirstOrDefault(),
                                 "return 5*10",
-                                (response) => { result = response.MessageAs<int>(); }
+                                response => { result = response.MessageAs<int>(); }
                             );
                         },
                         () => { assert.AreEqual(50, result); },

@@ -1,19 +1,19 @@
 ﻿namespace SignalXLib.Lib
 {
-    using Microsoft.AspNet.SignalR;
-    using Microsoft.AspNet.SignalR.Hubs;
-    using Microsoft.AspNet.SignalR.Owin;
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Security.Principal;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.AspNet.SignalR;
+    using Microsoft.AspNet.SignalR.Hubs;
+    using Microsoft.AspNet.SignalR.Owin;
 
     public class SignalX : IDisposable
     {
         internal static object padlock = new object();
-        private static readonly SignalXAgents SignalXAgents = new SignalXAgents();
+        static readonly SignalXAgents SignalXAgents = new SignalXAgents();
         internal static string SIGNALXCLIENTAGENT = "SIGNALXCLIENTAGENT";
         internal static string SIGNALXCLIENTREADY = "SIGNALXCLIENTREADY";
         internal static string SIGNALXCLIENTERRORHANDLER = "SIGNALXCLIENTERRORHANDLER";
@@ -51,15 +51,14 @@
         public HubCallerContext NullHubCallerContext;
 
         public SignalXSettings Settings = new SignalXSettings();
-        public string AppCorrelationId { get; }
 
-        private SignalX()
+        SignalX()
         {
-            Serializer = new JsonSignalXSerializer();
+            this.Serializer = new JsonSignalXSerializer();
             this.NullHubCallerContext = new HubCallerContext(new ServerRequest(new ConcurrentDictionary<string, object>()), Guid.NewGuid().ToString());
-            AppCorrelationId = Guid.NewGuid().ToString();
+            this.AppCorrelationId = Guid.NewGuid().ToString();
             this.Advanced = new SignalXAdvanced();
-            this.Advanced.Trace(AppCorrelationId, "Initializing Framework SIgnalX ...");
+            this.Advanced.Trace(this.AppCorrelationId, "Initializing Framework SIgnalX ...");
             this.SignalXServers = new ConcurrentDictionary<string, Func<SignalXRequest, SignalXServerState, Task>>();
             this.SignalXClientDetails = new ConcurrentDictionary<string, ClientDetails>();
             this.SignalXServerExecutionDetails = new ConcurrentDictionary<string, ServerHandlerDetails>();
@@ -69,15 +68,12 @@
             this.OnDebugMessageReceivedFromClient = new List<Action<string, SignalXRequest>>();
             this.OnClientReady = new List<Action<SignalXRequest>>();
             this.Receiver = ReceiverCreator != null ? ReceiverCreator(this) : new DefaultSignalRClientReceiver();
-            this.Advanced.Trace(AppCorrelationId, "SIgnalX framework initialized");
+            this.Advanced.Trace(this.AppCorrelationId, "SIgnalX framework initialized");
         }
+
+        public string AppCorrelationId { get; }
 
         internal ISignalXSerializer Serializer { set; get; }
-
-        public void SetSerializer(ISignalXSerializer serializer)
-        {
-            Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
-        }
 
         public SignalXAdvanced Advanced { set; get; }
 
@@ -105,7 +101,7 @@
 
         internal List<Action<SignalXRequest>> OnClientReady { set; get; }
 
-        private static SignalX instance { set; get; }
+        static SignalX instance { set; get; }
 
         public ulong ConnectionCount { get; internal set; }
 
@@ -145,10 +141,15 @@
             ReceiverCreator = null;
         }
 
+        public void SetSerializer(ISignalXSerializer serializer)
+        {
+            this.Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+        }
+
         //todo rename this to reflect what is actually happening!
         public void SetSignalXClientAsReady()
         {
-            this.Advanced.Trace(AppCorrelationId, "Client is ready...");
+            this.Advanced.Trace(this.AppCorrelationId, "Client is ready...");
             this.Settings.HasOneOrMoreConnections = true;
             this.ConnectionCount++;
         }
@@ -167,13 +168,13 @@
 
         public void SetUpClientErrorMessageHandler(Action<string, SignalXRequest> handler)
         {
-            this.Advanced.Trace(AppCorrelationId, $"Registering {nameof(this.SetUpClientErrorMessageHandler)}...");
+            this.Advanced.Trace(this.AppCorrelationId, $"Registering {nameof(this.SetUpClientErrorMessageHandler)}...");
             this.OnErrorMessageReceivedFromClient.Add(handler);
         }
 
         public void SetUpClientDebugMessageHandler(Action<string, SignalXRequest> handler)
         {
-            this.Advanced.Trace(AppCorrelationId, $"Registering {nameof(this.SetUpClientDebugMessageHandler)}...");
+            this.Advanced.Trace(this.AppCorrelationId, $"Registering {nameof(this.SetUpClientDebugMessageHandler)}...");
             this.OnDebugMessageReceivedFromClient.Add(handler);
         }
 
@@ -182,9 +183,10 @@
             object message,
             object sender = null,
             string replyTo = null,
-            List<string> groupList = null, string correlationId = null)
+            List<string> groupList = null,
+            string correlationId = null)
         {
-            RespondToServer(this.NullHubCallerContext, null, null, handler, message, sender, replyTo, groupList);
+            this.RespondToServer(this.NullHubCallerContext, null, null, handler, message, sender, replyTo, groupList);
         }
 
         public async Task RespondToServer(
@@ -203,7 +205,8 @@
         }
 
         [Obsolete("Not intended for client use")]
-        internal async Task SendMessageToServer(string correlationId,
+        internal async Task SendMessageToServer(
+            string correlationId,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,
@@ -213,7 +216,8 @@
             object sender,
             string messageId,
             List<string> groupList,
-            bool isInternalCall, object messageObject)
+            bool isInternalCall,
+            object messageObject)
         {
             this.Advanced.Trace(correlationId, $"Sending message {message} to server from {messageId} having groups {string.Join(",", groupList ?? new List<string>())} with reply to {replyTo}");
 
@@ -239,7 +243,7 @@
                 if (string.IsNullOrEmpty(handler) || !this.SignalXServers.ContainsKey(handler))
                 {
                     string e = "Error request for unknown server name " + handler;
-                    this.Advanced.Trace(AppCorrelationId, e);
+                    this.Advanced.Trace(this.AppCorrelationId, e);
                     this.Settings.ExceptionHandler.ForEach(h => h?.Invoke(e, new Exception(e)));
                     this.RespondToUser(context?.ConnectionId, replyTo, e);
                     return;

@@ -1,16 +1,15 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
+    using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
 
     [TestClass]
     public class when_server_receives_message_from_multiple_clients
     {
-        private static readonly int numberOfRety = 0;
+        static readonly int numberOfRety = 0;
 
         [TestCleanup]
         public void Cleanup()
@@ -446,10 +445,7 @@
                             signalx.Server(
                                 ServerType.SingleAccess,
                                 "sample",
-                                 request =>
-                                {
-                                    counter++;
-                                });
+                                request => { counter++; });
                         },
                         () => { assert.AreEqual(2, counter); });
                 },

@@ -1,10 +1,10 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
 
     [TestClass]
     public class when_authorized_server_receives_message_from_client_in_a_group_that_fails_authorization2

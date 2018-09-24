@@ -13,7 +13,8 @@
 
         internal List<Action<string, SignalXAdvancedLogType, string, Exception, List<object>>> TraceHandlers { set; get; }
 
-        internal void Trace(string correlationId,
+        internal void Trace(
+            string correlationId,
             Exception error,
             SignalXAdvancedLogType signalXAdvancedLogType,
             params object[] context)
@@ -21,21 +22,24 @@
             this.Trace(correlationId, signalXAdvancedLogType, error?.Message, error, context);
         }
 
-        internal void Trace(string correlationId,
+        internal void Trace(
+            string correlationId,
             Exception error,
             params object[] context)
         {
             this.Trace(correlationId, SignalXAdvancedLogType.Exception, error?.Message, error, context);
         }
 
-        internal void Trace(string correlationId,
+        internal void Trace(
+            string correlationId,
             string message,
             params object[] context)
         {
             this.Trace(correlationId, SignalXAdvancedLogType.Trace, message, null, context);
         }
 
-        internal void Trace(string correlationId,
+        internal void Trace(
+            string correlationId,
             Exception error,
             string message,
             params object[] context)
@@ -43,7 +47,8 @@
             this.Trace(correlationId, SignalXAdvancedLogType.Trace, message, error, context);
         }
 
-        internal void Trace(string correlationId,
+        internal void Trace(
+            string correlationId,
             SignalXAdvancedLogType signalXAdvancedLogType,
             string message,
             Exception error,

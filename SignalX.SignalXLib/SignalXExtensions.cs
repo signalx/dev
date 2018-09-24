@@ -1,19 +1,20 @@
 ﻿namespace SignalXLib.Lib
 {
-    using Microsoft.AspNet.SignalR;
-    using Microsoft.AspNet.SignalR.Hubs;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.AspNet.SignalR;
+    using Microsoft.AspNet.SignalR.Hubs;
 
     public static class SignalXExtensions
     {
         [Obsolete("SET signalx.MESSAGE_ID TO USE SPECIFIC MESSAGE ID FOR REQUESTS")]
         public static async Task RespondToScriptRequest(
-            this SignalX signalX, string correlationId,
+            this SignalX signalX,
+            string correlationId,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups)
@@ -84,7 +85,7 @@
         /// </summary>
         public static void DisableClient(this SignalX signalX, string clientMethodName)
         {
-            var correlationId = Guid.NewGuid().ToString();
+            string correlationId = Guid.NewGuid().ToString();
             signalX.Advanced.Trace(correlationId, $"Disabling client {clientMethodName}...");
             UpdateClient(signalX, correlationId, clientMethodName, true);
         }
@@ -441,7 +442,8 @@
         }
 
         internal static void JoinGroup(
-            this SignalX signalX, string correlationId,
+            this SignalX signalX,
+            string correlationId,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,
@@ -456,7 +458,8 @@
         }
 
         internal static void LeaveGroup(
-            this SignalX signalX, string correlationId,
+            this SignalX signalX,
+            string correlationId,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,

@@ -1,11 +1,11 @@
 ﻿namespace SignalXLib.Tests
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SignalXLib.Lib;
-    using SignalXLib.TestHelperLib;
     using System;
     using System.Linq;
     using System.Threading.Tasks;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using SignalXLib.Lib;
+    using SignalXLib.TestHelperLib;
 
     [TestClass]
     public class when_signalx_is_used : SignalXAssertionLib

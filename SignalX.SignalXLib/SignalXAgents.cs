@@ -2,7 +2,7 @@
 {
     using System;
 
-    internal class SignalXAgents
+    class SignalXAgents
     {
         public void SetUpAgents(SignalX SignalX, string correlationId)
         {
@@ -18,7 +18,6 @@
                 {
                     SignalX?.Advanced.Trace(correlationId, $"Running all client ready handlers  '{request?.MessageAsJsonString}'  ...");
                     foreach (Action<SignalXRequest> action in SignalX.OnClientReady)
-                    {
                         try
                         {
                             action.Invoke(request);
@@ -33,7 +32,6 @@
                             else
                                 SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke(error, e));
                         }
-                    }
                 });
 
             SignalX.Advanced.Trace(correlationId, $"Setting up agent {SignalX.SIGNALXCLIENTAGENT} ...");
@@ -88,7 +86,6 @@
                     SignalX?.Advanced.Trace(correlationId, $"Running client debug handlers with message '{request?.MessageAsJsonString}' ...");
 
                     foreach (Action<string, SignalXRequest> action in SignalX.OnDebugMessageReceivedFromClient)
-                    {
                         try
                         {
                             action?.Invoke(request.MessageAsJsonString, request);
@@ -98,7 +95,6 @@
                             SignalX.Advanced.Trace(correlationId, e);
                             SignalX.Settings.WarningHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.MessageAsJsonString} from sender {request?.Sender}", e));
                         }
-                    }
                 });
         }
     }

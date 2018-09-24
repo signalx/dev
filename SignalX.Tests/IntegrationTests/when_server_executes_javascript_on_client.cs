@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
-    using System;
 
     [TestClass]
     public class when_server_executes_javascript_on_all_clients
@@ -14,7 +14,6 @@
             SignalXTester.Run(
                 (signalX, assert) =>
                 {
-                   
                     int result = 0;
                     SignalXTester.ScriptDownLoadFunction = ScriptSource.ScriptDownLoadFunction;
                     SignalXTester.EmbedeLibraryScripts = true;
@@ -35,7 +34,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                    (response) => { result = response.MessageAs<int>(); },
+                                    response => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(10));
                             })
                     );
@@ -94,7 +93,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                    (response) => { result = response.MessageAs<int>(); },
+                                    response => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(10));
                             })
                     );
@@ -121,7 +120,7 @@
                             {
                                 signalX.RunJavaScriptOnAllClients(
                                     "return 5*10",
-                                    (response) => { result = response.MessageAs<int>(); },
+                                    response => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(15));
                             }));
                 });
@@ -212,7 +211,7 @@
                                     var avg = total / grades.length;
                                     return avg;
                             ",
-                                    (response) => { result = response.MessageAs<int>(); },
+                                    response => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(10));
                             })
                     );
@@ -239,7 +238,7 @@
                             {
                                 signalX.RunJavaScriptOnAllClients(
                                     "return 5*10*20",
-                                    (response) => { result = response.MessageAs<int>(); },
+                                    response => { result = response.MessageAs<int>(); },
                                     TimeSpan.FromSeconds(15));
                             }));
                 });

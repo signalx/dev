@@ -9,10 +9,6 @@
     [TestClass]
     public class when_sending_message_to_server
     {
-        public class SampleClass
-        {
-            public string Data { set; get; }
-        }
         [TestMethod]
         public void server_should_not_deserialize_object_sent()
         {
@@ -33,14 +29,14 @@
                                 "sample",
                                 request =>
                                 {
-                                    assert.AreEqual<int>(100, request.MessageAs<int>(), "server must get the correct message");
-                                    request.RespondToAll(request.ReplyTo, 100/10);
+                                    assert.AreEqual(100, request.MessageAs<int>(), "server must get the correct message");
+                                    request.RespondToAll(request.ReplyTo, 100 / 10);
                                 });
                             signalx.Server(
                                 "sample2",
                                 request =>
                                 {
-                                    assert.AreEqual<int>(10, Convert.ToInt32(request.MessageAs<SampleClass>().Data));
+                                    assert.AreEqual(10, Convert.ToInt32(request.MessageAs<SampleClass>().Data));
                                     request.RespondToServer("sample3", request.MessageAs<SampleClass>());
                                 });
                             signalx.Server(
@@ -53,6 +49,10 @@
                         });
                 });
         }
-        
+
+        public class SampleClass
+        {
+            public string Data { set; get; }
+        }
     }
 }

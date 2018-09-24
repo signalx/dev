@@ -1,7 +1,5 @@
 ﻿namespace SignalXLib.Tests
 {
-    using System;
-    using System.Threading.Tasks;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SignalXLib.Lib;
     using SignalXLib.TestHelperLib;
@@ -32,26 +30,18 @@
                         {
                             signalx.Server(
                                 "sample",
-                                 (request,state) =>
-                                 {
-                                    
+                                (request, state) =>
+                                {
                                     if (state.Data == null)
-                                    {
-                                        state.Data= request.MessageAs<int>();
-                                    }
+                                        state.Data = request.MessageAs<int>();
                                     else
-                                    {
                                         state.Data = state.Data * 2;
-                                    }
-                                  
+
                                     request.RespondToSender(state.Data);
                                 });
                             signalx.Server(
                                 "final",
-                                (request, state) =>
-                                {
-                                    result = request.MessageAs<int>();
-                                });
+                                (request, state) => { result = request.MessageAs<int>(); });
                         },
                         () => { assert.AreEqual(result, 20); }
                     );

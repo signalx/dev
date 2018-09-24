@@ -15,9 +15,9 @@
             return new WriteLockToken(locker);
         }
 
-        private sealed class ReadLockToken : IDisposable
+        sealed class ReadLockToken : IDisposable
         {
-            private ReaderWriterLockSlim locker;
+            ReaderWriterLockSlim locker;
 
             public ReadLockToken(ReaderWriterLockSlim sync)
             {
@@ -34,9 +34,9 @@
             }
         }
 
-        private sealed class WriteLockToken : IDisposable
+        sealed class WriteLockToken : IDisposable
         {
-            private ReaderWriterLockSlim locker;
+            ReaderWriterLockSlim locker;
 
             public WriteLockToken(ReaderWriterLockSlim sync)
             {

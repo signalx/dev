@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Lib
 {
-    using Microsoft.AspNet.SignalR;
-    using Microsoft.AspNet.SignalR.Hubs;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Microsoft.AspNet.SignalR;
+    using Microsoft.AspNet.SignalR.Hubs;
 
     public interface ISignalXClientReceiver
     {
@@ -21,9 +21,11 @@
             SignalX SignalX,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
-            IGroupManager groups, string correlationId);
+            IGroupManager groups,
+            string correlationId);
 
-        Task SendMessageToServer(string correlationId,
+        Task SendMessageToServer(
+            string correlationId,
             SignalX SignalX,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,

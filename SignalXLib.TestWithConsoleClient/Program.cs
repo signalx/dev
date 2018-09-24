@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System;
 
 namespace SignalXLib.TestWithConsoleClient
 {
@@ -19,7 +14,8 @@ namespace SignalXLib.TestWithConsoleClient
             var myHub = connection.CreateHubProxy("CustomHub");
             //Start connection
 
-            connection.Start().ContinueWith(task => {
+            connection.Start().ContinueWith(task =>
+            {
                 if (task.IsFaulted)
                 {
                     Console.WriteLine("There was an error opening the connection:{0}",
@@ -29,10 +25,10 @@ namespace SignalXLib.TestWithConsoleClient
                 {
                     Console.WriteLine("Connected");
                 }
-
             }).Wait();
 
-            myHub.Invoke<string>("Send", "HELLO World ").ContinueWith(task => {
+            myHub.Invoke<string>("Send", "HELLO World ").ContinueWith(task =>
+            {
                 if (task.IsFaulted)
                 {
                     Console.WriteLine("There was an error calling send: {0}",
@@ -44,12 +40,12 @@ namespace SignalXLib.TestWithConsoleClient
                 }
             });
 
-            myHub.On<string>("addMessage", param => {
+            myHub.On<string>("addMessage", param =>
+            {
                 Console.WriteLine(param);
             });
 
             myHub.Invoke<string>("DoSomething", "I'm doing something!!!").Wait();
-
 
             Console.Read();
             connection.Stop();

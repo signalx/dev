@@ -4,15 +4,15 @@
 
     public class JsonSignalXSerializer : ISignalXSerializer
     {
-        private JsonSerializerSettings JsonSerializerSettings { set; get; }
-
         public JsonSignalXSerializer(JsonSerializerSettings jsonSerializerSettings = null)
         {
-            this.JsonSerializerSettings = jsonSerializerSettings ?? new JsonSerializerSettings()
+            this.JsonSerializerSettings = jsonSerializerSettings ?? new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
         }
+
+        JsonSerializerSettings JsonSerializerSettings { get; }
 
         public T DeserializeObject<T>(string data, string correlationId)
         {
