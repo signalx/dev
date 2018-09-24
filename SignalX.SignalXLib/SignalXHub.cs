@@ -35,11 +35,12 @@
         }
 
         public async Task GetMethods()
-        {  var correlationId = Guid.NewGuid().ToString();
+        {
+            var correlationId = Guid.NewGuid().ToString();
 
             this.signalX.Advanced.Trace(Context.ConnectionId + "_" + correlationId, "Sending methods to client...");
-          
-            await  this.signalX.RespondToScriptRequest(Context.ConnectionId + "_" + correlationId,  this.Context, this.Clients, this.Groups).ConfigureAwait(false);
+
+            await this.signalX.RespondToScriptRequest(Context.ConnectionId + "_" + correlationId, this.Context, this.Clients, this.Groups).ConfigureAwait(false);
         }
 
         public void SignalXClientReady()

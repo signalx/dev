@@ -4,7 +4,6 @@
     using Microsoft.AspNet.SignalR.Hubs;
     using System;
     using System.Collections.Generic;
-    using System.Dynamic;
     using System.Security.Principal;
     using System.Threading.Tasks;
 
@@ -13,6 +12,7 @@
         private readonly SignalX SignalX;
 
         public string CorrelationId { get; }
+
         internal SignalXRequest(string correlationId,
             SignalX signalX,
             string replyTo,
@@ -45,36 +45,36 @@
             this.Request = request;
             MessageObject = messageObject;
         }
-        
+
         public void Receive<T>(Action<T> operation)
         {
             var message = MessageAs<T>();
             if (message != null) { operation(message); }
         }
-        
-      public  T DeserializeObject<T>(string data)
+
+        public T DeserializeObject<T>(string data)
         {
-          return  this.SignalX.Serializer.DeserializeObject<T>(data, CorrelationId);
+            return this.SignalX.Serializer.DeserializeObject<T>(data, CorrelationId);
         }
 
-      public   string SerializeObject(object data)
+        public string SerializeObject(object data)
         {
-          return  this.SignalX.Serializer.SerializeObject(data, CorrelationId);
+            return this.SignalX.Serializer.SerializeObject(data, CorrelationId);
         }
-        public T MessageAs<T>(string message=null)
+
+        public T MessageAs<T>(string message = null)
         {
             try
             {
-
                 if (MessageObject != null)
                 {
                     SignalX.Advanced.Trace(CorrelationId, $"Message object present , so casting that o type {typeof(T).FullName}...");
                     return (T)MessageObject;
                 }
 
-                SignalX.Advanced.Trace(CorrelationId, $"Deserializing message string {message??this.MessageAsJsonString} to type {typeof(T).FullName}...");
+                SignalX.Advanced.Trace(CorrelationId, $"Deserializing message string {message ?? this.MessageAsJsonString} to type {typeof(T).FullName}...");
 
-                if (string.IsNullOrEmpty(message??this.MessageAsJsonString))
+                if (string.IsNullOrEmpty(message ?? this.MessageAsJsonString))
                 {
                     return default(T);
                 }
@@ -82,19 +82,19 @@
             }
             catch (Exception e)
             {
-                SignalX.Advanced.Trace(CorrelationId, e,$"Error deserializing message string {message ?? this.MessageAsJsonString} to type {typeof(T).FullName}...");
+                SignalX.Advanced.Trace(CorrelationId, e, $"Error deserializing message string {message ?? this.MessageAsJsonString} to type {typeof(T).FullName}...");
                 this.SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke("MessageSerializationError", e));
 
                 return default(T);
             }
         }
-        
+
         private HubCallerContext Context { get; }
 
         private IHubCallerConnectionContext<dynamic> Clients { get; }
 
         private IGroupManager GroupsManager { get; }
-        
+
         public string ReplyTo { get; }
 
         public List<string> Groups { get; }
@@ -103,14 +103,12 @@
 
         public string MessageId { get; }
 
-
-       private string MessageAsJson { get; }
+        private string MessageAsJson { get; }
 
         public string MessageAsJsonString => this.MessageObject == null ? this.MessageAsJson : SignalX.Serializer.SerializeObject(this.MessageObject, CorrelationId);
 
         private object MessageObject { get; }
 
-        
         public string User { get; }
 
         public IPrincipal PrincipalUser { get; }
@@ -122,13 +120,13 @@
         public void RespondToAllInGroup(string replyTo, object response, string groupName)
         {
             if (replyTo == null) throw new ArgumentNullException(nameof(replyTo));
-            this.SignalX.RespondToAllInGroup(replyTo, response, groupName,CorrelationId);
+            this.SignalX.RespondToAllInGroup(replyTo, response, groupName, CorrelationId);
         }
 
         public void RespondToAll(string replyTo, object response)
         {
             if (replyTo == null) throw new ArgumentNullException(nameof(replyTo));
-            this.SignalX.RespondToAll(replyTo, response,CorrelationId);
+            this.SignalX.RespondToAll(replyTo, response, CorrelationId);
         }
 
         /// <summary>
@@ -140,7 +138,7 @@
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             if (!string.IsNullOrEmpty(this.ReplyTo))
-                this.SignalX.RespondToUser(user, this.ReplyTo, response,CorrelationId);
+                this.SignalX.RespondToUser(user, this.ReplyTo, response, CorrelationId);
         }
 
         /// <summary>
@@ -150,10 +148,8 @@
         public void RespondToSender(object response)
         {
             if (!string.IsNullOrEmpty(this.User))
-                this.SignalX.RespondToUser(this.User, this.ReplyTo, response,CorrelationId);
+                this.SignalX.RespondToUser(this.User, this.ReplyTo, response, CorrelationId);
         }
-
-        
 
         /// <summary>
         ///     Forward request to  another server asynchronously The original message and 'reply to' is forwarded if none is
@@ -164,7 +160,7 @@
         /// <param name="replyTo"></param>
         public async Task ForwardAsync(string handler, string message = null, string replyTo = null)
         {
-            Task task = this.SignalX.SendMessageToServer(CorrelationId, this.Context, this.Clients, this.GroupsManager, handler, message ?? this.MessageAsJsonString, replyTo ?? this.ReplyTo, this.Sender, this.MessageId, this.Groups, true, message==null? this.MessageObject:null);
+            Task task = this.SignalX.SendMessageToServer(CorrelationId, this.Context, this.Clients, this.GroupsManager, handler, message ?? this.MessageAsJsonString, replyTo ?? this.ReplyTo, this.Sender, this.MessageId, this.Groups, true, message == null ? this.MessageObject : null);
             await task.ConfigureAwait(false);
         }
 

@@ -1,9 +1,9 @@
 ﻿namespace SignalXLib.Lib
 {
-    using System;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using Microsoft.AspNet.SignalR.Infrastructure;
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
@@ -94,8 +94,8 @@
 
         public async Task RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups, string correlationId)
         {
-             correlationId = correlationId?? Guid.NewGuid().ToString();
-            await  SignalX.RespondToScriptRequest(correlationId, context, clients, groups).ConfigureAwait(false);
+            correlationId = correlationId ?? Guid.NewGuid().ToString();
+            await SignalX.RespondToScriptRequest(correlationId, context, clients, groups).ConfigureAwait(false);
         }
 
         /// <summary>

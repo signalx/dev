@@ -4,12 +4,13 @@
 
     public class ResponseAfterScriptRuns
     {
-        SignalX SignalX= Lib.SignalX.Instance;
+        private SignalX SignalX = Lib.SignalX.Instance;
         public string CorrelationId { set; get; }
         public SignalXRequest Request { set; get; }
         public string Error { get; set; }
 
         public string MessageAsJsonString { get; set; }
+
         public T MessageAs<T>(string message = null)
         {
             try

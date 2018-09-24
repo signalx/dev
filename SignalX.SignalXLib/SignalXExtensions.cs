@@ -1,13 +1,13 @@
 ﻿namespace SignalXLib.Lib
 {
+    using Microsoft.AspNet.SignalR;
+    using Microsoft.AspNet.SignalR.Hubs;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.AspNet.SignalR;
-    using Microsoft.AspNet.SignalR.Hubs;
 
     public static class SignalXExtensions
     {
@@ -82,14 +82,14 @@
         /// <summary>
         ///     Stops message sending to a given client
         /// </summary>
-        public static void DisableClient(this SignalX signalX,  string clientMethodName)
+        public static void DisableClient(this SignalX signalX, string clientMethodName)
         {
-           var correlationId = Guid.NewGuid().ToString();
+            var correlationId = Guid.NewGuid().ToString();
             signalX.Advanced.Trace(correlationId, $"Disabling client {clientMethodName}...");
             UpdateClient(signalX, correlationId, clientMethodName, true);
         }
 
-        public static void DisableAllClients(this SignalX signalX,string correlationId=null)
+        public static void DisableAllClients(this SignalX signalX, string correlationId = null)
         {
             correlationId = correlationId ?? Guid.NewGuid().ToString();
             signalX.Advanced.Trace(correlationId, "Disabling all clients ...");
@@ -116,7 +116,7 @@
         ///     see https://docs.microsoft.com/en-us/aspnet/signalr/overview/performance/signalr-performance#tuning
         /// </summary>
         /// <param name="defaultMessageBufferSize">Default val is 1000 </param>
-        public static void SetGlobalDefaultMessageBufferSize(this SignalX signalX,  int defaultMessageBufferSize = 1000)
+        public static void SetGlobalDefaultMessageBufferSize(this SignalX signalX, int defaultMessageBufferSize = 1000)
         {
             signalX.Advanced.Trace(signalX.AppCorrelationId, "Setting global message buffer size ...");
             GlobalHost.Configuration.DefaultMessageBufferSize = defaultMessageBufferSize;
@@ -124,14 +124,12 @@
 
         public static void EnableClient(this SignalX signalX, string clientMethodName)
         {
-            
             signalX.Advanced.Trace(signalX.AppCorrelationId, $"Enabling client {clientMethodName}...");
             signalX.UpdateClient(signalX.AppCorrelationId, clientMethodName, false);
         }
 
         public static void EnableAllClients(this SignalX signalX)
         {
-            
             signalX.Advanced.Trace(signalX.AppCorrelationId, "Enabling all clients ...");
 
             signalX.Settings.DisabledAllClients = false;
@@ -256,7 +254,7 @@
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="handler"></param>
-        public static void OnException(this SignalX signalX,  Action<Exception> handler)
+        public static void OnException(this SignalX signalX, Action<Exception> handler)
         {
             signalX.Settings.ExceptionHandler.Add(
                 (m, e) =>
@@ -277,7 +275,7 @@
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="handler"></param>
-        public static void OnException(this SignalX signalX,Action<string, Exception> handler)
+        public static void OnException(this SignalX signalX, Action<string, Exception> handler)
         {
             signalX.Settings.ExceptionHandler.Add(
                 (s, o) =>
@@ -298,7 +296,7 @@
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="handler"></param>
-        public static void OnConnectionEvent(this SignalX signalX,  Action<string, object> handler)
+        public static void OnConnectionEvent(this SignalX signalX, Action<string, object> handler)
         {
             signalX.Advanced.Trace(signalX.AppCorrelationId, "Setting up  OnConnectionEvent ...");
             signalX.Settings.ConnectionEventsHandler.Add(handler);
@@ -337,15 +335,15 @@
         /// <param name="user"></param>
         /// <param name="name"></param>
         /// <param name="data"></param>
-        public static void RespondToUser(this SignalX signalX,  string user, string name, object data,string correlationId=null)
+        public static void RespondToUser(this SignalX signalX, string user, string name, object data, string correlationId = null)
         {
-             correlationId = correlationId?? Guid.NewGuid().ToString();
+            correlationId = correlationId ?? Guid.NewGuid().ToString();
             if (!signalX.AllowToSend(name, data, correlationId))
                 return;
             if (signalX.Settings.StartCountingOutGoingMessages)
                 Interlocked.Increment(ref signalX.Settings.OutGoingCounter);
 
-            signalX.Receiver.Receive(user, name, data,correlationId);
+            signalX.Receiver.Receive(user, name, data, correlationId);
         }
 
         /// <summary>
@@ -356,9 +354,9 @@
         /// <param name="name"></param>
         /// <param name="data"></param>
         /// <param name="groupName"></param>
-        public static void RespondToOthers(this SignalX signalX, string excludedUserId, string name, object data, string groupName = null, string correlationId=null)
+        public static void RespondToOthers(this SignalX signalX, string excludedUserId, string name, object data, string groupName = null, string correlationId = null)
         {
-            if (!signalX.AllowToSend(  name, data, correlationId))
+            if (!signalX.AllowToSend(name, data, correlationId))
                 return;
             if (signalX.Settings.StartCountingOutGoingMessages)
                 Interlocked.Increment(ref signalX.Settings.OutGoingCounter);
@@ -366,7 +364,7 @@
             signalX.Receiver.ReceiveAsOther(correlationId, name, data, excludedUserId, groupName);
         }
 
-        internal static async Task CallServer(this SignalX signalX, SignalXRequest request,string correlationId)
+        internal static async Task CallServer(this SignalX signalX, SignalXRequest request, string correlationId)
         {
             signalX.Advanced.Trace(correlationId, $"Running call to server {request?.Handler}...");
             ServerHandlerDetails executionDetails = signalX.SignalXServerExecutionDetails[request.Handler];
@@ -379,15 +377,14 @@
                 await signalX.SignalXServers[request.Handler].Invoke(request, signalX.SignalXServerExecutionDetails[request.Handler].State).ConfigureAwait(false);
         }
 
-        public static void RunJavaScriptOnAllClients(this SignalX signalX,  string script, Action<ResponseAfterScriptRuns> onResponse = null, TimeSpan? delay = null)
+        public static void RunJavaScriptOnAllClients(this SignalX signalX, string script, Action<ResponseAfterScriptRuns> onResponse = null, TimeSpan? delay = null)
         {
-
-            signalX.RunJavaScriptOnAllClientsInGroup( script, null, onResponse, delay);
+            signalX.RunJavaScriptOnAllClientsInGroup(script, null, onResponse, delay);
         }
 
-        public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX,  string script, string groupName, Action<ResponseAfterScriptRuns> onResponse = null, TimeSpan? delay = null)
+        public static void RunJavaScriptOnAllClientsInGroup(this SignalX signalX, string script, string groupName, Action<ResponseAfterScriptRuns> onResponse = null, TimeSpan? delay = null)
         {
-            signalX.Advanced.Trace(signalX.AppCorrelationId, $"Running javascript on all clients in group {groupName} ..."+ script);
+            signalX.Advanced.Trace(signalX.AppCorrelationId, $"Running javascript on all clients in group {groupName} ..." + script);
 
             if (signalX.OnResponseAfterScriptRuns != null)
             {
@@ -399,7 +396,7 @@
             delay = delay ?? TimeSpan.FromSeconds(0);
             signalX.OnResponseAfterScriptRuns = onResponse;
             Task.Delay(delay.Value).ContinueWith(
-                c => { signalX.RespondToAllInGroup(  SignalX.SIGNALXCLIENTAGENT, script, groupName, signalX.AppCorrelationId); });
+                c => { signalX.RespondToAllInGroup(SignalX.SIGNALXCLIENTAGENT, script, groupName, signalX.AppCorrelationId); });
         }
 
         /// <summary>
@@ -407,7 +404,7 @@
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="onResponse"></param>
-        public static void OnClientReady(this SignalX signalX,  Action<SignalXRequest> onResponse)
+        public static void OnClientReady(this SignalX signalX, Action<SignalXRequest> onResponse)
         {
             signalX.Advanced.Trace(signalX.AppCorrelationId, "Setting up  OnClientReady ...");
             signalX.OnClientReady.Add(onResponse);
@@ -418,7 +415,7 @@
         /// </summary>
         /// <param name="signalX"></param>
         /// <param name="onResponse"></param>
-        public static void OnClientReady(this SignalX signalX,  Action onResponse)
+        public static void OnClientReady(this SignalX signalX, Action onResponse)
         {
             if (onResponse != null)
             {
@@ -427,10 +424,9 @@
             }
         }
 
-        public static void RunJavaScriptOnUser(this SignalX signalX,  string userId, string script, Action<ResponseAfterScriptRuns> onResponse = null, TimeSpan? delay = null)
+        public static void RunJavaScriptOnUser(this SignalX signalX, string userId, string script, Action<ResponseAfterScriptRuns> onResponse = null, TimeSpan? delay = null)
         {
-             
-            signalX.Advanced.Trace(signalX.AppCorrelationId, $"Running javascript on user {userId}  ..."+ script);
+            signalX.Advanced.Trace(signalX.AppCorrelationId, $"Running javascript on user {userId}  ..." + script);
 
             if (signalX.OnResponseAfterScriptRuns != null)
             {
@@ -441,7 +437,7 @@
 
             delay = delay ?? TimeSpan.FromSeconds(0);
             signalX.OnResponseAfterScriptRuns = onResponse;
-            Task.Delay(delay.Value).ContinueWith(c => { signalX.RespondToUser( userId, SignalX.SIGNALXCLIENTAGENT, script, signalX.AppCorrelationId); });
+            Task.Delay(delay.Value).ContinueWith(c => { signalX.RespondToUser(userId, SignalX.SIGNALXCLIENTAGENT, script, signalX.AppCorrelationId); });
         }
 
         internal static void JoinGroup(
@@ -514,23 +510,29 @@
             {
                 case ServerType.Default:
                     break;
+
                 case ServerType.SingleAccess:
                     isSingleWriter = true;
                     break;
+
                 case ServerType.Authorized:
                     requireAuthorization = true;
                     break;
+
                 case ServerType.AuthorizedSingleAccess:
                     requireAuthorization = true;
                     isSingleWriter = true;
                     break;
+
                 case ServerType.Dynamic:
                     allowDynamicServerForThisInstance = true;
                     break;
+
                 case ServerType.DynamicAuthorized:
                     allowDynamicServerForThisInstance = true;
                     requireAuthorization = true;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(serverType), serverType, null);
             }
@@ -545,7 +547,7 @@
             if ((signalX.SignalXServers.ContainsKey(camelCased) || signalX.SignalXServers.ContainsKey(unCamelCased)) && !signalX.Settings.AllowDynamicServerInternal && !allowDynamicServerForThisInstance)
             {
                 var exc = new Exception("Server with name '" + name + "' has already been created");
-                signalX.Advanced.Trace(signalX.AppCorrelationId,  exc.Message, exc);
+                signalX.Advanced.Trace(signalX.AppCorrelationId, exc.Message, exc);
 
                 throw exc;
             }
@@ -579,7 +581,7 @@
             }
             catch (Exception e)
             {
-                signalX.Advanced.Trace( signalX.AppCorrelationId,  $"Error creating a server {name} with authorized groups {string.Join(",", groupNames ?? new List<string>())} and requires authorization : {requireAuthorization}, is set to single write : {isSingleWriter} and allows dynamic server for this instance {allowDynamicServerForThisInstance}", e);
+                signalX.Advanced.Trace(signalX.AppCorrelationId, $"Error creating a server {name} with authorized groups {string.Join(",", groupNames ?? new List<string>())} and requires authorization : {requireAuthorization}, is set to single write : {isSingleWriter} and allows dynamic server for this instance {allowDynamicServerForThisInstance}", e);
 
                 signalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while creating server {name}", e));
             }
@@ -587,25 +589,25 @@
 
         public static void ServerAsync(this SignalX signalX, string name, Func<SignalXRequest, SignalXServerState, Task> server, List<string> groupNames = null)
         {
-            signalX.ServerBase( ServerType.Default, name, server, groupNames);
+            signalX.ServerBase(ServerType.Default, name, server, groupNames);
         }
 
-        public static void ServerAsync(this SignalX signalX,  string name, Func<SignalXRequest, Task> server, List<string> groupNames = null)
+        public static void ServerAsync(this SignalX signalX, string name, Func<SignalXRequest, Task> server, List<string> groupNames = null)
         {
-            signalX.ServerBase( ServerType.Default, name, (r, s) => server(r), groupNames);
+            signalX.ServerBase(ServerType.Default, name, (r, s) => server(r), groupNames);
         }
 
         public static void ServerAsync(this SignalX signalX, ServerType serverType, string name, Func<SignalXRequest, SignalXServerState, Task> server, List<string> groupNames = null)
         {
-            signalX.ServerBase( serverType, name, server, groupNames);
+            signalX.ServerBase(serverType, name, server, groupNames);
         }
 
-        public static void ServerAsync(this SignalX signalX,  ServerType serverType, string name, Func<SignalXRequest, Task> server, List<string> groupNames = null)
+        public static void ServerAsync(this SignalX signalX, ServerType serverType, string name, Func<SignalXRequest, Task> server, List<string> groupNames = null)
         {
-            signalX.ServerBase( serverType, name, (r, s) => server(r), groupNames);
+            signalX.ServerBase(serverType, name, (r, s) => server(r), groupNames);
         }
 
-        public static void Server(this SignalX signalX,  string name, Action<SignalXRequest, SignalXServerState> server, List<string> groupNames = null)
+        public static void Server(this SignalX signalX, string name, Action<SignalXRequest, SignalXServerState> server, List<string> groupNames = null)
         {
             signalX.ServerBase(
                 ServerType.Default,
@@ -618,9 +620,7 @@
                 groupNames);
         }
 
-        
-
-        public static void Server(this SignalX signalX,  string name, Action<SignalXRequest> server, List<string> groupNames = null)
+        public static void Server(this SignalX signalX, string name, Action<SignalXRequest> server, List<string> groupNames = null)
         {
             signalX.ServerBase(
                 ServerType.Default,
@@ -633,7 +633,7 @@
                 groupNames);
         }
 
-        public static void Server(this SignalX signalX,  ServerType serverType, string name, Action<SignalXRequest, SignalXServerState> server, List<string> groupNames = null)
+        public static void Server(this SignalX signalX, ServerType serverType, string name, Action<SignalXRequest, SignalXServerState> server, List<string> groupNames = null)
         {
             signalX.ServerBase(
                 serverType,
@@ -646,7 +646,7 @@
                 groupNames);
         }
 
-        public static void Server(this SignalX signalX,  ServerType serverType, string name, Action<SignalXRequest> server, List<string> groupNames = null)
+        public static void Server(this SignalX signalX, ServerType serverType, string name, Action<SignalXRequest> server, List<string> groupNames = null)
         {
             signalX.ServerBase(
                 serverType,
@@ -659,6 +659,6 @@
                 groupNames);
         }
 
-        #endregion
+        #endregion ServerDefinitions
     }
 }

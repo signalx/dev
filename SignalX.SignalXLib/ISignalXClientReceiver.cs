@@ -11,7 +11,7 @@
 
         void ReceiveByGroup(string correlationId, string clientName, object message, string groupName = null);
 
-        void ReceiveAsOther(string correlationId, string clientName,  object message, string excludedConnection, string groupName = null);
+        void ReceiveAsOther(string correlationId, string clientName, object message, string excludedConnection, string groupName = null);
 
         void ReceiveScripts(string correlationId, string contextConnectionId, string script, HubCallerContext context, IGroupManager groups, IHubCallerConnectionContext<dynamic> clients);
 
@@ -21,7 +21,7 @@
             SignalX SignalX,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
-            IGroupManager groups,string correlationId);
+            IGroupManager groups, string correlationId);
 
         Task SendMessageToServer(string correlationId,
             SignalX SignalX,
