@@ -85,6 +85,8 @@
                                 "sample2",
                                 async request =>
                                 {
+                                   
+
                                     result = request.MessageAs<int>();
                                     await Task.Delay(TimeSpan.FromSeconds(1));
                                 });

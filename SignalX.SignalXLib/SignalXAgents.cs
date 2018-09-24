@@ -5,19 +5,19 @@
 
     internal class SignalXAgents
     {
-        public void SetUpAgents(SignalX SignalX)
+        public void SetUpAgents(SignalX SignalX, string correlationId)
         {
-            SignalX?.Advanced.Trace("Setting up agents ...");
+            SignalX?.Advanced.Trace(correlationId, "Setting up agents ...");
             if (SignalX == null)
                 throw new ArgumentNullException(nameof(SignalX));
 
-            SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTREADY} ...");
+            SignalX.Advanced.Trace(correlationId, $"Setting up agent {SignalX.SIGNALXCLIENTREADY} ...");
             SignalX.Server(
                 ServerType.Dynamic,
                 SignalX.SIGNALXCLIENTREADY,
                 (request, state) =>
                 {
-                    SignalX?.Advanced.Trace($"Running all client ready handlers  '{request?.MessageAsJsonString}'  ...");
+                    SignalX?.Advanced.Trace(correlationId, $"Running all client ready handlers  '{request?.MessageAsJsonString}'  ...");
                     foreach (Action<SignalXRequest> action in SignalX.OnClientReady)
                     {
  try
@@ -28,7 +28,7 @@
                         catch (Exception e)
                         {
                             string error = $"Error while obtaining response from client after server executed script on client : Response was {request?.MessageAsJsonString} from sender {request?.Sender}";
-                            SignalX.Advanced.Trace(e, error);
+                            SignalX.Advanced.Trace(correlationId, e, error);
                             if (SignalX.Settings.ContinueClientExecutionWhenAnyServerOnClientReadyFails)
                                 request.RespondToSender("Error while executing server ready, but server has allowed client to continue execution regardless");
                             else
@@ -38,13 +38,13 @@
                        
                 });
 
-            SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTAGENT} ...");
+            SignalX.Advanced.Trace(correlationId, $"Setting up agent {SignalX.SIGNALXCLIENTAGENT} ...");
             SignalX.Server(
                 ServerType.Dynamic,
                 SignalX.SIGNALXCLIENTAGENT,
                 (request, state) =>
                 {
-                    SignalX?.Advanced.Trace($"Received message from client agent '{request?.MessageAsJsonString}' ...");
+                    SignalX?.Advanced.Trace(correlationId, $"Received message from client agent '{request?.MessageAsJsonString}' ...");
                     try
                     {
                         var response = request.MessageAs<ResponseAfterScriptRuns>();
@@ -54,7 +54,7 @@
                     }
                     catch (Exception e)
                     {
-                        SignalX.Advanced.Trace(e, $"Error while handling client agent with message {request?.MessageAsJsonString}...");
+                        SignalX.Advanced.Trace(correlationId, e, $"Error while handling client agent with message {request?.MessageAsJsonString}...");
                         SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.MessageAsJsonString} from sender {request?.Sender}", e));
                     }
 
@@ -62,13 +62,13 @@
                     // SignalX.OnResponseAfterScriptRuns = null;
                 });
 
-            SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTERRORHANDLER} ...");
+            SignalX.Advanced.Trace(correlationId, $"Setting up agent {SignalX.SIGNALXCLIENTERRORHANDLER} ...");
             SignalX.Server(
                 ServerType.Dynamic,
                 SignalX.SIGNALXCLIENTERRORHANDLER,
                 (request, state) =>
                 {
-                    SignalX?.Advanced.Trace($"Running client error handlers with message '{request?.MessageAsJsonString}' ...");
+                    SignalX?.Advanced.Trace(correlationId, $"Running client error handlers with message '{request?.MessageAsJsonString}' ...");
 
                     foreach (Action<string, SignalXRequest> action in SignalX.OnErrorMessageReceivedFromClient)
                         try
@@ -77,18 +77,18 @@
                         }
                         catch (Exception e)
                         {
-                            SignalX.Advanced.Trace(e);
+                            SignalX.Advanced.Trace(correlationId, e);
                             SignalX.Settings.ExceptionHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.MessageAsJsonString} from sender {request?.Sender}", e));
                         }
                 });
 
-            SignalX.Advanced.Trace($"Setting up agent {SignalX.SIGNALXCLIENTDEBUGHANDLER} ...");
+            SignalX.Advanced.Trace(correlationId, $"Setting up agent {SignalX.SIGNALXCLIENTDEBUGHANDLER} ...");
             SignalX.Server(
                 ServerType.Dynamic,
                 SignalX.SIGNALXCLIENTDEBUGHANDLER,
                 (request, state) =>
                 {
-                    SignalX?.Advanced.Trace($"Running client debug handlers with message '{request?.MessageAsJsonString}' ...");
+                    SignalX?.Advanced.Trace(correlationId, $"Running client debug handlers with message '{request?.MessageAsJsonString}' ...");
 
                     foreach (Action<string, SignalXRequest> action in SignalX.OnDebugMessageReceivedFromClient)
                     {
@@ -98,7 +98,7 @@
                         }
                         catch (Exception e)
                         {
-                            SignalX.Advanced.Trace(e);
+                            SignalX.Advanced.Trace(correlationId, e);
                             SignalX.Settings.WarningHandler.ForEach(h => h?.Invoke($"Error while obtaining response from client after server executed script on client : Response was {request?.MessageAsJsonString} from sender {request?.Sender}", e));
                         }
                     }

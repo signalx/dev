@@ -48,6 +48,8 @@
     <Compile Include="ConnectionMapping.cs" />
     <Compile Include="DefaultSignalRClientReceiver.cs" />
     <Compile Include="ISignalXClientReceiver.cs" />
+    <Compile Include="ISignalXSerializer.cs" />
+    <Compile Include="JsonSignalXSerializer.cs" />
     <Compile Include="ReaderWriterLockSlimExtensions.cs" />
     <Compile Include="ResponseAfterScriptRuns.cs" />
     <Compile Include="ServerHandlerDetails.cs" />

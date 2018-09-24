@@ -7,29 +7,29 @@
 
     public interface ISignalXClientReceiver
     {
-        void Receive(string user, string clientName, object message);
+        void Receive(string user, string clientName, object message, string correlationId);
 
-        void ReceiveByGroup(string clientName, object message, string groupName = null);
+        void ReceiveByGroup(string correlationId, string clientName, object message, string groupName = null);
 
-        void ReceiveAsOther(string clientName, object message, string excludedConnection, string groupName = null);
+        void ReceiveAsOther(string correlationId, string clientName,  object message, string excludedConnection, string groupName = null);
 
-        void ReceiveScripts(string contextConnectionId, string script, HubCallerContext context, IGroupManager groups, IHubCallerConnectionContext<dynamic> clients);
+        void ReceiveScripts(string correlationId, string contextConnectionId, string script, HubCallerContext context, IGroupManager groups, IHubCallerConnectionContext<dynamic> clients);
 
-        void ReceiveInGroupManager(string operation, string userId, string groupName, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups);
+        void ReceiveInGroupManager(string correlationId, string operation, string userId, string groupName, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups);
 
         Task RequestScripts(
             SignalX SignalX,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
-            IGroupManager groups);
+            IGroupManager groups,string correlationId);
 
-        Task SendMessageToServer(
+        Task SendMessageToServer(string correlationId,
             SignalX SignalX,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,
             string handler,
-            string message,
+            object message,
             string replyTo,
             object sender,
             string messageId,

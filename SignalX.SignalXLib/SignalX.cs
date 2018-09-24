@@ -51,13 +51,14 @@
         public HubCallerContext NullHubCallerContext;
 
         public SignalXSettings Settings = new SignalXSettings();
-
+        public string AppCorrelationId { get; }
         private SignalX()
         {
+            Serializer = new JsonSignalXSerializer();
             this.NullHubCallerContext = new HubCallerContext(new ServerRequest(new ConcurrentDictionary<string, object>()), Guid.NewGuid().ToString());
-
+             AppCorrelationId = Guid.NewGuid().ToString();
             this.Advanced = new SignalXAdvanced();
-            this.Advanced.Trace("Initializing Framework SIgnalX ...");
+            this.Advanced.Trace(AppCorrelationId, "Initializing Framework SIgnalX ...");
             this.SignalXServers = new ConcurrentDictionary<string, Func<SignalXRequest, SignalXServerState, Task>>();
             this.SignalXClientDetails = new ConcurrentDictionary<string, ClientDetails>();
             this.SignalXServerExecutionDetails = new ConcurrentDictionary<string, ServerHandlerDetails>();
@@ -67,7 +68,13 @@
             this.OnDebugMessageReceivedFromClient = new List<Action<string, SignalXRequest>>();
             this.OnClientReady = new List<Action<SignalXRequest>>();
             this.Receiver = ReceiverCreator != null ? ReceiverCreator(this) : new DefaultSignalRClientReceiver();
-            this.Advanced.Trace("SIgnalX framework initialized");
+            this.Advanced.Trace(AppCorrelationId, "SIgnalX framework initialized");
+        }
+        internal  ISignalXSerializer Serializer { set; get; }
+
+        public void SetSerializer(ISignalXSerializer serializer)
+        {
+            Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }
 
         public SignalXAdvanced Advanced { set; get; }
@@ -112,7 +119,7 @@
                     if (instance != null)
                         return instance;
                     instance = new SignalX();
-                    SignalXAgents.SetUpAgents(instance);
+                    SignalXAgents.SetUpAgents(instance, instance.AppCorrelationId);
                 }
 
                 return instance;
@@ -139,7 +146,7 @@
         //todo rename this to reflect what is actually happening!
         public void SetSignalXClientAsReady()
         {
-            this.Advanced.Trace("Client is ready...");
+            this.Advanced.Trace(AppCorrelationId, "Client is ready...");
             this.Settings.HasOneOrMoreConnections = true;
             this.ConnectionCount++;
         }
@@ -158,22 +165,22 @@
 
         public void SetUpClientErrorMessageHandler(Action<string, SignalXRequest> handler)
         {
-            this.Advanced.Trace($"Registering {nameof(this.SetUpClientErrorMessageHandler)}...");
+            this.Advanced.Trace(AppCorrelationId, $"Registering {nameof(this.SetUpClientErrorMessageHandler)}...");
             this.OnErrorMessageReceivedFromClient.Add(handler);
         }
 
         public void SetUpClientDebugMessageHandler(Action<string, SignalXRequest> handler)
         {
-            this.Advanced.Trace($"Registering {nameof(this.SetUpClientDebugMessageHandler)}...");
+            this.Advanced.Trace(AppCorrelationId, $"Registering {nameof(this.SetUpClientDebugMessageHandler)}...");
             this.OnDebugMessageReceivedFromClient.Add(handler);
         }
 
         public void RespondToServer(
             string handler,
-            dynamic message,
+            object message,
             object sender = null,
             string replyTo = null,
-            List<string> groupList = null)
+            List<string> groupList = null,string correlationId=null)
         {
             RespondToServer(this.NullHubCallerContext, null, null, handler, message, sender, replyTo, groupList);
         }
@@ -183,18 +190,18 @@
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,
             string handler,
-            dynamic message,
+            object message,
             object sender = null,
             string replyTo = null,
             List<string> groupList = null)
         {
             string messageId = Guid.NewGuid().ToString();
-            Task task = SendMessageToServer(context, clients, groups, handler, message, replyTo, sender, messageId, groupList, true);
+            Task task = this.SendMessageToServer(messageId, context, clients, groups, handler, message?.ToString(), replyTo, sender, messageId, groupList, true, message);
             await task.ConfigureAwait(false);
         }
 
         [Obsolete("Not intended for client use")]
-        internal async Task SendMessageToServer(
+        internal async Task SendMessageToServer( string correlationId,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,
@@ -204,9 +211,9 @@
             object sender,
             string messageId,
             List<string> groupList,
-            bool isInternalCall)
+            bool isInternalCall, object messageObject)
         {
-            this.Advanced.Trace($"Sending message {message} to server from {messageId} having groups {string.Join(",", groupList ?? new List<string>())} with reply to {replyTo}");
+            this.Advanced.Trace(correlationId, $"Sending message {message} to server from {messageId} having groups {string.Join(",", groupList ?? new List<string>())} with reply to {replyTo}");
 
             IPrincipal user = context?.User;
             string error = "";
@@ -230,28 +237,28 @@
                 if (string.IsNullOrEmpty(handler) || !this.SignalXServers.ContainsKey(handler))
                 {
                     string e = "Error request for unknown server name " + handler;
-                    this.Advanced.Trace(e);
+                    this.Advanced.Trace(AppCorrelationId, e);
                     this.Settings.ExceptionHandler.ForEach(h => h?.Invoke(e, new Exception(e)));
                     this.RespondToUser(context?.ConnectionId, replyTo, e);
                     return;
                 }
 
-                var request = new SignalXRequest(  this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User, groupList, context?.Request, context, clients, groups);
+                var request = new SignalXRequest(correlationId, this, replyTo, sender, messageId, message, context?.ConnectionId, handler, context?.User, groupList, context?.Request, context, clients, groups, messageObject);
 
-                if (! await this.CanProcess(context, handler, request, isInternalCall).ConfigureAwait(false))
+                if (! await this.CanProcess(correlationId,  context, handler, request, isInternalCall).ConfigureAwait(false))
                 {
                     this.Settings.WarningHandler.ForEach(h => h?.Invoke("RequireAuthentication", "User attempting to connect has not been authenticated when authentication is required"));
                     return;
                 }
 
-                await this.CallServer(request).ConfigureAwait(false);
+                await this.CallServer(request, correlationId).ConfigureAwait(false);
             }
             catch (Exception e)
             {
                 error = "An error occured on the server while processing message " + message + " with id " +
                     messageId + " received from  " + sender + " [ user = " + user?.Identity?.Name + "] for a response to " + replyTo + ". Check that you are using ServerAsync() to register an async server and not Server() - ERROR: " +
                     e?.Message;
-                this.Advanced.Trace(error, e);
+                this.Advanced.Trace(correlationId,  error, e);
                 if (!string.IsNullOrEmpty(context?.ConnectionId))
                     this.RespondToUser(context?.ConnectionId, "signalx_error", error);
 
@@ -276,9 +283,9 @@
                     }));
         }
 
-        internal bool AllowToSend(string name, dynamic data)
+        internal bool AllowToSend(string name, dynamic data, string correlationId)
         {
-            this.Advanced.Trace($"Checking if {name} can be sent a message", data);
+            this.Advanced.Trace( correlationId,  $"Checking if {name} can be sent a message", data);
 
             if (!string.IsNullOrEmpty(name))
             {
@@ -339,21 +346,23 @@
             return true;
         }
 
-        public void RespondToAll(string replyTo, dynamic responseData)
+        public void RespondToAll(string replyTo, dynamic responseData, string correlationId=null)
         {
-            this.Advanced.Trace($"Responding to all {replyTo}...", responseData);
-            RespondToAllInGroup(replyTo, responseData, null);
+            correlationId = correlationId ?? Guid.NewGuid().ToString();
+            this.Advanced.Trace(correlationId,  $"Responding to all {replyTo}..."+ responseData);
+            RespondToAllInGroup(replyTo, responseData, null,correlationId);
         }
 
-        public void RespondToAllInGroup(string replyTo, dynamic responseData, string groupName)
+        public void RespondToAllInGroup(string replyTo, dynamic responseData, string groupName, string correlationId=null)
         {
-            this.Advanced.Trace($"Responding to all {replyTo} in group {groupName}...", responseData);
-            if (!AllowToSend(replyTo, responseData))
+            correlationId = correlationId ?? Guid.NewGuid().ToString();
+            this.Advanced.Trace(correlationId, $"Responding to all {replyTo} in group {groupName}...", responseData);
+            if (!AllowToSend(replyTo, responseData,correlationId))
                 return;
             if (this.Settings.StartCountingOutGoingMessages)
                 Interlocked.Increment(ref this.Settings.OutGoingCounter);
 
-            this.Receiver.ReceiveByGroup(replyTo, responseData, groupName);
+            this.Receiver.ReceiveByGroup(correlationId, replyTo, responseData, groupName);
         }
     }
 

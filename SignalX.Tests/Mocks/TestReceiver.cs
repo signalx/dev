@@ -1,5 +1,6 @@
 ﻿namespace SignalXLib.Tests
 {
+    using System;
     using Microsoft.AspNet.SignalR;
     using Microsoft.AspNet.SignalR.Hubs;
     using SignalXLib.Lib;
@@ -15,7 +16,7 @@
 
         public List<TestMessageModel> MessagesReceived { set; get; }
 
-        public void Receive(string userId, string clientName, object message)
+        public void Receive(string userId, string clientName, object message, string correlationId)
         {
             this.MessagesReceived.Add(
                 new TestMessageModel
@@ -26,7 +27,7 @@
                 });
         }
 
-        public void ReceiveByGroup(string clientName, object message, string groupName = null)
+        public void ReceiveByGroup(string correlationId, string clientName, object message, string groupName = null)
         {
             this.MessagesReceived.Add(
                 new TestMessageModel
@@ -39,7 +40,7 @@
 
        
 
-        public void ReceiveAsOther(string clientName, object message, string excludedConnection, string groupName = null)
+        public void ReceiveAsOther(string correlationId, string clientName, object message, string excludedConnection, string groupName = null)
         {
             this.MessagesReceived.Add(
                 new TestMessageModel
@@ -51,7 +52,7 @@
                 });
         }
 
-        public void ReceiveScripts(string contextConnectionId, string script, HubCallerContext context, IGroupManager groups, IHubCallerConnectionContext<dynamic> clients)
+        public void ReceiveScripts(string correlationId, string contextConnectionId, string script, HubCallerContext context, IGroupManager groups, IHubCallerConnectionContext<dynamic> clients)
         {
             this.MessagesReceived.Add(
                 new TestMessageModel
@@ -60,7 +61,7 @@
                 });
         }
 
-        public void ReceiveInGroupManager(string operation, string userId, string message, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
+        public void ReceiveInGroupManager(string correlationId, string operation, string userId, string message, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
         {
             this.MessagesReceived.Add(
                 new TestMessageModel
@@ -70,18 +71,20 @@
                 });
         }
 
-        public async Task RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups)
+        public async Task RequestScripts(SignalX SignalX, HubCallerContext context, IHubCallerConnectionContext<dynamic> clients, IGroupManager groups,string correlationId)
         {
-         await   SignalX.RespondToScriptRequest(context, clients, groups).ConfigureAwait(false);
+             correlationId = correlationId?? Guid.NewGuid().ToString();
+            await   SignalX.RespondToScriptRequest(correlationId, context, clients, groups).ConfigureAwait(false);
         }
 
         public async Task SendMessageToServer(
+            string correlationId,
             SignalX signalX,
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
             IGroupManager groups,
             string handler,
-            string message,
+            object message,
             string replyTo,
             object sender,
             string messageId,

@@ -8,42 +8,42 @@
     {
         public SignalXAdvanced()
         {
-            this.TraceHandlers = new List<Action<SignalXAdvancedLogType, string, Exception, List<object>>>();
+            this.TraceHandlers = new List<Action<string,SignalXAdvancedLogType, string, Exception, List<object>>>();
         }
 
-        internal List<Action<SignalXAdvancedLogType, string, Exception, List<object>>> TraceHandlers { set; get; }
+        internal List<Action<string,SignalXAdvancedLogType, string, Exception, List<object>>> TraceHandlers { set; get; }
 
-        internal void Trace(
+        internal void Trace(string correlationId,
             Exception error,
             SignalXAdvancedLogType signalXAdvancedLogType,
             params object[] context)
         {
-            this.Trace(signalXAdvancedLogType, error?.Message, error);
+            this.Trace(correlationId, signalXAdvancedLogType, error?.Message, error, context);
         }
 
-        internal void Trace(
+        internal void Trace(string correlationId,
             Exception error,
             params object[] context)
         {
-            this.Trace(SignalXAdvancedLogType.Exception, error?.Message, error);
+            this.Trace(correlationId, SignalXAdvancedLogType.Exception, error?.Message, error, context);
         }
 
-        internal void Trace(
+        internal void Trace(string correlationId,
             string message,
             params object[] context)
         {
-            this.Trace(SignalXAdvancedLogType.Trace, message, null);
+            this.Trace(correlationId, SignalXAdvancedLogType.Trace, message, null,context);
         }
 
-        internal void Trace(
+        internal void Trace(string correlationId,
             Exception error,
             string message,
             params object[] context)
         {
-            this.Trace(SignalXAdvancedLogType.Trace, message, error);
+            this.Trace(correlationId, SignalXAdvancedLogType.Trace, message, error,context);
         }
 
-        internal void Trace(
+        internal void Trace(string correlationId,
             SignalXAdvancedLogType signalXAdvancedLogType,
             string message,
             Exception error,
@@ -51,10 +51,10 @@
         {
             try
             {
-                foreach (Action<SignalXAdvancedLogType, string, Exception, List<object>> traceHandler in this.TraceHandlers)
+                foreach (Action<string,SignalXAdvancedLogType, string, Exception, List<object>> traceHandler in this.TraceHandlers)
                     try
                     {
-                        traceHandler?.Invoke(signalXAdvancedLogType, message, error, context.ToList());
+                        traceHandler?.Invoke(correlationId, signalXAdvancedLogType, message, error, context.ToList());
                     }
                     catch (Exception e)
                     {
@@ -62,29 +62,32 @@
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+               
             }
         }
 
-        public void OnTrace(Action<SignalXAdvancedLogType, string, Exception, List<object>> logHandler)
+        public void OnTrace(Action<string,SignalXAdvancedLogType, string, Exception, List<object>> logHandler)
         {
             this.TraceHandlers.Add(logHandler);
         }
 
-        public void OnTrace(Action<SignalXAdvancedLogType, string, Exception> logHandler)
+        public void OnTrace(Action<string,SignalXAdvancedLogType, string, Exception> logHandler)
         {
-            this.TraceHandlers.Add((s, m, e, l) => { logHandler?.Invoke(s, m, e); });
+            this.TraceHandlers.Add((c,s, m, e, l) => { logHandler?.Invoke(c,s, m, e); });
         }
 
         public void OnTrace(Action<string, Exception> logHandler)
         {
-            this.TraceHandlers.Add((s, m, e, l) => { logHandler?.Invoke(m, e); });
+            this.TraceHandlers.Add((c,s, m, e, l) => { logHandler?.Invoke(m, e); });
         }
 
         public void OnTrace(Action<string> logHandler)
         {
-            this.TraceHandlers.Add((s, m, e, l) => { logHandler?.Invoke(m); });
+            this.TraceHandlers.Add((c,s, m, e, l) => { logHandler?.Invoke(m); });
+        }
+        public void OnTraceWithCorrelation(Action<string,string> logHandler)
+        {
+            this.TraceHandlers.Add((c, s, m, e, l) => { logHandler?.Invoke(c,m); });
         }
     }
 }

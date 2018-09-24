@@ -15,28 +15,31 @@
         //not async because it already behaves as async from client clide
         public async Task Send(string handler, string message, string replyTo, dynamic sender, string messageId, List<string> groups)
         {
-            this.signalX.Advanced.Trace($"Received message from client {handler}...");
-            Task task = this.signalX.SendMessageToServer(this.Context, this.Clients, this.Groups, handler, message, replyTo, sender, messageId, groups, false);
+            this.signalX.Advanced.Trace(messageId, $"Received message from client {handler}...");
+            Task task = this.signalX.SendMessageToServer(messageId, this.Context, this.Clients, this.Groups, handler, message, replyTo, sender, messageId, groups, false, null);
             await task.ConfigureAwait(false);
         }
 
         //not async because it already behaves as async from client clide
         public void JoinGroup(string groupName)
         {
-            this.signalX.JoinGroup(this.Context, this.Clients, this.Groups, groupName);
+            var correlationId = Guid.NewGuid().ToString();
+            this.signalX.JoinGroup(Context.ConnectionId + "_" + correlationId, this.Context, this.Clients, this.Groups, groupName);
         }
 
         //not async because it already behaves as async from client clide
         public void LeaveGroup(string groupName)
         {
-            this.signalX.LeaveGroup(this.Context, this.Clients, this.Groups, groupName);
+            var correlationId = Guid.NewGuid().ToString();
+            this.signalX.LeaveGroup(Context.ConnectionId + "_" + correlationId, this.Context, this.Clients, this.Groups, groupName);
         }
 
         public async Task GetMethods()
-        {
-            this.signalX.Advanced.Trace("Sending methods to client...");
+        {  var correlationId = Guid.NewGuid().ToString();
 
-          await  this.signalX.RespondToScriptRequest(this.Context, this.Clients, this.Groups).ConfigureAwait(false);
+            this.signalX.Advanced.Trace(Context.ConnectionId + "_" + correlationId, "Sending methods to client...");
+          
+            await  this.signalX.RespondToScriptRequest(Context.ConnectionId + "_" + correlationId,  this.Context, this.Clients, this.Groups).ConfigureAwait(false);
         }
 
         public void SignalXClientReady()
@@ -61,7 +64,7 @@
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            this.signalX.Advanced.Trace("Client is disconnected");
+            this.signalX.Advanced.Trace(Context.ConnectionId + "_" + Guid.NewGuid(), "Client is disconnected");
             this.signalX.Settings.ConnectionEventsHandler.ForEach(h => h?.Invoke(ConnectionEvents.OnDisconnected.ToString(), null));
             string name = this.Context?.User?.Identity?.Name ?? this.Context?.ConnectionId;
 

@@ -1,8 +1,12 @@
 ﻿/*!
- * SignalX JavaScript Library v5.0.0-pre
+ * SignalX JavaScript Library v6.0.0-pre
  * https://github.com/signalx
  */
 (function ($, window, undefined) {
+    
+    if (typeof SIGNALR_ROOT !== 'undefined') {
+        var SIGNALR_ROOT = "/signalr/hubs";
+    }
     var signalx = {};
     var context = {};
     signalx.logConnections = false;

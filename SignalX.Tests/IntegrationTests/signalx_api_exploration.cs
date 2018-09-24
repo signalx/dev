@@ -74,7 +74,7 @@
                                 traceCount++;
                         });
                     signalx.Advanced.OnTrace(
-                        (s, m, e) =>
+                        (c,s, m, e) =>
                         {
                             if (traceCount == 1)
                                 traceCount++;
