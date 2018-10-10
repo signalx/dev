@@ -6,6 +6,9 @@
 
 [![Bower version](https://badge.fury.io/bo/signalx.svg)](https://badge.fury.io/bo/signalx)
 
+[![Build status](https://dev.azure.com/signalx/SignalXDev/_apis/build/status/SignalXDev-ASP.NET-CI)](https://dev.azure.com/signalx/SignalXDev/_build/latest?definitionId=5)
+
+
 # SignalX
 Simplifying sigalr front and backend  setups
 
