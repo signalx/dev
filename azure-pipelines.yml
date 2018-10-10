@@ -12,10 +12,9 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- paket:
 - task: NuGetToolInstaller@0
 
-- task: Paket Restore
+- task: PaketRestore
     
 - task: NuGetCommand@2
   inputs:
