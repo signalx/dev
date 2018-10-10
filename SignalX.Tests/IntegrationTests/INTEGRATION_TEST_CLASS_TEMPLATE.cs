@@ -27,6 +27,7 @@
                                 signalx.RunJavaScriptOnAllClients(
                                     "return 100*100",
                                     answer => { actual = answer.MessageAs<int>(); });
+                                signalx.RespondToServer("hala", "");
                             })
                     );
                 },

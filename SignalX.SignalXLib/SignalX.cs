@@ -186,9 +186,9 @@
             List<string> groupList = null,
             string correlationId = null)
         {
-            this.RespondToServer(this.NullHubCallerContext, null, null, handler, message, sender, replyTo, groupList);
+            this.RespondToServer(this.NullHubCallerContext, null, null, handler, message, sender, replyTo, groupList).ConfigureAwait(false);
         }
-
+        
         public async Task RespondToServer(
             HubCallerContext context,
             IHubCallerConnectionContext<dynamic> clients,
@@ -200,8 +200,8 @@
             List<string> groupList = null)
         {
             string messageId = Guid.NewGuid().ToString();
-            Task task = this.SendMessageToServer(messageId, context, clients, groups, handler, message?.ToString(), replyTo, sender, messageId, groupList, true, message);
-            await task.ConfigureAwait(false);
+            await this.SendMessageToServer(messageId, context, clients, groups, handler, message?.ToString(), replyTo, sender, messageId, groupList, true, message).ConfigureAwait(false);
+           // await task.ConfigureAwait(false);
         }
 
         [Obsolete("Not intended for client use")]
