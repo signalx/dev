@@ -15,9 +15,7 @@ steps:
 - paket:
 - task: NuGetToolInstaller@0
 
-- paket:
-    paket restore
-    paket install
+- task: Paket Restore
     
 - task: NuGetCommand@2
   inputs:
